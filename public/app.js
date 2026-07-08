@@ -27,32 +27,90 @@ function renderPosts(posts) {
 
     container.innerHTML = "";
 
+    if (!posts.length) {
+
+        container.innerHTML = `
+            <h2 style="text-align:center;padding:40px;">
+                Объявления не найдены
+            </h2>
+        `;
+
+        return;
+    }
+
     posts.forEach((post, index) => {
 
-    const image =
-        (post.images && post.images.length)
-            ? "/" + post.images[0]
-            : "https://via.placeholder.com/600x400?text=No+Photo";
+        const image =
+            (post.images && post.images.length > 0)
+                ? "/" + post.images[0]
+                : "https://via.placeholder.com/600x400?text=No+Photo";
 
-    let district = post.district;
+        let district = post.district || "-";
 
-        if (!district && post.text) {
+        if ((!district || district === "-") && post.text) {
 
             const match = post.text.match(/Район:\s*#?([^\n]+)/i);
 
             if (match) {
-
-                district = match[1]
-                    .replace("#", "")
-                    .trim();
-
-            } else {
-
-                district = "-";
-
+                district = match[1].replace("#", "").trim();
             }
 
         }
+
+        container.innerHTML += `
+
+<div class="card">
+
+    <img
+        src="${image}"
+        class="card-image"
+        loading="lazy"
+        onclick="event.stopPropagation();openGallery(${index})"
+        onerror="this.src='https://via.placeholder.com/600x400?text=No+Photo';"
+    >
+
+    <div class="info">
+
+        <div class="price">
+            $${post.price || "-"}
+        </div>
+
+        <div class="details">
+
+            📍 <b>Район:</b> ${district}
+
+            <br><br>
+
+            📌 <b>Адрес:</b> ${post.street || "-"}
+
+            <br><br>
+
+            🛏 <b>Комнат:</b> ${post.rooms || "-"}
+
+            <br><br>
+
+            📐 <b>Площадь:</b> ${post.area || "-"} м²
+
+        </div>
+
+        <button
+            class="details-btn"
+            onclick="location.href='details.html?id=${post.id}'">
+
+            Подробнее
+
+        </button>
+
+    </div>
+
+</div>
+
+`;
+
+    });
+
+}
+        
 
         container.innerHTML += `
 
