@@ -8,8 +8,8 @@ const PORT = 3000;
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
-    "/downloads",
-    express.static("C:\\Users\\User\\Desktop\\orangeparser\\downloads")
+  "/downloads",
+  express.static(path.join(__dirname, "downloads"))
 );
 
 const POSTS_FILE = path.join(__dirname, "posts.json");
