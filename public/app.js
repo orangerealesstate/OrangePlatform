@@ -29,12 +29,12 @@ function renderPosts(posts) {
 
     posts.forEach((post, index) => {
 
-        const image =
-            (post.images && post.images.length)
-                ? "/" + post.images[0]
-                : "https://via.placeholder.com/600x400?text=No+Photo";
+    const image =
+        (post.images && post.images.length)
+            ? "/" + post.images[0]
+            : "https://via.placeholder.com/600x400?text=No+Photo";
 
-        let district = post.district;
+    let district = post.district;
 
         if (!district && post.text) {
 
