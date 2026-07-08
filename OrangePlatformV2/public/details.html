@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orange Real Estate</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    🍊 Orange Real Estate
+</header>
+
+<div id="content" class="loading">
+    <h2>Загрузка...</h2>
+</div>
+
+<!-- ფოტოების Viewer -->
+<div id="viewer" class="viewer" style="display:none;">
+
+   <span class="close" onclick="closeImage()">&times;</span>
+
+    <span class="prev" onclick="prevImage()">&lsaquo;</span>
+
+    <img id="viewerImage">
+
+    <span class="next" onclick="nextImage()">&rsaquo;</span>
+
+</div>
+
+<script src="details.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍊 Orange Real Estate</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🍊 Orange Real Estate
+    </div>
+
+</header>
+
+<section class="filters">
+
+    <input
+        id="search"
+        type="text"
+        placeholder="🔍 Поиск..."
+        onkeyup="filterPosts()"
+    >
+
+    <select
+        id="districtFilter"
+        onchange="filterPosts()">
+
+        <option value="">Все районы</option>
+
+        <option value="saburtalo">Saburtalo</option>
+        <option value="vake">Vake</option>
+        <option value="vera">Vera</option>
+        <option value="isani">Isani</option>
+        <option value="didi digomi">Didi Digomi</option>
+
+    </select>
+
+    <select
+        id="roomsFilter"
+        onchange="filterPosts()">
+
+        <option value="">Комнаты</option>
+
+        <option value="1">1</option>
+
+        <option value="2">2</option>
+
+        <option value="3">3</option>
+
+        <option value="4">4</option>
+
+        <option value="5">5+</option>
+
+    </select>
+
+    <input
+        id="minPrice"
+        type="number"
+        placeholder="Цена от"
+        onkeyup="filterPosts()"
+    >
+
+    <input
+        id="maxPrice"
+        type="number"
+        placeholder="Цена до"
+        onkeyup="filterPosts()"
+    >
+
+</section>
+
+<div id="posts" class="grid">
+
+    Загрузка...
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>

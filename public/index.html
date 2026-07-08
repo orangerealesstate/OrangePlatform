@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ka">
+<html lang="ru">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,13 +16,58 @@
 <body>
 
 <header>
-    <h1>🍊 Orange Real Estate</h1>
+<h1>🍊 Orange Real Estate</h1>
 </header>
 
+<div class="search-panel">
+
+<input
+type="text"
+id="search"
+placeholder="🔍 Поиск..."
+onkeyup="filterPosts()"
+>
+
+<select id="districtFilter" onchange="filterPosts()">
+<option value="">🏙 Все районы</option>
+<option>Сабуртало</option>
+<option>Ваке</option>
+<option>Вера</option>
+<option>Мтацминда</option>
+<option>Исани</option>
+<option>Ортачала</option>
+<option>Диди Дигоми</option>
+<option>Авлабари</option>
+<option>Чугурети</option>
+</select>
+
+<select id="roomsFilter" onchange="filterPosts()">
+<option value="">🛏 Комнаты</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5+</option>
+</select>
+
+<input
+type="number"
+id="minPrice"
+placeholder="От $"
+onkeyup="filterPosts()"
+>
+
+<input
+type="number"
+id="maxPrice"
+placeholder="До $"
+onkeyup="filterPosts()"
+>
+
+</div>
+
 <div id="posts" class="grid">
-
-    Loading...
-
+Загрузка...
 </div>
 
 <script src="app.js"></script>
