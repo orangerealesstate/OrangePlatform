@@ -4,7 +4,9 @@ async function loadPosts() {
 
     try {
 
-        const response = await fetch("/api/posts");
+        const response = await fetch("/api/posts?t=" + Date.now(), {
+    cache: "no-store"
+});
 
         if (!response.ok) {
             throw new Error("Failed to load posts");
@@ -120,6 +122,9 @@ async function loadPosts() {
 
         const postDistrict =
             (post.district || "").toLowerCase();
+            console.log("District:", postDistrict, "| Filter:", district);
+        
+
 
         const postRooms =
             Number(post.rooms) || 0;

@@ -89,12 +89,18 @@ async function start() {
     await client.connect();
 
     console.log("✅ Bot connected");
+console.log("CHANNEL:", channel);
 
     const messages = await client.getMessages(channel, {
-        limit: 100
+        limit: 500
     });
+    console.log("Messages count:", messages.length);
+console.log(messages.map(m => m.id));
 
-    console.log("Messages:", messages.length);
+for (const m of messages) {
+    console.log("ID:", m.id, "TEXT:", !!m.message, "PHOTO:", !!m.photo);
+}
+console.log(messages);
 
     const posts = [];
     const albums = {};
@@ -133,11 +139,12 @@ async function start() {
         if (text.length > post.text.length) {
             post.text = text;
         }
-                post.price = post.price || getValue(text, [
-            /💲\s*Цена[: ]*([\d\s.,]+)/i,
-            /Цена[: ]*([\d\s.,]+)/i,
-            /\$\s*([\d\s.,]+)/i
-        ]);
+           post.price = post.price || getValue(text, [
+    /#Цена[_\s:]*([\d\s.,]+)/i,
+    /Цена[_\s:]*([\d\s.,]+)/i,
+    /\$\s*([\d\s.,]+)/i,
+    /([\d\s.,]+)\s*\$/i
+]);
 
     post.district = post.district || getValue(text, [
     /Район\s*#([^\s#]+)/i,
