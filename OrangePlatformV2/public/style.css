@@ -525,19 +525,19 @@ flex-direction:column;
     display:block;
 }
 .info{
-    padding:20px;
+    padding:14px;
 }
 
 .price{
-    font-size:44px;
+    font-size:22px;
 }
 
 .details{
-    font-size:26px;
-    line-height:2.1;
+    font-size:16px;
+    line-height:1.6;
 }
 
 .details-btn{
-    font-size:24px;
-    padding:18px;
+    font-size:16px;
+    padding:12px;
 }
