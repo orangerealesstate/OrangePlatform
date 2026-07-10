@@ -17,7 +17,7 @@
       "downloads/183040.jpg"
     ],
     "price": "-",
-    "district": "-",
+    "district": "ваке",
     "street": "Улица Михаила Тамарашвили 13თ",
     "rooms": "3",
     "bedrooms": "2",
@@ -92,7 +92,7 @@
       "downloads/183010.jpg"
     ],
     "price": "800",
-    "district": "-",
+    "district": "центре",
     "street": "ул. Шартава 31/33",
     "rooms": "2",
     "bedrooms": "1",
@@ -117,7 +117,7 @@
       "downloads/183000.jpg"
     ],
     "price": "800",
-    "district": "-",
+    "district": "багеби",
     "street": "https://maps.app.goo.gl/DTB8xvuDgyPQ2w8A6",
     "rooms": "2",
     "bedrooms": "1",
@@ -212,7 +212,7 @@
       "downloads/182961.jpg"
     ],
     "price": "-",
-    "district": "-",
+    "district": "мтацминда",
     "street": "Табукашвили   #МЕТРО_РУСТАВЕЛИ",
     "rooms": "3",
     "bedrooms": "2",
