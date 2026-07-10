@@ -212,4 +212,3 @@ document.addEventListener("click", (e) => {
     }
 
 });
-loadDetails();
