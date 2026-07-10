@@ -65,7 +65,7 @@ ${images}
 
 <div class="stat-card">
 <div class="icon">📍</div>
-<div class="value">${post.district || "-"}</div>
+<div class="value">${post.street || "-"}</div>
 <div class="label">Район</div>
 </div>
 
