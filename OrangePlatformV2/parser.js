@@ -140,9 +140,9 @@ async function start() {
         ]);
 
         post.district = post.district || getValue(text, [
-            /Район:\s*#?([^\n]+)/i,
-            /#([A-Za-zА-Яа-я\u10A0-\u10FF]+)/i
-        ]);
+    /Район\s*#([^\s#]+)/i,
+    /Район:\s*#?([^\n#]+)/i
+]);
 
         post.street = post.street || getValue(text, [
             /Адрес:\s*([^\n]+)/i
