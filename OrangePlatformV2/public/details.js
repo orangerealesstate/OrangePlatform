@@ -24,15 +24,16 @@ async function loadDetails() {
 
         if (currentImages.length) {
 
-            images = currentImages.map(img => `
-                <img
-                    src="/${img}"
-                    class="gallery-image"
-                    onclick="openImage('/${img}')"
-                >
-            `).join("");
+    images = `
+        <img
+            src="/${currentImages[0]}"
+            class="main-image"
+            onclick="openImage('/${currentImages[0]}')"
+        >
+    `;
 
-        }
+}
+
 
         document.getElementById("content").innerHTML = `
 <div class="details-container">
