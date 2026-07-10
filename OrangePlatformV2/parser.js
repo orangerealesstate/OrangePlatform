@@ -1,0 +1,213 @@
+const { TelegramClient } = require("telegram");
+const { StringSession } = require("telegram/sessions");
+const fs = require("fs");
+const path = require("path");
+require("dotenv").config();
+
+const apiId = Number(process.env.API_ID);
+const apiHash = process.env.API_HASH;
+const channel = process.env.CHANNEL;
+const stringSession = new StringSession(
+    process.env.STRING_SESSION || ""
+);
+
+const client = new TelegramClient(
+    stringSession,
+    apiId,
+    apiHash,
+    {
+        connectionRetries: 5,
+    }
+);
+
+const POSTS_FILE = path.join(__dirname, "posts.json");
+const DOWNLOADS = path.join(__dirname, "downloads");
+
+if (!fs.existsSync(DOWNLOADS)) {
+    fs.mkdirSync(DOWNLOADS);
+}
+
+function getValue(text, patterns) {
+
+    if (!text) return "";
+
+    for (const pattern of patterns) {
+
+        const match = text.match(pattern);
+
+        if (match) {
+            return match[1].trim();
+        }
+
+    }
+
+    return "";
+}
+
+function savePosts(posts) {
+
+    fs.writeFileSync(
+        POSTS_FILE,
+        JSON.stringify(posts, null, 2),
+        "utf8"
+    );
+
+}
+
+async function downloadPhoto(message, fileName) {
+
+    try {
+
+        const buffer = await client.downloadMedia(message);
+        console.log("Downloading:", fileName, buffer ? "OK" : "FAILED");
+
+        if (!buffer) return null;
+
+        const filePath = path.join(
+            DOWNLOADS,
+            fileName
+        );
+
+        fs.writeFileSync(filePath, buffer);
+
+        return "downloads/" + fileName;
+
+    } catch (err) {
+
+        console.log(
+            "Photo download error:",
+            err.message
+        );
+
+        return null;
+
+    }
+
+}
+async function start() {
+
+    await client.connect();
+
+    console.log("✅ Bot connected");
+
+    const messages = await client.getMessages(channel, {
+        limit: 100
+    });
+
+    console.log("Messages:", messages.length);
+
+    const posts = [];
+    const albums = {};
+
+    for (const msg of messages.reverse()) {
+
+        const text = msg.message || "";
+
+        if (!msg.photo && !text) continue;
+
+        const albumId = msg.groupedId
+            ? String(msg.groupedId)
+            : String(msg.id);
+
+        if (!albums[albumId]) {
+
+            albums[albumId] = {
+                id: msg.id,
+                groupId: albumId,
+                date: msg.date,
+                text: text,
+                images: [],
+                price: "",
+                district: "",
+                street: "",
+                rooms: "",
+                bedrooms: "",
+                area: "",
+                floor: ""
+            };
+
+        }
+
+        const post = albums[albumId];
+
+        if (text.length > post.text.length) {
+            post.text = text;
+        }
+                post.price = post.price || getValue(text, [
+            /💲\s*Цена[: ]*([\d\s.,]+)/i,
+            /Цена[: ]*([\d\s.,]+)/i,
+            /\$\s*([\d\s.,]+)/i
+        ]);
+
+        post.district = post.district || getValue(text, [
+            /Район:\s*#?([^\n]+)/i,
+            /#([A-Za-zА-Яа-я\u10A0-\u10FF]+)/i
+        ]);
+
+        post.street = post.street || getValue(text, [
+            /Адрес:\s*([^\n]+)/i
+        ]);
+
+        post.rooms = post.rooms || getValue(text, [
+            /Количество\s*#?Комнат[: ]*(\d+)/i,
+            /Количество\s*комнат[: ]*(\d+)/i,
+            /Комнат[: ]*(\d+)/i
+        ]);
+
+        post.bedrooms = post.bedrooms || getValue(text, [
+            /Количество\s*#?Спален[: ]*(\d+)/i,
+            /Количество\s*спален[: ]*(\d+)/i,
+            /Спален[: ]*(\d+)/i
+        ]);
+
+        post.area = post.area || getValue(text, [
+            /Общая\s*площадь[: ]*([\d.,]+)/i,
+            /Площадь[: ]*([\d.,]+)/i
+        ]);
+
+        post.floor = post.floor || getValue(text, [
+            /Этаж[: ]*([^\n]+)/i
+        ]);
+
+        if (msg.photo) {
+
+            const fileName = `${msg.id}.jpg`;
+            const image = await downloadPhoto(msg, fileName);
+
+            if (image && !post.images.includes(image)) {
+                post.images.push(image);
+            }
+
+        }
+
+    }
+        for (const key of Object.keys(albums)) {
+
+        const post = albums[key];
+
+        post.price = post.price || "-";
+        post.district = post.district || "-";
+        post.street = post.street || "-";
+        post.rooms = post.rooms || "-";
+        post.bedrooms = post.bedrooms || "-";
+        post.area = post.area || "-";
+        post.floor = post.floor || "-";
+
+        posts.push(post);
+
+    }
+
+    posts.sort((a, b) => b.id - a.id);
+
+    savePosts(posts);
+
+    console.log(`✅ Saved ${posts.length} posts`);
+
+    process.exit(0);
+
+}
+
+start().catch(err => {
+    console.error(err);
+    process.exit(1);
+});

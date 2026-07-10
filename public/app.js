@@ -112,58 +112,6 @@ function renderPosts(posts) {
 }
         
 
-        container.innerHTML += `
-
-<div class="card">
-
-    <img
-        src="${image}"
-        class="card-image"
-        onclick="event.stopPropagation();openGallery(${index})"
-    >
-
-    <div class="info">
-
-        <div class="price">
-            $${post.price || "-"}
-        </div>
-
-        <div class="details">
-
-    📍 <b>Район:</b> ${district}
-
-    <br><br>
-
-    📌 <b>Адрес:</b> ${post.street || "-"}
-
-    <br><br>
-
-    🛏 <b>Комнат:</b> ${post.rooms || "-"}
-
-    <br><br>
-
-    📐 <b>Площадь:</b> ${post.area || "-"} м²
-
-</div>
-
-        <button
-            class="details-btn"
-            onclick="location.href='details.html?id=${post.id}'">
-
-            Подробнее
-
-        </button>
-
-    </div>
-
-</div>
-
-`;
-
-    });
-
-}
-
 
     function filterPosts() {
 
@@ -250,7 +198,7 @@ if (!postDistrict && post.text) {
     const filtered = allPosts.filter(post => {
 
         const text =
-            (post.text || "").toLowerCase();
+    (post.text || "").toLowerCase();
 
         let postDistrict =
             (post.district || "").toLowerCase().trim();
@@ -266,7 +214,8 @@ if (!postDistrict && post.text) {
             else if (text.includes("вера")) postDistrict = "вера";
             else if (text.includes("vera")) postDistrict = "вера";
 
-            else if (tconst search =ext.includes("исани")) postDistrict = "исани";
+            else if (text.includes("исани"))
+    postDistrict = "исани";
 
             else if (text.includes("ортачала")) postDistrict = "ортачала";
 
