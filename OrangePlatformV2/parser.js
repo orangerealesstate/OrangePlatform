@@ -139,11 +139,12 @@ console.log(messages);
         if (text.length > post.text.length) {
             post.text = text;
         }
-           post.price = post.price || getValue(text, [
-    /#Цена[_\s:]*([\d\s.,]+)/i,
-    /Цена[_\s:]*([\d\s.,]+)/i,
-    /\$\s*([\d\s.,]+)/i,
-    /([\d\s.,]+)\s*\$/i
+          post.price = post.price || getValue(text, [
+    /#Цена[_ ]?(\d+)/i,
+    /#Цена[:_ ]*(\d+)/i,
+    /Цена[:_ ]*(\d+)/i,
+    /\$\s*(\d+)/i,
+    /(\d+)\s*\$/i
 ]);
 
     post.district = post.district || getValue(text, [
