@@ -101,7 +101,7 @@ async function loadPosts() {
 }function filterPosts() {
 
     const search = "";
-        document.getElementById("search").value.toLowerCase().trim();
+         
 
     const district =
         document.getElementById("districtFilter").value.toLowerCase();
@@ -132,13 +132,7 @@ async function loadPosts() {
         const postPrice =
             Number(post.price) || 0;
 
-        if (
-            search &&
-            !text.includes(search) &&
-            !postDistrict.includes(search)
-        ) {
-            return false;
-        }
+        
 
         if (
             district &&
