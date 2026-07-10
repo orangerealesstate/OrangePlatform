@@ -100,7 +100,7 @@ async function loadPosts() {
 
 }function filterPosts() {
 
-    const search =
+    const search = "";
         document.getElementById("search").value.toLowerCase().trim();
 
     const district =
