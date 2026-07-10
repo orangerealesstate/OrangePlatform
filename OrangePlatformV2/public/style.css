@@ -510,3 +510,11 @@ flex-direction:column;
 .back-btn:hover{
     opacity:.9;
 }
+.main-image{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+    border-radius:16px;
+    cursor:pointer;
+    display:block;
+}
