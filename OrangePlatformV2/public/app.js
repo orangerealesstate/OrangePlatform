@@ -29,6 +29,7 @@ async function loadPosts() {
     }
 
 }function renderPosts(posts) {
+    console.log("FILTER WORKS");
 
     const container = document.getElementById("posts");
 
@@ -61,7 +62,7 @@ async function loadPosts() {
     <img
         src="${image}"
         class="card-image"
-        onclick="openGallery(${index})"
+        onclick="openGallery(allPosts.indexOf(post))"
     >
 
     <div class="info">
@@ -99,22 +100,26 @@ async function loadPosts() {
     });
 
 }function filterPosts() {
+    console.log("filterPosts called");
+console.log(document.getElementById("districtFilter").value);
 
     const search = "";
          
+const districtEl = document.getElementById("districtFilter");
+const roomsEl = document.getElementById("roomsFilter");
+const minPriceEl = document.getElementById("minPrice");
+const maxPriceEl = document.getElementById("maxPrice");
 
-    const district =
-        document.getElementById("districtFilter").value.toLowerCase();
+console.log(districtEl);
+console.log(roomsEl);
+console.log(minPriceEl);
+console.log(maxPriceEl);
 
-    const rooms =
-        document.getElementById("roomsFilter").value;
-
-    const minPrice =
-        Number(document.getElementById("minPrice").value) || 0;
-
-    const maxPrice =
-        Number(document.getElementById("maxPrice").value) || 999999999;
-
+const district = districtEl.value.toLowerCase();
+const rooms = roomsEl.value;
+const minPrice = Number(minPriceEl.value) || 0;
+const maxPrice = Number(maxPriceEl.value) || 999999999;
+    
     const filtered = allPosts.filter(post => {
 
         const text =
@@ -122,7 +127,11 @@ async function loadPosts() {
 
         const postDistrict =
             (post.district || "").toLowerCase();
-            console.log("District:", postDistrict, "| Filter:", district);
+            console.log({
+    postDistrict,
+    district,
+    original: post.district
+});
         
 
 

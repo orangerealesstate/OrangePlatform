@@ -71,7 +71,7 @@ ${images}
 
 <div class="stat-card">
 <div class="icon">📌</div>
-<div class="value">${post.district|| "-"}</div>
+<div class="value">${post.street || "-"}</div>
 <div class="label">Улица</div>
 </div>
 
@@ -115,7 +115,7 @@ class="map-btn">
 🗺 Открыть карту
 </a>
 
-<a href="https://t.me/tornikeorange1"
+<a href="https://t.me/Orangerealestatetbilisi"
 target="_blank"
 class="call-btn">
 📞 Позвонить

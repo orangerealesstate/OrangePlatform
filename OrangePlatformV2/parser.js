@@ -53,6 +53,29 @@ function savePosts(posts) {
     );
 
 }
+function normalizeDistrict(value) {
+
+    if (!value) return "-";
+
+    let d = value
+        .toLowerCase()
+        .replace(/#/g, "")
+        .replace(/📍/g, "")
+        .trim();
+
+    if (d.includes("сабур")) return "saburtalo";
+    if (d.includes("вак")) return "vake";
+    if (d.includes("вер")) return "vera";
+    if (d.includes("исан")) return "isani";
+    if (d.includes("дигом")) return "digomi";
+    if (d.includes("крцан")) return "krtsanisi";
+    if (d.includes("ортач")) return "ortachala";
+    if (d.includes("мтац")) return "mtatsminda";
+    if (d.includes("дидуб")) return "didube";
+    if (d.includes("глдан")) return "gldani";
+
+    return d;
+}
 
 async function downloadPhoto(message, fileName) {
 
@@ -148,14 +171,22 @@ console.log(messages);
 ]);
 
     post.district = post.district || getValue(text, [
+    /📍\s*Район:\s*#?([^\n]+)/i,
+    /Район:\s*#?([^\n]+)/i,
     /Район\s*#([^\s#]+)/i,
-    /Район:\s*#?([^\n#]+)/i,
-    /квартира\s+в\s+#([^\s📍]+)/i
+    /квартира\s+в\s+([^\s📍\n]+)/i
 ]);
-
+post.district = normalizeDistrict(post.district);
         post.street = post.street || getValue(text, [
-            /Адрес:\s*([^\n]+)/i
-        ]);
+    /Адрес:\s*([^\n]+)/i,
+    /Улица:\s*([^\n]+)/i
+]);
+post.agent = getValue(text, [
+    /Агент:\s*([^\n]+)/i,
+    /Риелтор:\s*([^\n]+)/i,
+    /Контакт:\s*([^\n]+)/i,
+    /@([A-Za-z0-9_]+)/i
+])
 
         post.rooms = post.rooms || getValue(text, [
             /Количество\s*#?Комнат[: ]*(\d+)/i,
