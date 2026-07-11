@@ -243,11 +243,19 @@ post.agent = getValue(text, [
 
     console.log(`✅ Saved ${posts.length} posts`);
 
-    process.exit(0);
 
 }
 
-start().catch(err => {
-    console.error(err);
-    process.exit(1);
-});
+
+async function runParser() {
+    try {
+        await start();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+runParser();
+
+// ყოველ 2 წუთში გადაამოწმოს Telegram
+setInterval(runParser, 2 * 60 * 1000);
