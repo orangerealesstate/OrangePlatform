@@ -81,7 +81,7 @@ async function downloadPhoto(message, fileName) {
 
     try {
 
-        const buffer = await client.downloadMedia(message, {});
+        const buffer = await client.downloadMedia(message);
         console.log("Downloading:", fileName, buffer ? "OK" : "FAILED");
 
         if (!buffer) return null;
@@ -96,15 +96,10 @@ async function downloadPhoto(message, fileName) {
         return "downloads/" + fileName;
 
     } catch (err) {
-
-        console.log(
-            "Photo download error:",
-            err.message
-        );
-
-        return null;
-
-    }
+    console.log("Photo download error:");
+    console.log(err);
+    return null;
+}
 
 }
 async function start() {
