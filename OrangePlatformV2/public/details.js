@@ -162,10 +162,7 @@ class="call-btn">
 // SHARE
 // ==========================
 
-function sharePost(post){
 
-loadDetails();
-// ==========================
 
 function sharePost(post){
 
@@ -201,7 +198,7 @@ ${url}`;
     }
 
 }
-}loadDetails();
+loadDetails();
 
 function openImage(src) {
 
