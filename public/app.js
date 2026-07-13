@@ -4,7 +4,9 @@ async function loadPosts() {
 
     try {
 
-        const response = await fetch("/api/posts");
+        const response = await fetch(`/api/posts?t=${Date.now()}`, {
+    cache: "no-store"
+});
 
         allPosts = await response.json();
 

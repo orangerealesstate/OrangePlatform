@@ -36,11 +36,14 @@ app.get("/posts.json", (req, res) => {
     res.sendFile(POSTS_FILE);
 });
 
-// All posts
 app.get("/api/posts", (req, res) => {
+
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
     res.json(getPosts());
 });
-
 // One post
 app.get("/api/post/:id", (req, res) => {
 
