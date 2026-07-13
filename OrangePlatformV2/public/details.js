@@ -109,7 +109,9 @@ ${images}
 
 <div class="buttons">
 
-<a href="https://maps.google.com/?q=${encodeURIComponent(post.street || post.district || "Tbilisi")}"
+<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${post.street || ""}, ${post.district || ""}, Tbilisi, Georgia`
+)}"
 target="_blank"
 class="map-btn">
 🗺 Открыть карту
