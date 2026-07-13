@@ -174,13 +174,21 @@ console.log(messages);
     /📍\s*Район:\s*#?([^\n]+)/i,
     /Район:\s*#?([^\n]+)/i,
     /Район\s*#([^\s#]+)/i,
-    /квартира\s+в\s+([^\s📍\n]+)/i
-]);
-post.district = normalizeDistrict(post.district);
-        post.street = post.street || getValue(text, [
+    /квартира\s+в\s+([^\s📍\n]+)/i ]);
+    post.street = post.street || getValue(text, [
     /Адрес:\s*([^\n]+)/i,
+    /📍\s*Адрес:\s*([^\n]+)/i,
     /Улица:\s*([^\n]+)/i
 ]);
+
+if (post.street) {
+    post.street = post.street
+        .replace(/^он\s+/i, "")
+        .replace(/^ул\.?\s*/i, "")
+        .replace(/^улица\s*/i, "")
+        .trim();
+}
+
 post.agent = getValue(text, [
     /Агент:\s*([^\n]+)/i,
     /Риелтор:\s*([^\n]+)/i,
