@@ -16,7 +16,19 @@
 </header>
 
 <div id="content" class="loading">
-    <h2>Загрузка...</h2>
+
+    <div class="skeleton">
+
+        <div class="skeleton-image"></div>
+
+        <div class="skeleton-card"></div>
+
+        <div class="skeleton-card"></div>
+
+        <div class="skeleton-card"></div>
+
+    </div>
+
 </div>
 
 <!-- ფოტოების Viewer -->
@@ -31,7 +43,22 @@
     <span class="next" onclick="nextImage()">&rsaquo;</span>
 
 </div>
+<!-- Bottom Action Bar -->
+<div class="bottom-bar">
 
+    <button id="shareBtn" class="action-btn share-btn">
+        📤 Поделиться
+    </button>
+
+    <button id="mapBtn" class="action-btn map-btn">
+        🗺 Карта
+    </button>
+
+    <button id="agentBtn" class="action-btn contact-btn">
+        💬 Агент
+    </button>
+
+</div>
 <script src="details.js"></script>
 
 </body>

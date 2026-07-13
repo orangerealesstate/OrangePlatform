@@ -109,18 +109,37 @@ ${images}
 
 <div class="buttons">
 
-<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `${post.street || ""}, ${post.district || ""}, Tbilisi, Georgia`
+<button
+class="share-btn"
+onclick='sharePost(${JSON.stringify(post)})'>
+
+📤 Поделиться
+
+</button>
+
+<a
+href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+`${post.street || ""}, ${post.district || ""}, Tbilisi`
 )}"
+
 target="_blank"
+
 class="map-btn">
-🗺 Открыть карту
+
+🗺 Карта
+
 </a>
 
-<a href="https://t.me/Orangerealestatetbilisi"
+<a
+
+href="https://t.me/Orangerealestatetbilisi"
+
 target="_blank"
+
 class="call-btn">
-📞 Позвонить
+
+💬 Агент
+
 </a>
 
 </div>
@@ -137,6 +156,51 @@ class="call-btn">
 
 }
 
+} // ← აქ იხურება loadDetails()
+
+// ==========================
+// SHARE
+// ==========================
+
+function sharePost(post){
+
+loadDetails();
+// ==========================
+
+function sharePost(post){
+
+    const url = window.location.href;
+
+    const text =
+`🏠 Apartment
+
+📍 ${post.district || "-"}
+
+💰 $${post.price || "-"}
+
+${url}`;
+
+    if(navigator.share){
+
+        navigator.share({
+
+            title:"Orange Real Estate",
+
+            text,
+
+            url
+
+        });
+
+    }else{
+
+        navigator.clipboard.writeText(url);
+
+        alert("🔗 Link copied");
+
+    }
+
+}
 }loadDetails();
 
 function openImage(src) {
