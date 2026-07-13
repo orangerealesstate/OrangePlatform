@@ -81,7 +81,7 @@ async function downloadPhoto(message, fileName) {
 
     try {
 
-        const buffer = await client.downloadMedia(message);
+        const buffer = await client.downloadMedia(message, {});
         console.log("Downloading:", fileName, buffer ? "OK" : "FAILED");
 
         if (!buffer) return null;
@@ -110,6 +110,9 @@ async function downloadPhoto(message, fileName) {
 async function start() {
 
     await client.connect();
+    if (!client.connected) {
+    await client.connect();
+}
 
     console.log("✅ Bot connected");
 console.log("CHANNEL:", channel);
