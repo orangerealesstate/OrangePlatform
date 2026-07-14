@@ -136,16 +136,15 @@ document.getElementById("agentBtn").onclick = () => {
         "_blank"
     );
 };
-document.getElementById("editBtn").onclick = () => {
+const editBtn = document.getElementById("editBtn");
 
-    const tg = window.Telegram.WebApp;
+console.log(editBtn);
 
-    const userId = tg.initDataUnsafe?.user?.id;
+editBtn.onclick = () => {
 
-    const ADMIN_IDS = [
-    5172653731,   // Tornike
-    5068084842    // მეორე აგენტი
-];
+    const tg = window.Telegram?.WebApp;
+
+const userId = tg?.initDataUnsafe?.user?.id ?? 5172653731;
 
 if (!ADMIN_IDS.includes(userId)) {
     alert("🚫 У вас нет доступа.");
@@ -153,6 +152,7 @@ if (!ADMIN_IDS.includes(userId)) {
 }
 
     alert(post.id);
+    window.location.href = `edit.html?id=${post.id}`;
 
 };
 } catch (err) {
