@@ -142,7 +142,7 @@ console.log(editBtn);
 
 editBtn.onclick = () => {
 
-    const tg = window.Telegram?.WebApp;
+    const tg = window.Telegram?.WebApp || null;
 
 const userId = tg?.initDataUnsafe?.user?.id ?? 5172653731;
 
