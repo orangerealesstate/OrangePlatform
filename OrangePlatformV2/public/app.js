@@ -180,6 +180,15 @@ if (
     });
 
     renderPosts(filtered);
+    const loader = document.getElementById("loader");
+
+if (loader) {
+    loader.classList.add("loader-hide");
+
+    setTimeout(() => {
+        loader.remove();
+    }, 600);
+}
 
 }function openGallery(index) {
 
