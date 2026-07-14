@@ -836,3 +836,41 @@ body{
     50%{width:75%;}
     100%{width:100%;}
 }
+.edit-container{
+    max-width:600px;
+    margin:20px auto 120px;
+    padding:20px;
+}
+
+.edit-container h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.edit-container input,
+.edit-container textarea{
+    width:100%;
+    padding:14px;
+    margin-bottom:15px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
+.edit-container textarea{
+    min-height:120px;
+    resize:vertical;
+}
+
+#saveBtn{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:14px;
+    background:#ff7a00;
+    color:#fff;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+}
