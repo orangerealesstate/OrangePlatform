@@ -142,10 +142,13 @@ document.getElementById("editBtn").onclick = () => {
 
     const userId = tg.initDataUnsafe?.user?.id;
 
-    const ADMIN_ID = 5172653731;
-5068084842;
-    if (!ADMIN_IDS.includes(userId)) {
-    alert("У вас нет доступа.");
+    const ADMIN_IDS = [
+    5172653731,   // Tornike
+    5068084842    // მეორე აგენტი
+];
+
+if (!ADMIN_IDS.includes(userId)) {
+    alert("🚫 У вас нет доступа.");
     return;
 }
 
