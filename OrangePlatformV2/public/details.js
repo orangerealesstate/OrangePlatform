@@ -149,6 +149,7 @@ editBtn.onclick = () => {
     const tg = window.Telegram?.WebApp ?? null;
 
 const userId = tg?.initDataUnsafe?.user?.id;
+alert("My Telegram ID: " + userId);
 
 if (!ADMIN_IDS.includes(userId)) {
     alert("🚫 У вас нет доступа.");
