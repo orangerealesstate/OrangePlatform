@@ -15,9 +15,6 @@ app.use(
 );
 
 const POSTS_FILE = path.join(__dirname, "posts.json");
-function getPosts() {
-    return JSON.parse(fs.readFileSync(POSTS_FILE, "utf8"));
-}
 
 function savePosts(posts) {
     fs.writeFileSync(
