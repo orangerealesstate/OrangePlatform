@@ -143,7 +143,7 @@ console.log(editBtn);
 editBtn.onclick = () => {
     const ADMIN_IDS = [
     5172653731, // Tornike
-    5068084842  // მეორე აგენტი
+
 ];
 
     const tg = window.Telegram?.WebApp ?? null;
