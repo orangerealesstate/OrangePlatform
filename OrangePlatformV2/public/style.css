@@ -663,77 +663,65 @@ body{
 ============================= */
 
 .bottom-bar{
-
     position:fixed;
-
-    bottom:15px;
-
+    bottom:14px;
     left:50%;
-
     transform:translateX(-50%);
-
-    width:calc(100% - 24px);
-
+    width:calc(100% - 20px);
     max-width:900px;
 
     display:flex;
+    gap:10px;
 
-    gap:12px;
-
-    background:white;
-
-    padding:12px;
+    padding:10px;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(18px);
 
     border-radius:24px;
 
-    box-shadow:0 12px 35px rgba(0,0,0,.12);
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.12),
+        0 2px 10px rgba(255,122,0,.08);
 
     z-index:9999;
-
 }
-
 .action-btn{
-
     flex:1;
+    height:62px;
 
     border:none;
+    border-radius:18px;
 
-    border-radius:16px;
-
-    padding:15px;
-
-    font-size:15px;
-
+    font-size:16px;
     font-weight:700;
 
-    cursor:pointer;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
 
     transition:.25s;
-
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
 }
 
 .action-btn:hover{
-
     transform:translateY(-2px);
-
 }
 
 .share-btn{
-
-    background:#f5f5f5;
-
-    color:#333;
-
+    background:linear-gradient(135deg,#f3f3f3,#dfdfdf);
+    color:#222;
 }
 
 .map-btn{
-
-    background:#ff8a00;
-
+    background:linear-gradient(135deg,#ff9800,#ff6a00);
     color:#fff;
-
 }
 
+.contact-btn{
+    background:linear-gradient(135deg,#30d96b,#18b84f);
+    color:#fff;
+}
 .contact-btn{
 
     background:#24c35a;
