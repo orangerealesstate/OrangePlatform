@@ -147,6 +147,14 @@ editBtn.onclick = () => {
 ];
 
     const tg = window.Telegram?.WebApp ?? null;
+    if (tg) {
+    tg.ready();
+    tg.expand();
+}
+
+console.log(window.Telegram);
+console.log(tg);
+console.log(tg?.initDataUnsafe);
 
 const userId = tg?.initDataUnsafe?.user?.id;
 alert("My Telegram ID: " + userId);
