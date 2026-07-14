@@ -188,32 +188,8 @@ if (!ADMIN_IDS.includes(userId)) {
 }
 
 } 
-const deleteBtn = document.getElementById("deleteBtn");
 
-deleteBtn.onclick = async () => {
-
-    if (!confirm("🗑️ Удалить объявление?")) return;
-
-    const response = await fetch("/api/post/delete", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            id: post.id
-        })
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-        alert("✅ Объявление удалено");
-        window.location.href = "/";
-    } else {
-        alert("❌ Ошибка удаления");
-    }
-
-};// ← აქ იხურება loadDetails()
+;// ← აქ იხურება loadDetails()
 
 // ==========================
 // SHARE
