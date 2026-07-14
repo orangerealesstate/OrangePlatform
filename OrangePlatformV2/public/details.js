@@ -107,46 +107,27 @@ ${images}
 
 </div>
 
-<div class="buttons">
 
-<button
-class="share-btn"
-onclick='sharePost(${JSON.stringify(post)})'>
-
-📤 Поделиться
-
-</button>
-
-<a
-href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-`${post.street || ""}, ${post.district || ""}, Tbilisi`
-)}"
-
-target="_blank"
-
-class="map-btn">
-
-🗺 Карта
-
-</a>
-
-<a
-
-href="https://t.me/Orangerealestatetbilisi"
-
-target="_blank"
-
-class="call-btn">
-
-💬 Агент
-
-</a>
-
-</div>
 
 </div>
 `;
+document.getElementById("shareBtn").onclick = () => sharePost(post);
 
+document.getElementById("mapBtn").onclick = () => {
+    window.open(
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+            `${post.street || ""}, ${post.district || ""}, Tbilisi`
+        )}`,
+        "_blank"
+    );
+};
+
+document.getElementById("agentBtn").onclick = () => {
+    window.open(
+        "https://t.me/Orangerealestatetbilisi",
+        "_blank"
+    );
+};
 } catch (err) {
 
     document.getElementById("content").innerHTML =

@@ -176,14 +176,18 @@ console.log(messages);
     post.street = post.street || getValue(text, [
     /Адрес:\s*([^\n]+)/i,
     /📍\s*Адрес:\s*([^\n]+)/i,
-    /Улица:\s*([^\n]+)/i
+    /Улица:\s*([^\n]+)/i,
+    /Локация:\s*([^\n]+)/i,
+    /📍\s*([^\n]+)/i
 ]);
 
 if (post.street) {
     post.street = post.street
+        .replace(/^📍/g, "")
         .replace(/^он\s+/i, "")
         .replace(/^ул\.?\s*/i, "")
         .replace(/^улица\s*/i, "")
+        .replace(/\s+/g, " ")
         .trim();
 }
 
