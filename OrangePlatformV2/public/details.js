@@ -137,7 +137,20 @@ document.getElementById("agentBtn").onclick = () => {
     );
 };
 document.getElementById("editBtn").onclick = () => {
-    alert("Редактирование скоро будет доступно!");
+
+    const tg = window.Telegram.WebApp;
+
+    const userId = tg.initDataUnsafe?.user?.id;
+
+    const ADMIN_ID = 5172653731;
+5068084842;
+    if (!ADMIN_IDS.includes(userId)) {
+    alert("У вас нет доступа.");
+    return;
+}
+
+    window.location.href = `edit.html?id=${post.id}`;
+
 };
 } catch (err) {
 
