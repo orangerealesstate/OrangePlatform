@@ -874,3 +874,36 @@ body{
     font-weight:bold;
     cursor:pointer;
 }
+.admin-buttons{
+    display:flex;
+    gap:12px;
+    margin-top:10px;
+}
+
+.edit-btn,
+.delete-btn{
+    flex:1;
+    border:none;
+    border-radius:14px;
+    padding:14px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.edit-btn{
+    background:#ff8a00;
+    color:white;
+}
+
+.delete-btn{
+    background:#e53935;
+    color:white;
+}
+
+.edit-btn:hover,
+.delete-btn:hover{
+    opacity:.9;
+    transform:translateY(-2px);
+    transition:.2s;
+}

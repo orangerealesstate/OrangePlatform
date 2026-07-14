@@ -62,9 +62,17 @@ ${images}
 
 <div style="padding:20px;">
 
-    <button id="editBtn" class="edit-btn">
-        ✏️ Редактировать
-    </button>
+    <div class="admin-buttons">
+
+        <button id="editBtn" class="edit-btn">
+            ✏️ Редактировать
+        </button>
+
+        <button id="deleteBtn" class="delete-btn">
+            🗑️ Удалить
+        </button>
+
+    </div>
 
 </div>
 
@@ -179,7 +187,32 @@ if (!ADMIN_IDS.includes(userId)) {
 
 }
 
-} // ← აქ იხურება loadDetails()
+} const deleteBtn = document.getElementById("deleteBtn");
+
+deleteBtn.onclick = async () => {
+
+    if (!confirm("🗑️ Удалить объявление?")) return;
+
+    const response = await fetch("/api/post/delete", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            id: post.id
+        })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+        alert("✅ Объявление удалено");
+        window.location.href = "/";
+    } else {
+        alert("❌ Ошибка удаления");
+    }
+
+};// ← აქ იხურება loadDetails()
 
 // ==========================
 // SHARE
