@@ -15,6 +15,17 @@ async function loadPosts() {
         allPosts = await response.json();
 
         renderPosts(allPosts);
+        const loader = document.getElementById("loader");
+
+if (loader) {
+    setTimeout(() => {
+        loader.classList.add("loader-hide");
+
+        setTimeout(() => {
+            loader.remove();
+        }, 600);
+    }, 300);
+}
 
     } catch (err) {
 
