@@ -143,12 +143,15 @@ const maxPrice = Number(maxPriceEl.value) || 999999999;
 
         
 
-        if (
-            district &&
-            !postDistrict.includes(district)
-        ) {
-            return false;
-        }
+        const postText = (post.text || "").toLowerCase();
+
+if (
+    district &&
+    !postDistrict.includes(district) &&
+    !postText.includes(district)
+) {
+    return false;
+}
 
         if (rooms) {
 
