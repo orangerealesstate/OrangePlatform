@@ -144,33 +144,7 @@ app.post("/api/post/delete", (req, res) => {
     }
 
 });
-app.post("/api/post/delete", (req, res) => {
 
-    try {
-
-        const posts = getPosts();
-
-        const newPosts = posts.filter(
-            p => String(p.id) !== String(req.body.id)
-        );
-
-        savePosts(newPosts);
-
-        res.json({
-            success: true
-        });
-
-    } catch (err) {
-
-        console.error(err);
-
-        res.json({
-            success: false
-        });
-
-    }
-
-});
 app.listen(PORT, () => {
     console.log(`✅ Server running: http://localhost:${PORT}`);
 });

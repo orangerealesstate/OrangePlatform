@@ -187,7 +187,8 @@ if (!ADMIN_IDS.includes(userId)) {
 
 }
 
-} const deleteBtn = document.getElementById("deleteBtn");
+} 
+const deleteBtn = document.getElementById("deleteBtn");
 
 deleteBtn.onclick = async () => {
 
