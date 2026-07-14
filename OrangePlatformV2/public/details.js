@@ -60,6 +60,14 @@ $${post.price || "-"}
 
 ${images}
 
+<div style="padding:20px;">
+
+    <button id="editBtn" class="edit-btn">
+        ✏️ Редактировать
+    </button>
+
+</div>
+
 </div>
 <div class="stats-grid">
 
@@ -127,6 +135,9 @@ document.getElementById("agentBtn").onclick = () => {
         "https://t.me/Orangerealestatetbilisi",
         "_blank"
     );
+};
+document.getElementById("editBtn").onclick = () => {
+    alert("Редактирование скоро будет доступно!");
 };
 } catch (err) {
 
