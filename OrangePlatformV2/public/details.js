@@ -152,7 +152,7 @@ if (!ADMIN_IDS.includes(userId)) {
     return;
 }
 
-    window.location.href = `edit.html?id=${post.id}`;
+    alert(post.id);
 
 };
 } catch (err) {
