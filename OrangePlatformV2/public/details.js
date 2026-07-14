@@ -146,7 +146,9 @@ editBtn.onclick = () => {
 
 ];
 
-    const tg = window.Telegram?.WebApp ?? null;
+    const tg = window.Telegram?.WebApp;
+
+alert("Telegram object: " + JSON.stringify(window.Telegram));
     if (tg) {
     tg.ready();
     tg.expand();
