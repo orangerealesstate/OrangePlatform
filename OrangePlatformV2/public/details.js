@@ -133,7 +133,7 @@ document.getElementById("shareBtn").onclick = () => sharePost(post);
 
 document.getElementById("mapBtn").onclick = () => {
     window.open(
-        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        `https://yandex.com/maps/?text=${encodeURIComponent(
             `${post.street || ""}, ${post.district || ""}, Tbilisi`
         )}`,
         "_blank"
@@ -267,6 +267,7 @@ const ADMIN_ID = 5172653731;
 
 const isAdmin =
     Telegram.WebApp.initDataUnsafe?.user?.id === ADMIN_ID;
+
 
 loadDetails();
 
