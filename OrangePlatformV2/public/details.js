@@ -177,7 +177,12 @@ if (deleteBtn) {
     };
 }
 console.log(editBtn);
+const editBtn = document.getElementById("editBtn");
+const deleteBtn = document.getElementById("deleteBtn");
 
+if (!editBtn || !deleteBtn) {
+    return;
+}
 editBtn.onclick = () => {
     const ADMIN_IDS = [
     5172653731, // Tornike
