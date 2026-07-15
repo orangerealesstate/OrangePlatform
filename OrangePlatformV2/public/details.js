@@ -24,7 +24,7 @@ async function loadDetails() {
 
         if (currentImages.length) {
 
-    if (currentImages.length) {
+     {
 
     images = `
 <div class="image-wrapper">
@@ -49,7 +49,6 @@ async function loadDetails() {
 
         document.getElementById("content").innerHTML = `
 <div class="details-container">
-${images}
 <header class="details-header">
 🍊 Orange Real Estate
 </header>
@@ -91,24 +90,26 @@ ${images}
 <div class="gallery">
 
 ${images}
+
 <div class="action-buttons">
 
-    <button id="shareBtn" class="action-btn">
-        📤 გაზიარება
-    </button>
+<button id="shareBtn" class="action-btn">
+📤 გაზიარება
+</button>
 
-    <button id="mapBtn" class="action-btn">
-        🗺️ რუკა
-    </button>
+<button id="mapBtn" class="action-btn">
+🗺️ რუკა
+</button>
 
-    <button id="agentBtn" class="action-btn">
-        👤 აგენტი
-    </button>
+<button id="agentBtn" class="action-btn">
+👤 აგენტი
+</button>
 
 </div>
+
 <div style="padding:20px;">
 
-    ${window.Telegram?.WebApp?.initDataUnsafe?.user?.id === 5172653731 ? `
+${window.Telegram?.WebApp?.initDataUnsafe?.user?.id === 5172653731 ? `
 <div class="admin-buttons">
 
     <button id="editBtn" class="edit-btn">
@@ -175,23 +176,33 @@ ${images}
 
 </div>
 `;
-document.getElementById("shareBtn").onclick = () => sharePost(post);
+const shareBtn = document.getElementById("shareBtn");
+const mapBtn = document.getElementById("mapBtn");
+const agentBtn = document.getElementById("agentBtn");
 
-document.getElementById("mapBtn").onclick = () => {
-    window.open(
-        `https://yandex.com/maps/?text=${encodeURIComponent(
-            `${post.street || ""}, ${post.district || ""}, Tbilisi`
-        )}`,
-        "_blank"
-    );
-};
+if (shareBtn) {
+    shareBtn.onclick = () => sharePost(post);
+}
 
-document.getElementById("agentBtn").onclick = () => {
-    window.open(
-        "https://t.me/Orangerealestatetbilisi",
-        "_blank"
-    );
-};
+if (mapBtn) {
+    mapBtn.onclick = () => {
+        window.open(
+            `https://yandex.com/maps/?text=${encodeURIComponent(
+                `${post.street || ""}, ${post.district || ""}, Tbilisi`
+            )}`,
+            "_blank"
+        );
+    };
+}
+
+if (agentBtn) {
+    agentBtn.onclick = () => {
+        window.open(
+            "https://t.me/Orangerealestatetbilisi",
+            "_blank"
+        );
+    };
+}
 const editBtn = document.getElementById("editBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 console.log(deleteBtn);
