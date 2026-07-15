@@ -24,20 +24,32 @@ async function loadDetails() {
 
         if (currentImages.length) {
 
+    if (currentImages.length) {
+
     images = `
-        <img
-            src="/${currentImages[0]}"
-            class="main-image"
-            onclick="openImage('/${currentImages[0]}')"
-        >
-    `;
+<div class="image-wrapper">
+
+    <img
+        src="/${currentImages[0]}"
+        class="main-image"
+        onclick="openImage('/${currentImages[0]}')"
+    >
+
+    <div class="photo-count">
+        📷 1 / ${currentImages.length}
+    </div>
+
+</div>
+`;
+
+}
 
 }
 
 
         document.getElementById("content").innerHTML = `
 <div class="details-container">
-
+${images}
 <header class="details-header">
 🍊 Orange Real Estate
 </header>
@@ -51,7 +63,27 @@ async function loadDetails() {
 <h2>🏠 Apartment</h2>
 
 <div class="price">
-$${post.price || "-"}
+    $${post.price || "-"}
+</div>
+
+<div class="publish-date">
+    🕒 ${new Date(post.date).toLocaleDateString("ru-RU", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    })}
+</div>
+
+<div class="address-block">
+
+    <div class="district">
+        📍 ${post.district || "-"}
+    </div>
+
+    <div class="street">
+        ${post.street || "-"}
+    </div>
+
 </div>
 
 </div>
@@ -59,7 +91,21 @@ $${post.price || "-"}
 <div class="gallery">
 
 ${images}
+<div class="action-buttons">
 
+    <button id="shareBtn" class="action-btn">
+        📤 გაზიარება
+    </button>
+
+    <button id="mapBtn" class="action-btn">
+        🗺️ რუკა
+    </button>
+
+    <button id="agentBtn" class="action-btn">
+        👤 აგენტი
+    </button>
+
+</div>
 <div style="padding:20px;">
 
     ${window.Telegram?.WebApp?.initDataUnsafe?.user?.id === 5172653731 ? `

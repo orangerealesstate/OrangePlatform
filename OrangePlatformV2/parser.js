@@ -2,6 +2,7 @@ const { TelegramClient } = require("telegram");
 const { StringSession } = require("telegram/sessions");
 const fs = require("fs");
 const path = require("path");
+const axios = require("axios");
 require("dotenv").config();
 
 const apiId = Number(process.env.API_ID);
@@ -76,6 +77,48 @@ function normalizeDistrict(value) {
 
     return d;
 }
+async function geocodeAddress(address) {
+
+    if (!address || address === "-") {
+        return { lat: null, lng: null };
+    }
+
+    try {
+
+        const url = "https://nominatim.openstreetmap.org/search";
+
+        const { data } = await axios.get(url, {
+            params: {
+                q: address,
+                format: "json",
+                limit: 1
+            },
+            headers: {
+                "User-Agent": "Orange Real Estate"
+            }
+        });
+
+        if (!data.length) {
+            return { lat: null, lng: null };
+        }
+await new Promise(resolve => setTimeout(resolve, 1200));
+        return {
+            lat: Number(data[0].lat),
+            lng: Number(data[0].lon)
+        };
+
+    } catch (err) {
+
+        console.log("Geocode error:", err.message);
+
+        return {
+            lat: null,
+            lng: null
+        };
+
+    }
+
+}
 
 async function downloadPhoto(message, fileName) {
 
@@ -113,7 +156,7 @@ async function start() {
 console.log("CHANNEL:", channel);
 
     const messages = await client.getMessages(channel, {
-        limit: 500
+        limit: 50
     });
     console.log("Messages count:", messages.length);
 console.log(messages.map(m => m.id));
@@ -127,6 +170,7 @@ console.log(messages);
     const albums = {};
 
     for (const msg of messages.reverse()) {
+        console.log("Processing message:", msg.id);
 
         const text = msg.message || "";
 
@@ -150,7 +194,9 @@ console.log(messages);
                 rooms: "",
                 bedrooms: "",
                 area: "",
-                floor: ""
+                floor: "",
+                lat: null,
+lng: null,
             };
 
         }
@@ -187,6 +233,15 @@ if (post.street) {
         .replace(/\s+/g, " ")
         .trim();
 }
+let coords = { lat: null, lng: null };
+
+if (post.street && post.street !== "-") {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    coords = await geocodeAddress(post.street + ", Tbilisi, Georgia");
+}
+
+post.lat = coords.lat;
+post.lng = coords.lng;
 
 post.agent = getValue(text, [
     /Агент:\s*([^\n]+)/i,
@@ -245,7 +300,14 @@ post.agent = getValue(text, [
     }
 
     posts.sort((a, b) => b.id - a.id);
-
+for (const p of posts) {
+    console.log(
+        p.street,
+        "=>",
+        p.lat,
+        p.lng
+    );
+}
     savePosts(posts);
 
     console.log(`✅ Saved ${posts.length} posts`);

@@ -952,3 +952,52 @@ body{
     height:220px;
     object-fit:cover;
 }
+.publish-date{
+    color:#777;
+    font-size:15px;
+    margin-top:-10px;
+    margin-bottom:18px;
+}
+
+.address-block{
+    background:#fafafa;
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:20px;
+    border:1px solid #ececec;
+}
+
+.district{
+    font-size:20px;
+    font-weight:700;
+    color:#222;
+    margin-bottom:6px;
+}
+
+.street{
+    color:#666;
+    font-size:16px;
+}
+.image-wrapper{
+    position:relative;
+}
+
+.photo-count{
+    position:absolute;
+    right:15px;
+    bottom:15px;
+
+    background:rgba(0,0,0,.65);
+
+    color:#fff;
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    backdrop-filter:blur(8px);
+}
