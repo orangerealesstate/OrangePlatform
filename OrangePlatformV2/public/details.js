@@ -147,7 +147,7 @@ document.getElementById("agentBtn").onclick = () => {
 const editBtn = document.getElementById("editBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 console.log(deleteBtn);
-alert("delete button loaded");
+
 
 if (deleteBtn) {
     deleteBtn.onclick = async () => {
