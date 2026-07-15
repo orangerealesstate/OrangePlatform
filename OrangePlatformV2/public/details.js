@@ -62,17 +62,19 @@ ${images}
 
 <div style="padding:20px;">
 
-    <div class="admin-buttons">
+    ${Telegram.WebApp.initDataUnsafe?.user?.id === 5172653731 ? `
+<div class="admin-buttons">
 
-        <button id="editBtn" class="edit-btn">
-            ✏️ Редактировать
-        </button>
+    <button id="editBtn" class="edit-btn">
+        ✏️ Редактировать
+    </button>
 
-        <button id="deleteBtn" class="delete-btn">
-            🗑️ Удалить
-        </button>
+    <button id="deleteBtn" class="delete-btn">
+        🗑️ Удалить
+    </button>
 
-    </div>
+</div>
+` : ""}
 
 </div>
 
@@ -259,6 +261,12 @@ ${url}`;
     }
 
 }
+const ADMIN_ID = 5172653731;
+
+const isAdmin =
+    Telegram.WebApp.initDataUnsafe?.user?.id === ADMIN_ID;
+
+loadDetails();
 loadDetails();
 
 function openImage(src) {
