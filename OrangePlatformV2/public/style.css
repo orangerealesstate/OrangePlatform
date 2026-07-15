@@ -605,21 +605,14 @@ body{
 }
 
 .stat-card{
-
     background:#fafafa;
-
     border:1px solid #ececec;
-
-    border-radius:20px;
-
-    padding:16px;
-
+    border-radius:12px;
+    padding:10px;
     text-align:center;
-
     transition:.25s;
-
-    box-shadow:0 4px 12px rgba(0,0,0,.05);
-
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+    min-height:75px;
 }
 
 .stat-card:hover{
@@ -631,18 +624,15 @@ body{
 }
 
 .stat-card .icon{
-
-    font-size:28px;
-
-    margin-bottom:8px;
-
+    font-size:20px;
+    margin-bottom:4px;
 }
 
 .stat-card .value{
 
-    font-size:22px;
+    font-size:18px;
 
-    font-weight:700;
+    font-weight:600;
 
     color:#222;
 
@@ -654,7 +644,7 @@ body{
 
     color:#888;
 
-    font-size:13px;
+    font-size:12px;
 
     font-weight:500;
 
