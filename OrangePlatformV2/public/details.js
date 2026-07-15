@@ -9,18 +9,40 @@ async function loadDetails() {
     try {
 
         const res = await fetch(`/api/post/${id}`);
+
+        if (!res.ok) {
+            throw new Error("Post not found");
+        }
+
         const post = await res.json();
 
-        currentImages = post.images || [];
+        currentImages = Array.isArray(post.images)
+            ? post.images
+            : [];
+
         currentIndex = 0;
 
-        const cleanText = (post.text || "")
-            .replace(/\*+/g, "")
-            .replace(/#[^\s]+/g, "")
-            .replace(/\n{3,}/g, "\n\n")
-            .trim();
-
         let images = "";
+
+        if (currentImages.length > 0) {
+
+            images = `
+<div class="image-wrapper">
+
+<img
+    src="/${currentImages[0]}"
+    class="main-image"
+    onclick="openImage('/${currentImages[0]}')"
+>
+
+<div class="photo-count">
+📷 1 / ${currentImages.length}
+</div>
+
+</div>
+`;
+
+        }
 
         if (currentImages.length) {
 
@@ -46,9 +68,9 @@ async function loadDetails() {
 
 }
 
-
-        document.getElementById("content").innerHTML = `
+document.getElementById("content").innerHTML = `
 <div class="details-container">
+
 <header class="details-header">
 🍊 Orange Real Estate
 </header>
@@ -62,70 +84,19 @@ async function loadDetails() {
 <h2>🏠 Apartment</h2>
 
 <div class="price">
-    $${post.price || "-"}
+$${post.price || "-"}
 </div>
 
 <div class="publish-date">
-    🕒 ${new Date(post.date).toLocaleDateString("ru-RU", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    })}
-</div>
-
-<div class="address-block">
-
-    <div class="district">
-        📍 ${post.district || "-"}
-    </div>
-
-    <div class="street">
-        ${post.street || "-"}
-    </div>
-
+🕒 ${new Date(post.date).toLocaleDateString("ru-RU")}
 </div>
 
 </div>
 
 <div class="gallery">
-
 ${images}
-
-<div class="action-buttons">
-
-<button id="shareBtn" class="action-btn">
-📤 გაზიარება
-</button>
-
-<button id="mapBtn" class="action-btn">
-🗺️ რუკა
-</button>
-
-<button id="agentBtn" class="action-btn">
-👤 აგენტი
-</button>
-
 </div>
 
-<div style="padding:20px;">
-
-${window.Telegram?.WebApp?.initDataUnsafe?.user?.id === 5172653731 ? `
-<div class="admin-buttons">
-
-    <button id="editBtn" class="edit-btn">
-        ✏️ Редактировать
-    </button>
-
-    <button id="deleteBtn" class="delete-btn">
-        🗑️ Удалить
-    </button>
-
-</div>
-` : ""}
-
-</div>
-
-</div>
 <div class="stats-grid">
 
 <div class="stat-card">
@@ -172,6 +143,18 @@ ${window.Telegram?.WebApp?.initDataUnsafe?.user?.id === 5172653731 ? `
 
 </div>
 
+${
+window.Telegram?.WebApp?.initDataUnsafe?.user?.id === 5172653731
+? `
+<div class="admin-buttons">
+<button id="editBtn" class="edit-btn">✏️ Редактировать</button>
+<button id="deleteBtn" class="delete-btn">🗑️ Удалить</button>
+</div>
+`
+: ""
+}
+
+</div>
 
 
 </div>
@@ -190,6 +173,15 @@ if (mapBtn) {
             `https://yandex.com/maps/?text=${encodeURIComponent(
                 `${post.street || ""}, ${post.district || ""}, Tbilisi`
             )}`,
+            "_blank"
+        );
+    };
+}
+
+if (agentBtn) {
+    agentBtn.onclick = () => {
+        window.open(
+            "https://t.me/Orangerealestatetbilisi",
             "_blank"
         );
     };
