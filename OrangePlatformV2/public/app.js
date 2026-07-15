@@ -67,6 +67,7 @@ const image = images[0];
         const district = post.district || "-";
 
         container.innerHTML += `
+        <div class="card">
 
 <div class="card-slider">
 
@@ -77,7 +78,7 @@ const image = images[0];
 
     <img
         id="card-image-${index}"
-        src="${image}"
+        src="${images[0]}"
         class="card-image"
         onclick="openGallery(allPosts.indexOf(post))"
     >
