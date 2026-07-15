@@ -62,7 +62,7 @@ ${images}
 
 <div style="padding:20px;">
 
-    ${Telegram.WebApp.initDataUnsafe?.user?.id === 5172653731 ? `
+    ${window.Telegram?.WebApp?.initDataUnsafe?.user?.id === 5172653731 ? `
 <div class="admin-buttons">
 
     <button id="editBtn" class="edit-btn">
@@ -177,12 +177,8 @@ if (deleteBtn) {
     };
 }
 console.log(editBtn);
-const editBtn = document.getElementById("editBtn");
-const deleteBtn = document.getElementById("deleteBtn");
 
-if (!editBtn || !deleteBtn) {
-    return;
-}
+if (editBtn) {
 editBtn.onclick = () => {
     const ADMIN_IDS = [
     5172653731, // Tornike
@@ -191,7 +187,7 @@ editBtn.onclick = () => {
 
     const tg = window.Telegram?.WebApp;
 
-alert(JSON.stringify(tg?.initDataUnsafe, null, 2));
+
     if (tg) {
     tg.ready();
     tg.expand();
@@ -202,7 +198,7 @@ console.log(tg);
 console.log(tg?.initDataUnsafe);
 
 const userId = tg?.initDataUnsafe?.user?.id;
-alert("My Telegram ID: " + userId);
+
 
 if (!ADMIN_IDS.includes(userId)) {
     alert("🚫 У вас нет доступа.");
@@ -213,6 +209,7 @@ if (!ADMIN_IDS.includes(userId)) {
     window.location.href = `edit.html?id=${post.id}`;
 
 };
+}
 } catch (err) {
 
     document.getElementById("content").innerHTML =
@@ -271,7 +268,6 @@ const ADMIN_ID = 5172653731;
 const isAdmin =
     Telegram.WebApp.initDataUnsafe?.user?.id === ADMIN_ID;
 
-loadDetails();
 loadDetails();
 
 function openImage(src) {
