@@ -59,22 +59,35 @@ if (loader) {
 
     posts.forEach((post, index) => {
 
-        const image =
-            post.images && post.images.length
-                ? "/" + post.images[0]
-                : "https://via.placeholder.com/600x400?text=No+Photo";
-
+        const images =
+    post.images && post.images.length
+        ? post.images
+        : ["https://via.placeholder.com/600x400?text=No+Photo"];
+const image = images[0];
         const district = post.district || "-";
 
         container.innerHTML += `
 
-<div class="card">
+<div class="card-slider">
+
+    <button class="prev-btn"
+        onclick="event.stopPropagation(); prevCardImage(${index})">
+        ◀
+    </button>
 
     <img
+        id="card-image-${index}"
         src="${image}"
         class="card-image"
         onclick="openGallery(allPosts.indexOf(post))"
     >
+
+    <button class="next-btn"
+        onclick="event.stopPropagation(); nextCardImage(${index})">
+        ▶
+    </button>
+
+</div>
 
     <div class="info">
 
@@ -285,3 +298,26 @@ if (loader) {
     };
 
 }loadPosts();
+const currentCardImage = {};
+
+function nextCardImage(index) {
+    const post = allPosts[index];
+    if (!post.images || post.images.length < 2) return;
+
+    currentCardImage[index] =
+        ((currentCardImage[index] || 0) + 1) % post.images.length;
+
+    document.getElementById(`card-image-${index}`).src =
+        "/" + post.images[currentCardImage[index]];
+}
+
+function prevCardImage(index) {
+    const post = allPosts[index];
+    if (!post.images || post.images.length < 2) return;
+
+    currentCardImage[index] =
+        ((currentCardImage[index] || 0) - 1 + post.images.length) % post.images.length;
+
+    document.getElementById(`card-image-${index}`).src =
+        "/" + post.images[currentCardImage[index]];
+}
