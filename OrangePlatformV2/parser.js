@@ -173,10 +173,7 @@ for (const m of messages) {
     console.log("ID:", m.id, "TEXT:", !!m.message, "PHOTO:", !!m.photo);
 }
 
-console.log(messages); {
-    console.log("ID:", m.id, "TEXT:", !!m.message, "PHOTO:", !!m.photo);
-}
-console.log(messages);
+
 
     let posts = [];
 
