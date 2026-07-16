@@ -88,7 +88,7 @@ $${post.price || "-"}
 </div>
 
 <div class="publish-date">
-🕒 ${new Date(post.date).toLocaleDateString("ru-RU")}
+🕒 ${new Date(post.date * 1000).toLocaleDateString("ru-RU")}
 </div>
 
 </div>
