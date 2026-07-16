@@ -164,7 +164,7 @@ async function start() {
 console.log("CHANNEL:", channel);
 
 const messages = await client.getMessages(channel, {
-    limit: 50
+    limit: 10
 });
 
 console.log("Messages count:", messages.length);
