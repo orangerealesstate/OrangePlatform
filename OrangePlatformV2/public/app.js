@@ -300,6 +300,26 @@ if (loader) {
     };
 
 }loadPosts();
+// პირველი ჩატვირთვა
+loadPosts();
+
+// ყოველ 30 წამში შეამოწმოს ახალი განცხადებები
+setInterval(async () => {
+    try {
+        const res = await fetch("/api/posts?t=" + Date.now(), {
+            cache: "no-store"
+        });
+
+        const posts = await res.json();
+
+        if (posts.length !== allPosts.length) {
+            allPosts = posts;
+            filterPosts(); // თუ ფილტრი არჩეულია, ისიც შეინარჩუნოს
+        }
+    } catch (e) {
+        console.log("Auto refresh error:", e);
+    }
+}, 30000);
 const currentCardImage = {};
 
 function nextCardImage(index) {
