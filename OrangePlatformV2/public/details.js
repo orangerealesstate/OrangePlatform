@@ -15,6 +15,7 @@ async function loadDetails() {
         }
 
         const post = await res.json();
+        console.log(post.date);
 
         currentImages = Array.isArray(post.images)
             ? post.images
@@ -29,11 +30,24 @@ async function loadDetails() {
             images = `
 <div class="image-wrapper">
 
+<div class="image-wrapper">
+
+<button class="gallery-prev" onclick="prevImage()">❮</button>
+
 <img
+    id="mainImage"
     src="/${currentImages[0]}"
     class="main-image"
-    onclick="openImage('/${currentImages[0]}')"
+    onclick="openImage('/' + currentImages[currentIndex])"
 >
+
+<button class="gallery-next" onclick="nextImage()">❯</button>
+
+<div class="photo-count">
+📷 <span id="photoNumber">1</span> / ${currentImages.length}
+</div>
+
+</div>
 
 <div class="photo-count">
 📷 1 / ${currentImages.length}

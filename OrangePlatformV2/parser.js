@@ -124,19 +124,27 @@ async function downloadPhoto(message, fileName) {
 
     try {
 
-        const buffer = await client.downloadMedia(message);
-        console.log("Downloading:", fileName, buffer ? "OK" : "FAILED");
-
-        if (!buffer) return null;
-
         const filePath = path.join(
-            DOWNLOADS,
-            fileName
-        );
+    DOWNLOADS,
+    fileName
+);
 
-        fs.writeFileSync(filePath, buffer);
+if (fs.existsSync(filePath)) {
+    console.log("Already exists:", fileName);
+    return "downloads/" + fileName;
+}
 
-        return "downloads/" + fileName;
+const buffer = await client.downloadMedia(message);
+
+console.log("Downloading:", fileName, buffer ? "OK" : "FAIL");
+
+if (!buffer) return null;
+
+fs.writeFileSync(filePath, buffer);
+
+return "downloads/" + fileName;
+
+        
 
     } catch (err) {
     console.log("Photo download error:");
@@ -155,18 +163,46 @@ async function start() {
     console.log("✅ Bot connected");
 console.log("CHANNEL:", channel);
 
-    const messages = await client.getMessages(channel, {
-        limit: 50
+let messages = [];
+let offsetId = 0;
+
+while (true) {
+
+    const batch = await client.getMessages(channel, {
+        limit: 1000,
+        offsetId,
+        addOffset: 0
     });
-    console.log("Messages count:", messages.length);
-console.log(messages.map(m => m.id));
+
+    if (!batch.length) break;
+
+    messages.push(...batch);
+
+    offsetId = Math.min(...batch.map(m => m.id));
+
+    console.log("Loaded:", messages.length);
+
+    if (batch.length < 1000) break;
+}
+
+console.log("Messages count:", messages.length);
 
 for (const m of messages) {
     console.log("ID:", m.id, "TEXT:", !!m.message, "PHOTO:", !!m.photo);
 }
+
+console.log(messages); {
+    console.log("ID:", m.id, "TEXT:", !!m.message, "PHOTO:", !!m.photo);
+}
 console.log(messages);
 
-    const posts = [];
+    let posts = [];
+
+if (fs.existsSync(POSTS_FILE)) {
+    posts = JSON.parse(
+        fs.readFileSync(POSTS_FILE, "utf8")
+    );
+}
     const albums = {};
 
     for (const msg of messages.reverse()) {
@@ -233,11 +269,14 @@ if (post.street) {
         .replace(/\s+/g, " ")
         .trim();
 }
-let coords = { lat: null, lng: null };
+let coords = {
+    lat: post.lat || null,
+    lng: post.lng || null
+};
 
-if (post.street && post.street !== "-") {
-    await new Promise(resolve => setTimeout(resolve, 1500));
+if (false) {
     coords = await geocodeAddress(post.street + ", Tbilisi, Georgia");
+
 }
 
 post.lat = coords.lat;
@@ -295,7 +334,18 @@ post.agent = getValue(text, [
         post.area = post.area || "-";
         post.floor = post.floor || "-";
 
-        posts.push(post);
+        const existing = posts.findIndex(p => p.id === post.id);
+
+if (existing >= 0) {
+    posts[existing] = {
+        ...posts[existing],
+        ...post,
+        lat: posts[existing].lat || post.lat,
+        lng: posts[existing].lng || post.lng
+    };
+} else {
+    posts.push(post);
+}
 
     }
 
@@ -307,7 +357,8 @@ for (const p of posts) {
         p.lat,
         p.lng
     );
-}
+}console.log("Albums:", Object.keys(albums).length);
+console.log("Posts before save:", posts.length);
     savePosts(posts);
 
     console.log(`✅ Saved ${posts.length} posts`);
