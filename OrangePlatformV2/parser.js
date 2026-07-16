@@ -163,27 +163,9 @@ async function start() {
     console.log("✅ Bot connected");
 console.log("CHANNEL:", channel);
 
-let messages = [];
-let offsetId = 0;
-
-while (true) {
-
-    const batch = await client.getMessages(channel, {
-        limit: 1000,
-        offsetId,
-        addOffset: 0
-    });
-
-    if (!batch.length) break;
-
-    messages.push(...batch);
-
-    offsetId = Math.min(...batch.map(m => m.id));
-
-    console.log("Loaded:", messages.length);
-
-    if (batch.length < 1000) break;
-}
+const messages = await client.getMessages(channel, {
+    limit: 50
+});
 
 console.log("Messages count:", messages.length);
 
