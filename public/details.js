@@ -215,7 +215,7 @@ ${post.price ? "$" + post.price : "-"}
 <div style="margin-top:30px;text-align:center;">
 
 <a
-href="https://t.me/sandroorange"
+href="${post.telegramLink}"
 target="_blank"
 style="
 display:inline-block;
@@ -228,7 +228,7 @@ font-weight:bold;
 text-decoration:none;
 box-shadow:0 6px 18px rgba(0,0,0,.2);
 ">
-💬 Написать в Telegram
+📲 Смотреть в Telegram
 </a>
 
 </div>
