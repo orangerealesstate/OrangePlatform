@@ -62,6 +62,9 @@ function renderPosts(posts) {
         container.innerHTML += `
 
 <div class="card">
+${post.status === "rented"
+? `<div class="rented-badge">🔴 СДАНО</div>`
+: ""}
 
     <img
         src="${image}"
@@ -102,7 +105,14 @@ function renderPosts(posts) {
             Подробнее
 
         </button>
-
+<a
+    href="https://t.me/kvartiri_tbilisi2023"
+    target="_blank"
+    class="telegram-btn"
+    onclick="event.stopPropagation()"
+>
+    📲 Смотреть в Telegram
+</a>
     </div>
 
 </div>
