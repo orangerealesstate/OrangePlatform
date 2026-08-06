@@ -201,6 +201,7 @@ if (fs.existsSync(POSTS_FILE)) {
                 id: msg.id,
                 groupId: albumId,
                 date: msg.date,
+                telegramLink: `https://t.me/kvartiri_tbilisi2023/${msg.id}`,
                 text: text,
                 images: [],
                 price: "",
@@ -312,6 +313,13 @@ post.agent = getValue(text, [
         post.bedrooms = post.bedrooms || "-";
         post.area = post.area || "-";
         post.floor = post.floor || "-";
+        const days =
+    (Date.now() / 1000 - post.date) / 86400;
+
+post.status =
+    days > 30
+        ? "rented"
+        : "active";
 
         const existing = posts.findIndex(p => p.id === post.id);
 
