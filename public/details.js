@@ -15,6 +15,8 @@ if (!response.ok) {
 }
 
 const post = await response.json();
+console.log(post);
+console.log(post.telegramLink);
 
         if (!post) {
 
@@ -82,7 +84,8 @@ const post = await response.json();
             `;
 
         }
-
+console.log(post);
+console.log(post.telegramLink);
         container.innerHTML = `
 
 <div style="padding:20px;">
