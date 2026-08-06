@@ -284,3 +284,68 @@ header{
     border-radius: 8px;
     z-index: 100;
 }
+.card{
+    position: relative;
+}
+
+.rented-badge{
+    position:absolute;
+    top:10px;
+    left:10px;
+    background:#e60000;
+    color:#fff;
+    font-weight:bold;
+    padding:8px 14px;
+    border-radius:8px;
+    z-index:100;
+    font-size:15px;
+}
+.telegram-btn{
+    display:block;
+    margin-top:10px;
+    padding:12px;
+    background:#229ED9;
+    color:white;
+    text-align:center;
+    text-decoration:none;
+    border-radius:8px;
+    font-weight:bold;
+    transition:.2s;
+}
+
+.telegram-btn:hover{
+    background:#1d8ac3;
+}
+.telegram-btn{
+    display:block;
+    width:100%;
+    margin-top:10px;
+    padding:14px;
+    background:#229ED9;
+    color:#fff;
+    text-align:center;
+    text-decoration:none;
+    border-radius:12px;
+    font-size:17px;
+    font-weight:bold;
+}
+
+.telegram-btn:hover{
+    background:#1b8ac2;
+}.telegram-btn{
+    display:block;
+    width:100%;
+    margin-top:12px;
+    padding:14px;
+    background:#229ED9;
+    color:#fff;
+    text-align:center;
+    text-decoration:none;
+    border-radius:12px;
+    font-size:17px;
+    font-weight:bold;
+}
+
+.telegram-btn:hover{
+    background:#1b8ac2;
+}
