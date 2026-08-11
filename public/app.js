@@ -1,4 +1,5 @@
 let allPosts = [];
+let visiblePosts = [];
 
 async function loadPosts() {
 
@@ -31,6 +32,8 @@ async function loadPosts() {
 }
 
 function renderPosts(posts) {
+
+    visiblePosts = posts;
 
     const container = document.getElementById("posts");
 
@@ -283,19 +286,21 @@ onclick="event.stopPropagation()">
 let currentImages = [];
 let currentIndex = 0;
 
-function openGallery(id){
+function openGallery(id) {
 
-    const post = allPosts.find(
+    const post = visiblePosts.find(
         p => String(p.id) === String(id)
     );
 
-    if(!post) return;
+    if (!post) return;
 
-    currentImages = post.images || [];
+    currentImages = Array.isArray(post.images)
+        ? post.images
+        : [];
 
     currentIndex = 0;
 
-    if(!currentImages.length) return;
+    if (!currentImages.length) return;
 
     document.getElementById("viewer").style.display = "block";
 
