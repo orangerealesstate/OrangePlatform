@@ -15,6 +15,7 @@ if (!response.ok) {
 }
 
 const post = await response.json();
+alert(post.telegramLink);
 console.log(post);
 console.log(post.telegramLink);
 

@@ -223,7 +223,7 @@ ${post.status === "rented"
     src="${image}"
     class="card-image"
     loading="lazy"
-    onclick="event.stopPropagation();openGallery(${index})"
+    onclick="event.stopPropagation();openGallery('${post.id}')"
     onerror="this.src='https://via.placeholder.com/600x400?text=No+Photo';"
 >
 
@@ -283,11 +283,15 @@ onclick="event.stopPropagation()">
 let currentImages = [];
 let currentIndex = 0;
 
-function openGallery(index){
+function openGallery(id){
 
-    if(!allPosts[index]) return;
+    const post = allPosts.find(
+        p => String(p.id) === String(id)
+    );
 
-    currentImages = allPosts[index].images || [];
+    if(!post) return;
+
+    currentImages = post.images || [];
 
     currentIndex = 0;
 
@@ -296,7 +300,6 @@ function openGallery(index){
     document.getElementById("viewer").style.display = "block";
 
     updateGallery();
-
 }
 
 function updateGallery(){
