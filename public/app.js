@@ -1222,11 +1222,14 @@ function renderPosts(posts) {
                      ========================================== -->
 
                 <img
-                    src="${escapeHtml(image)}"
-                    class="card-image"
-                    loading="lazy"
-                    alt="Apartment"
-                >
+    src="${escapeHtml(image)}"
+    class="card-image"
+    data-post-id="${escapeHtml(id)}"
+    alt="Apartment"
+    onerror="
+        if (!this.dataset.error) {
+            this.dataset.error = '1';
+            this.src='https://via.placeholder.com/
 
 
                 <div class="info">
