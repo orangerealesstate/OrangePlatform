@@ -1029,45 +1029,33 @@ function getDisplayDistrict(post) {
 // RENDER POSTS
 // ============================================================
 
+// ============================================================
+// RENDER POSTS
+// ============================================================
+
 function renderPosts(posts) {
 
-    // ========================================================
-    // VERY IMPORTANT
-    // ========================================================
-    // აქ ვინახავთ ზუსტად იმ ბინებს,
-    // რომლებიც ამ მომენტში ეკრანზე ჩანს.
-    //
-    // მაგრამ ფოტოებს ერთმანეთში აღარ ვურევთ.
-    // თითო card იყენებს მხოლოდ თავის images[0]-ს.
-    // ========================================================
-
+    // ზუსტად ვინახავთ იმ ბინებს,
+    // რომლებიც ამ მომენტში ჩანს
     visiblePosts =
         Array.isArray(posts)
-            ? posts
+            ? [...posts]
             : [];
 
 
     const container =
-        document.getElementById(
-            "posts"
-        );
+        document.getElementById("posts");
 
 
     if (!container) {
 
-        console.error(
-            "❌ #posts not found"
-        );
+        console.error("❌ #posts not found");
 
         return;
-
     }
 
 
-    // ========================================================
-    // CLEAR
-    // ========================================================
-
+    // ძველი ბარათების სრულად წაშლა
     container.innerHTML = "";
 
 
@@ -1075,28 +1063,21 @@ function renderPosts(posts) {
     // NO RESULTS
     // ========================================================
 
-    if (
-        !visiblePosts.length
-    ) {
+    if (!visiblePosts.length) {
 
         container.innerHTML = `
-
             <div style="
                 width:100%;
                 text-align:center;
                 padding:50px 20px;
             ">
-
                 <h2>
                     Объявления не найдены
                 </h2>
-
             </div>
-
         `;
 
         return;
-
     }
 
 
@@ -1104,294 +1085,253 @@ function renderPosts(posts) {
     // CREATE CARDS
     // ========================================================
 
-    visiblePosts.forEach(
-        post => {
+    visiblePosts.forEach(post => {
 
-            // ==================================================
-            // FIRST PHOTO ONLY
-            // ==================================================
+        // ====================================================
+        // ID
+        // ====================================================
 
-            const image =
-                getImageUrl(post);
-
-
-            // ==================================================
-            // DISTRICT
-            // ==================================================
-
-            const district =
-                getDisplayDistrict(
-                    post
-                );
+        const id =
+            String(post?.id ?? "");
 
 
-            // ==================================================
-            // ROOMS
-            // ==================================================
+        // ====================================================
+        // ONLY FIRST PHOTO
+        // ====================================================
 
-            const rooms =
-                getPostRooms(
-                    post
-                );
+        const image =
+            getImageUrl(post);
 
 
-            // ==================================================
-            // PRICE
-            // ==================================================
+        // ====================================================
+        // DISTRICT
+        // ====================================================
 
-            const price =
-                getPostPrice(
-                    post
-                );
+        const district =
+            getDisplayDistrict(post);
 
 
-            // ==================================================
-            // ID
-            // ==================================================
+        // ====================================================
+        // ROOMS
+        // ====================================================
 
-            const id =
-                String(
-                    post?.id ?? ""
-                );
+        const rooms =
+            getPostRooms(post);
 
 
-            // ==================================================
-            // CARD
-            // ==================================================
+        // ====================================================
+        // PRICE
+        // ====================================================
 
-            const card =
-                document.createElement(
-                    "div"
-                );
+        const price =
+            getPostPrice(post);
 
 
-            card.className =
-                "card";
+        // ====================================================
+        // CARD
+        // ====================================================
+
+        const card =
+            document.createElement("div");
 
 
-            // ==================================================
-            // RENTED
-            // ==================================================
-
-            const rentedBadge =
-                post?.status === "rented"
-                    ? `
-
-                        <div class="rented-badge">
-                            🔴 СДАНО
-                        </div>
-
-                      `
-                    : "";
+        card.className = "card";
 
 
-            // ==================================================
-            // TELEGRAM
-            // ==================================================
+        // ====================================================
+        // RENTED BADGE
+        // ====================================================
 
-            const telegramButton =
-                post?.telegramLink
-                    ? `
-
-                        <a
-                            class="telegram-btn"
-                            href="${escapeHtml(
-                                post.telegramLink
-                            )}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            📲 Смотреть в Telegram
-                        </a>
-
-                      `
-                    : "";
-
-
-            // ==================================================
-            // CARD HTML
-            // ==================================================
-
-            card.innerHTML = `
-
-                ${rentedBadge}
-
-
-                <!-- ==========================================
-                     ONLY ONE PHOTO
-                     ========================================== -->
-
-                <img
-    src="${escapeHtml(image)}"
-    class="card-image"
-    data-post-id="${escapeHtml(id)}"
-    alt="Apartment"
-    onerror="
-        if (!this.dataset.error) {
-            this.dataset.error = '1';
-            this.src='https://via.placeholder.com/
-
-
-                <div class="info">
-
-
-                    <!-- ======================================
-                         PRICE
-                         ====================================== -->
-
-                    <div class="price">
-
-                        $${price || "-"}
-
+        const rentedBadge =
+            post?.status === "rented"
+                ? `
+                    <div class="rented-badge">
+                        🔴 СДАНО
                     </div>
+                  `
+                : "";
 
 
-                    <!-- ======================================
-                         DETAILS
-                         ====================================== -->
+        // ====================================================
+        // TELEGRAM BUTTON
+        // ====================================================
 
-                    <div class="details">
-
-
-                        📍 <b>Район:</b>
-                        ${escapeHtml(
-                            district
-                        )}
-
-
-                        <br><br>
-
-
-                        📌 <b>Адрес:</b>
-                        ${escapeHtml(
-                            post?.street ||
-                            post?.address ||
-                            "-"
-                        )}
-
-
-                        <br><br>
-
-
-                        🛏 <b>Комнат:</b>
-                        ${rooms || "-"}
-
-
-                        <br><br>
-
-
-                        📐 <b>Площадь:</b>
-                        ${escapeHtml(
-                            post?.area ??
-                            "-"
-                        )} м²
-
-
-                    </div>
-
-
-                    <!-- ======================================
-                         DETAILS BUTTON
-                         ====================================== -->
-
-                    <button
-                        class="details-btn"
-                        type="button"
+        const telegramButton =
+            post?.telegramLink
+                ? `
+                    <a
+                        class="telegram-btn"
+                        href="${escapeHtml(
+                            post.telegramLink
+                        )}"
+                        target="_blank"
+                        rel="noopener noreferrer"
                     >
-                        Подробнее
-                    </button>
+                        📲 Смотреть в Telegram
+                    </a>
+                  `
+                : "";
 
 
-                    ${telegramButton}
+        // ====================================================
+        // CARD HTML
+        // ====================================================
 
+        card.innerHTML = `
+
+            ${rentedBadge}
+
+
+            <!-- ==========================================
+                 ONLY ONE PHOTO ON MAIN PAGE
+                 ========================================== -->
+
+            <img
+                src="${escapeHtml(image)}"
+                class="card-image"
+                data-post-id="${escapeHtml(id)}"
+                alt="Apartment"
+                loading="lazy"
+            >
+
+
+            <div class="info">
+
+
+                <!-- ======================================
+                     PRICE
+                     ====================================== -->
+
+                <div class="price">
+                    $${price || "-"}
+                </div>
+
+
+                <!-- ======================================
+                     DETAILS
+                     ====================================== -->
+
+                <div class="details">
+
+                    📍 <b>Район:</b>
+                    ${escapeHtml(district)}
+
+                    <br><br>
+
+                    📌 <b>Адрес:</b>
+                    ${escapeHtml(
+                        post?.street ||
+                        post?.address ||
+                        "-"
+                    )}
+
+                    <br><br>
+
+                    🛏 <b>Комнат:</b>
+                    ${rooms || "-"}
+
+                    <br><br>
+
+                    📐 <b>Площадь:</b>
+                    ${escapeHtml(
+                        post?.area ?? "-"
+                    )} м²
 
                 </div>
 
-            `;
+
+                <!-- ======================================
+                     DETAILS BUTTON
+                     ====================================== -->
+
+                <button
+                    class="details-btn"
+                    type="button"
+                >
+                    Подробнее
+                </button>
 
 
-            // ==================================================
-            // DETAILS BUTTON EVENT
-            // ==================================================
-
-            const detailsButton =
-                card.querySelector(
-                    ".details-btn"
-                );
+                ${telegramButton}
 
 
-            if (detailsButton) {
+            </div>
 
-                detailsButton.addEventListener(
-                    "click",
-                    event => {
-
-                        event.stopPropagation();
+        `;
 
 
-                        window.location.href =
-                            "details.html?id=" +
-                            encodeURIComponent(
-                                id
-                            );
+        // ====================================================
+        // DETAILS BUTTON
+        // ====================================================
 
-                    }
-                );
-
-            }
+        const detailsButton =
+            card.querySelector(".details-btn");
 
 
-            // ==================================================
-            // IMAGE ERROR
-            // ==================================================
+        if (detailsButton) {
 
-            const imageElement =
-                card.querySelector(
-                    ".card-image"
-                );
+            detailsButton.addEventListener(
+                "click",
+                event => {
 
-
-            if (imageElement) {
-
-                imageElement.addEventListener(
-                    "error",
-                    () => {
-
-                        if (
-                            imageElement.dataset.failed
-                        ) {
-
-                            return;
-
-                        }
+                    event.stopPropagation();
 
 
-                        imageElement.dataset.failed =
-                            "1";
+                    window.location.href =
+                        "details.html?id=" +
+                        encodeURIComponent(id);
 
-
-                        imageElement.src =
-                            "https://via.placeholder.com/600x400?text=No+Photo";
-
-                    }
-                );
-
-            }
-
-
-            // ==================================================
-            // ADD CARD
-            // ==================================================
-
-            container.appendChild(
-                card
+                }
             );
 
         }
-    );
+
+
+        // ====================================================
+        // IMAGE ERROR
+        // ====================================================
+
+        const imageElement =
+            card.querySelector(".card-image");
+
+
+        if (imageElement) {
+
+            imageElement.addEventListener(
+                "error",
+                () => {
+
+                    // მხოლოდ ერთხელ
+                    if (
+                        imageElement.dataset.failed === "1"
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    imageElement.dataset.failed = "1";
+
+
+                    imageElement.src =
+                        "https://via.placeholder.com/600x400?text=No+Photo";
+
+                }
+            );
+
+        }
+
+
+        // ====================================================
+        // ADD CARD
+        // ====================================================
+
+        container.appendChild(card);
+
+    });
 
 }
-
 
 // ============================================================
 // ESCAPE HTML
