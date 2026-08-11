@@ -1086,6 +1086,11 @@ function renderPosts(posts) {
     // ========================================================
 
     visiblePosts.forEach(post => {
+        console.log(
+        "🟠 CARD:",
+        "ID =", post?.id,
+        "IMAGE =", post?.images?.[0]
+    );
 
         // ====================================================
         // ID
