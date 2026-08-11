@@ -97,11 +97,11 @@ function renderPosts(posts) {
     posts.forEach(post => {
 
         const image =
-            post.images &&
-            Array.isArray(post.images) &&
-            post.images.length
-                ? "/" + post.images[0]
-                : "https://via.placeholder.com/600x400?text=No+Photo";
+    post.images &&
+    Array.isArray(post.images) &&
+    post.images.length
+        ? "/" + post.images[0] + "?post=" + post.id
+        : "https://via.placeholder.com/600x400?text=No+Photo";
 
 
         // =========================
