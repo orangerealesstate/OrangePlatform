@@ -1,3 +1,4 @@
+alert("NEW APP.JS");
 let allPosts = [];
 
 async function loadPosts() {
@@ -87,6 +88,16 @@ function renderPosts(posts) {
 
         </button>
 
+        <a
+            class="telegram-btn"
+            href="${post.telegramLink || '#'}"
+            target="_blank"
+            rel="noopener noreferrer">
+
+            📲 Оригинал поста в Telegram
+
+        </a>
+
     </div>
 
 </div>
@@ -94,6 +105,7 @@ function renderPosts(posts) {
 `;
 
     });
+
 }
 
 }function filterPosts() {
