@@ -9,6 +9,8 @@ let visiblePosts = [];
 let currentImages = [];
 let currentIndex = 0;
 
+let loadingRequest = null;
+
 
 // ============================================================
 // START
@@ -19,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("🟠 Orange Platform started");
 
     setupFilters();
+
     loadPosts();
 
 });
@@ -30,68 +33,216 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadPosts() {
 
+    // Cancel previous request if one is still running
+    if (loadingRequest) {
+        try {
+            loadingRequest.abort();
+        } catch (e) {}
+    }
+
+    const controller = new AbortController();
+    loadingRequest = controller;
+
     try {
 
         console.log("📥 Loading fresh posts...");
 
+        const cacheBuster = Date.now();
+
         const response = await fetch(
-            "/api/posts?t=" + Date.now(),
+            "/api/posts?t=" + cacheBuster,
             {
                 method: "GET",
                 cache: "no-store",
+                signal: controller.signal,
+
                 headers: {
-                    "Cache-Control": "no-cache",
-                    "Pragma": "no-cache"
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                    "Pragma": "no-cache",
+                    "Expires": "0"
                 }
             }
         );
 
         if (!response.ok) {
-            throw new Error("Server error: " + response.status);
+            throw new Error(
+                "Server error: " + response.status
+            );
         }
 
         const data = await response.json();
 
         if (!Array.isArray(data)) {
-            throw new Error("API did not return an array");
-        }
-
-        allPosts = [...data].sort((a, b) => {
-            return Number(b?.date || 0) - Number(a?.date || 0);
-        });
-
-        visiblePosts = [...allPosts];
-
-        console.log("✅ Fresh posts loaded:", allPosts.length);
-
-        if (allPosts.length) {
-            console.log(
-                "🆕 Newest apartment ID:",
-                allPosts[0].id
+            throw new Error(
+                "API did not return an array"
             );
         }
 
-        renderPosts(visiblePosts);
+        console.log(
+            "📦 API returned:",
+            data.length,
+            "posts"
+        );
+
+        // ====================================================
+        // REMOVE DUPLICATES
+        // ====================================================
+
+        const uniqueMap = new Map();
+
+        data.forEach(post => {
+
+            if (!post) return;
+
+            const id = String(
+                post.id ??
+                post.telegramId ??
+                ""
+            );
+
+            if (!id) return;
+
+            uniqueMap.set(id, post);
+
+        });
+
+        const uniquePosts = Array.from(
+            uniqueMap.values()
+        );
+
+
+        // ====================================================
+        // SORT NEWEST FIRST
+        // ====================================================
+
+        uniquePosts.sort((a, b) => {
+
+            const dateA = Number(a?.date || 0);
+            const dateB = Number(b?.date || 0);
+
+            if (dateA !== dateB) {
+                return dateB - dateA;
+            }
+
+            const idA = Number(a?.id || 0);
+            const idB = Number(b?.id || 0);
+
+            return idB - idA;
+
+        });
+
+
+        // ====================================================
+        // SAVE
+        // ====================================================
+
+        allPosts = uniquePosts;
+
+        visiblePosts = [...allPosts];
+
+
+        console.log(
+            "✅ Posts loaded:",
+            allPosts.length
+        );
+
+
+        if (allPosts.length > 0) {
+
+            console.log(
+                "🆕 NEWEST ID:",
+                allPosts[0].id
+            );
+
+            console.log(
+                "🆕 NEWEST DATE:",
+                allPosts[0].date
+            );
+
+            console.log(
+                "🆕 NEWEST ADDRESS:",
+                allPosts[0].street ||
+                allPosts[0].address ||
+                "-"
+            );
+
+        }
+
+
+        // ====================================================
+        // RENDER
+        // ====================================================
+
+        renderPosts(allPosts);
+
 
     } catch (error) {
 
-        console.error("❌ LOAD POSTS ERROR:", error);
+        if (error?.name === "AbortError") {
+
+            console.log(
+                "ℹ️ Previous posts request cancelled"
+            );
+
+            return;
+
+        }
+
+
+        console.error(
+            "❌ LOAD POSTS ERROR:",
+            error
+        );
+
 
         const container =
             document.getElementById("posts");
 
+
         if (container) {
 
             container.innerHTML = `
+
                 <div style="
+                    width:100%;
                     text-align:center;
                     padding:50px 20px;
                 ">
-                    <h2>Ошибка загрузки объявлений</h2>
-                    <p>${escapeHtml(error.message)}</p>
+
+                    <h2>
+                        Ошибка загрузки объявлений
+                    </h2>
+
+                    <p>
+                        ${escapeHtml(
+                            error?.message || "Unknown error"
+                        )}
+                    </p>
+
+                    <button
+                        type="button"
+                        onclick="loadPosts()"
+                        style="
+                            margin-top:20px;
+                            padding:12px 20px;
+                            border:none;
+                            border-radius:10px;
+                            cursor:pointer;
+                        "
+                    >
+                        🔄 Повторить
+                    </button>
+
                 </div>
+
             `;
 
+        }
+
+    } finally {
+
+        if (loadingRequest === controller) {
+            loadingRequest = null;
         }
 
     }
@@ -108,12 +259,11 @@ document.addEventListener(
     () => {
 
         if (
-            document.visibilityState ===
-            "visible"
+            document.visibilityState === "visible"
         ) {
 
             console.log(
-                "👀 App visible → refreshing posts"
+                "👀 Mini App visible → refreshing"
             );
 
             loadPosts();
@@ -123,6 +273,10 @@ document.addEventListener(
     }
 );
 
+
+// ============================================================
+// PAGE SHOW
+// ============================================================
 
 window.addEventListener(
     "pageshow",
@@ -175,12 +329,14 @@ function setupFilters() {
         );
     }
 
+
     if (district) {
         district.addEventListener(
             "change",
             filterPosts
         );
     }
+
 
     if (rooms) {
         rooms.addEventListener(
@@ -189,12 +345,14 @@ function setupFilters() {
         );
     }
 
+
     if (minPrice) {
         minPrice.addEventListener(
             "input",
             filterPosts
         );
     }
+
 
     if (maxPrice) {
         maxPrice.addEventListener(
@@ -220,49 +378,80 @@ function normalizeDistrict(value) {
 
     district = district
 
-        // SABURTALO
         .replace(/საბურთალო/g, "saburtalo")
         .replace(/сабуртало/g, "saburtalo")
 
-        // VAKE
         .replace(/ვაკე/g, "vake")
         .replace(/ваке/g, "vake")
 
-        // VERA
         .replace(/ვერა/g, "vera")
         .replace(/вера/g, "vera")
 
-        // ISANI
         .replace(/ისანი/g, "isani")
         .replace(/исани/g, "isani")
 
-        // ORTACHALA
         .replace(/ორთაჭალა/g, "ortachala")
         .replace(/ортачала/g, "ortachala")
 
-        // DIDI DIGOMI
-        .replace(/დიდი დიღომი/g, "didi digomi")
-        .replace(/диди дигоми/g, "didi digomi")
+        .replace(
+            /დიდი დიღომი/g,
+            "didi digomi"
+        )
 
-        // MTATSMINDA
-        .replace(/მთაწმინდა/g, "mtatsminda")
-        .replace(/мтацминда/g, "mtatsminda")
+        .replace(
+            /диди дигоми/g,
+            "didi digomi"
+        )
 
-        // KRTSANISI
-        .replace(/კრწანისი/g, "krtsanisi")
-        .replace(/крцаниси/g, "krtsanisi")
+        .replace(
+            /მთაწმინდა/g,
+            "mtatsminda"
+        )
 
-        // DIDUBE
-        .replace(/დიდუბე/g, "didube")
-        .replace(/дидубе/g, "didube")
+        .replace(
+            /мтацминда/g,
+            "mtatsminda"
+        )
 
-        // NADZALADEVI
-        .replace(/ნაძალადევი/g, "nadzaladevi")
-        .replace(/надзаладеви/g, "nadzaladevi")
+        .replace(
+            /კრწანისი/g,
+            "krtsanisi"
+        )
 
-        // AVLABARI
-        .replace(/ავლაბარი/g, "avlabari")
-        .replace(/авлабари/g, "avlabari");
+        .replace(
+            /крцаниси/g,
+            "krtsanisi"
+        )
+
+        .replace(
+            /დიდუბე/g,
+            "didube"
+        )
+
+        .replace(
+            /дидубе/g,
+            "didube"
+        )
+
+        .replace(
+            /ნაძალადევი/g,
+            "nadzaladevi"
+        )
+
+        .replace(
+            /надзаладеви/g,
+            "nadzaladevi"
+        )
+
+        .replace(
+            /ავლაბარი/g,
+            "avlabari"
+        )
+
+        .replace(
+            /авлабари/g,
+            "avlabari"
+        );
 
 
     return district;
@@ -354,7 +543,9 @@ function getPostDistrict(post) {
         of districts
     ) {
 
-        if (text.includes(keyword)) {
+        if (
+            text.includes(keyword)
+        ) {
 
             return district;
 
@@ -448,8 +639,7 @@ function getPostRooms(post) {
 
 
     for (
-        const pattern
-        of patterns
+        const pattern of patterns
     ) {
 
         const match =
@@ -528,8 +718,7 @@ function getPostPrice(post) {
 
 
     for (
-        const pattern
-        of patterns
+        const pattern of patterns
     ) {
 
         const match =
@@ -575,10 +764,7 @@ function getImageUrl(post) {
         !post.images.length
     ) {
 
-        return (
-            "https://via.placeholder.com/" +
-            "600x400?text=No+Photo"
-        );
+        return "https://via.placeholder.com/600x400?text=No+Photo";
 
     }
 
@@ -591,10 +777,7 @@ function getImageUrl(post) {
 
     if (!image) {
 
-        return (
-            "https://via.placeholder.com/" +
-            "600x400?text=No+Photo"
-        );
+        return "https://via.placeholder.com/600x400?text=No+Photo";
 
     }
 
@@ -642,8 +825,8 @@ function filterPosts() {
                 "search"
             )?.value || ""
         )
-        .toLowerCase()
-        .trim();
+            .toLowerCase()
+            .trim();
 
 
     const selectedDistrict =
@@ -689,7 +872,7 @@ function filterPosts() {
                 String(
                     post?.text || ""
                 )
-                .toLowerCase();
+                    .toLowerCase();
 
 
             const district =
@@ -710,26 +893,33 @@ function filterPosts() {
                     post?.address ||
                     ""
                 )
-                .toLowerCase();
+                    .toLowerCase();
 
 
             // SEARCH
+
             if (search) {
 
                 const searchable =
                     [
+
                         text,
+
                         district,
+
                         street,
+
                         String(
                             post?.id || ""
                         ),
+
                         String(
                             post?.price || ""
                         )
+
                     ]
-                    .join(" ")
-                    .toLowerCase();
+                        .join(" ")
+                        .toLowerCase();
 
 
                 if (
@@ -746,6 +936,7 @@ function filterPosts() {
 
 
             // DISTRICT
+
             if (selectedDistrict) {
 
                 if (
@@ -761,6 +952,7 @@ function filterPosts() {
 
 
             // ROOMS
+
             if (selectedRooms) {
 
                 const wantedRooms =
@@ -770,6 +962,7 @@ function filterPosts() {
 
 
                 // 5 = 5+
+
                 if (
                     wantedRooms === 5
                 ) {
@@ -799,6 +992,7 @@ function filterPosts() {
 
 
             // PRICE
+
             if (
                 price < minPrice
             ) {
@@ -828,6 +1022,9 @@ function filterPosts() {
         "/",
         allPosts.length
     );
+
+
+    visiblePosts = filtered;
 
 
     renderPosts(filtered);
@@ -910,9 +1107,7 @@ function renderPosts(posts) {
     container.innerHTML = "";
 
 
-    if (
-        !visiblePosts.length
-    ) {
+    if (!visiblePosts.length) {
 
         container.innerHTML = `
 
@@ -935,6 +1130,13 @@ function renderPosts(posts) {
     }
 
 
+    console.log(
+        "🖥 Rendering:",
+        visiblePosts.length,
+        "posts"
+    );
+
+
     visiblePosts.forEach(post => {
 
         const id =
@@ -943,26 +1145,25 @@ function renderPosts(posts) {
             );
 
 
+        if (!id) {
+            return;
+        }
+
+
         const image =
             getImageUrl(post);
 
 
         const district =
-            getDisplayDistrict(
-                post
-            );
+            getDisplayDistrict(post);
 
 
         const rooms =
-            getPostRooms(
-                post
-            );
+            getPostRooms(post);
 
 
         const price =
-            getPostPrice(
-                post
-            );
+            getPostPrice(post);
 
 
         const address =
@@ -977,23 +1178,28 @@ function renderPosts(posts) {
             );
 
 
-        card.className =
-            "card";
+        card.className = "card";
 
+
+        // ====================================================
+        // RENTED BADGE
+        // ====================================================
 
         const rentedBadge =
             post?.status === "rented"
                 ? `
 
                     <div class="rented-badge">
-
                         🔴 СДАНО
-
                     </div>
 
                 `
                 : "";
 
+
+        // ====================================================
+        // TELEGRAM BUTTON
+        // ====================================================
 
         const telegramButton =
             post?.telegramLink
@@ -1007,80 +1213,56 @@ function renderPosts(posts) {
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-
                         📲 Смотреть в Telegram
-
                     </a>
 
                 `
                 : "";
 
 
+        // ====================================================
+        // CARD
+        // ====================================================
+
         card.innerHTML = `
 
             ${rentedBadge}
 
-
             <img
-                src="${escapeHtml(
-                    image
-                )}"
+                src="${escapeHtml(image)}"
                 class="card-image"
-                data-post-id="${escapeHtml(
-                    id
-                )}"
+                data-post-id="${escapeHtml(id)}"
                 alt="Apartment"
                 loading="lazy"
             >
 
-
             <div class="info">
 
-
                 <div class="price">
-
                     $${price || "-"}
-
                 </div>
-
 
                 <div class="details">
 
-
                     📍 <b>Район:</b>
-
-                    ${escapeHtml(
-                        district
-                    )}
-
+                    ${escapeHtml(district)}
 
                     <br><br>
-
 
                     📌 <b>Адрес:</b>
-
-                    ${escapeHtml(
-                        address
-                    )}
-
+                    ${escapeHtml(address)}
 
                     <br><br>
-
 
                     🛏 <b>Комнат:</b>
-
                     ${rooms || "-"}
-
 
                     <br><br>
 
-
                     📐 <b>Площадь:</b>
-
                     ${escapeHtml(
                         post?.area ?? "-"
                     )} м²
-
 
                 </div>
 
@@ -1089,21 +1271,21 @@ function renderPosts(posts) {
                     class="details-btn"
                     type="button"
                 >
-
                     Подробнее
-
                 </button>
 
 
                 ${telegramButton}
-
 
             </div>
 
         `;
 
 
+        // ====================================================
         // IMAGE
+        // ====================================================
+
         const imageElement =
             card.querySelector(
                 ".card-image"
@@ -1129,8 +1311,7 @@ function renderPosts(posts) {
                 () => {
 
                     if (
-                        imageElement.dataset.failed ===
-                        "1"
+                        imageElement.dataset.failed === "1"
                     ) {
 
                         return;
@@ -1143,8 +1324,7 @@ function renderPosts(posts) {
 
 
                     imageElement.src =
-                        "https://via.placeholder.com/" +
-                        "600x400?text=No+Photo";
+                        "https://via.placeholder.com/600x400?text=No+Photo";
 
                 }
             );
@@ -1152,7 +1332,10 @@ function renderPosts(posts) {
         }
 
 
+        // ====================================================
         // DETAILS
+        // ====================================================
+
         const detailsButton =
             card.querySelector(
                 ".details-btn"
@@ -1180,9 +1363,7 @@ function renderPosts(posts) {
         }
 
 
-        container.appendChild(
-            card
-        );
+        container.appendChild(card);
 
     });
 
@@ -1196,7 +1377,7 @@ function renderPosts(posts) {
 function openGallery(id) {
 
     console.log(
-        "🖼 Opening gallery for ID:",
+        "🖼 Opening gallery:",
         id
     );
 
@@ -1204,9 +1385,7 @@ function openGallery(id) {
     const post =
         visiblePosts.find(
             p =>
-                String(
-                    p?.id
-                ) ===
+                String(p?.id) ===
                 String(id)
         );
 
@@ -1234,12 +1413,10 @@ function openGallery(id) {
     currentIndex = 0;
 
 
-    if (
-        !currentImages.length
-    ) {
+    if (!currentImages.length) {
 
         console.warn(
-            "No images for:",
+            "⚠️ No images for:",
             post.id
         );
 
@@ -1318,8 +1495,8 @@ function updateGallery() {
                 currentIndex
             ] || ""
         )
-        .replace(/\\/g, "/")
-        .replace(/^\/+/, "");
+            .replace(/\\/g, "/")
+            .replace(/^\/+/, "");
 
 
     viewerImage.src =
@@ -1379,7 +1556,7 @@ function prevPhoto() {
 
 
 // ============================================================
-// CLOSE
+// CLOSE VIEWER
 // ============================================================
 
 function closeViewer() {
