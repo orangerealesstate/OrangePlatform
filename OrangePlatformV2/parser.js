@@ -21,8 +21,8 @@ const client = new TelegramClient(
     }
 );
 
-const POSTS_FILE = path.join(__dirname, "..", "posts.json");
-const DOWNLOADS = path.join(__dirname, "..", "downloads");
+const POSTS_FILE = path.join(__dirname, "posts.json");
+const DOWNLOADS = path.join(__dirname, "downloads");
 
 if (!fs.existsSync(DOWNLOADS)) {
     fs.mkdirSync(DOWNLOADS);

@@ -25,8 +25,7 @@ async function loadPosts() {
         `;
 
     }
-
-}function renderPosts(posts) {
+function renderPosts(posts) {
 
     const container = document.getElementById("posts");
 
@@ -43,7 +42,7 @@ async function loadPosts() {
         return;
     }
 
-    posts.forEach((post, index) => {
+    posts.forEach((post) => {
 
         const image =
             post.images && post.images.length
@@ -59,7 +58,7 @@ async function loadPosts() {
     <img
         src="${image}"
         class="card-image"
-        onclick="openGallery(${index})"
+        onclick="openGallery('${post.id}')"
     >
 
     <div class="info">
@@ -95,6 +94,7 @@ async function loadPosts() {
 `;
 
     });
+}
 
 }function filterPosts() {
 
@@ -170,11 +170,13 @@ async function loadPosts() {
 
     renderPosts(filtered);
 
-}function openGallery(index) {
+}function openGallery(postId) {
 
-    const post = allPosts[index];
+    const post = allPosts.find(
+        p => String(p.id) === String(postId)
+    );
 
-    if (!post.images || post.images.length === 0) {
+    if (!post || !post.images || post.images.length === 0) {
         return;
     }
 
