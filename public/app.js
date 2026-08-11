@@ -10,40 +10,22 @@ async function loadPosts() {
 
     try {
 
-        const response = await fetch(`/api/posts?t=${Date.now()}`, {
-            cache: "no-store"
-        });
+        const response = await fetch(
+            `/api/posts?t=${Date.now()}`,
+            {
+                cache: "no-store"
+            }
+        );
 
         if (!response.ok) {
             throw new Error("Server error");
         }
 
-        const data = await response.json();
+        allPosts = await response.json();
 
-        // ერთი და იგივე ID მხოლოდ ერთხელ
-        const unique = new Map();
-
-        data.forEach(post => {
-
-            if (!post || !post.id) {
-                return;
-            }
-
-            const id = String(post.id);
-
-            if (!unique.has(id)) {
-                unique.set(id, post);
-            }
-
-        });
-
-        allPosts = Array.from(unique.values());
-
-        console.log("📦 Всего объявлений:", data.length);
-        console.log("✅ Уникальных объявлений:", allPosts.length);
         console.log(
-            "🗑 Дубликатов:",
-            data.length - allPosts.length
+            "✅ Loaded posts:",
+            allPosts.length
         );
 
         renderPosts(allPosts);
@@ -70,14 +52,21 @@ async function loadPosts() {
 
 function renderPosts(posts) {
 
-    // Очень важно:
-    // сохраняем именно те квартиры,
-    // которые сейчас показаны после фильтра
-    visiblePosts = posts;
+    // ძალიან მნიშვნელოვანია:
+    // ვინახავთ ზუსტად იმ ბინებს,
+    // რომლებიც ამ მომენტში ჩანს
+    visiblePosts = [...posts];
 
-    const container = document.getElementById("posts");
+    const container =
+        document.getElementById("posts");
+
+    if (!container) {
+        console.error("❌ #posts not found");
+        return;
+    }
 
     container.innerHTML = "";
+
 
     if (!posts.length) {
 
@@ -94,86 +83,111 @@ function renderPosts(posts) {
     }
 
 
-    posts.forEach(post => {
+    posts.forEach((post, index) => {
 
-        const image =
-    post.images &&
-    Array.isArray(post.images) &&
-    post.images.length
-        ? "/" + post.images[0] + "?post=" + post.id
-        : "https://via.placeholder.com/600x400?text=No+Photo";
-console.log(
-    "CARD:",
-    post.id,
-    "IMAGE:",
-    post.images?.[0]
-);
+        // =========================
+        // IMAGE
+        // =========================
+
+        let image =
+            "https://via.placeholder.com/600x400?text=No+Photo";
+
+
+        if (
+            Array.isArray(post.images) &&
+            post.images.length
+        ) {
+
+            const imagePath =
+                String(post.images[0])
+                    .replace(/^\/+/, "");
+
+            image =
+                "/" +
+                imagePath +
+                "?v=" +
+                encodeURIComponent(
+                    String(post.id)
+                );
+        }
+
+
+        console.log(
+            "CARD:",
+            post.id,
+            "IMAGE:",
+            post.images?.[0]
+        );
+
 
         // =========================
         // DISTRICT
         // =========================
 
         let district =
-            post.district || "";
+            String(post.district || "")
+                .trim();
 
 
-        if (post.text) {
+        if (
+            (!district || district === "-") &&
+            post.text
+        ) {
 
             const text =
-                post.text.toLowerCase();
+                String(post.text)
+                    .toLowerCase();
 
 
             if (
-                !district &&
-                (
-                    text.includes("сабуртало") ||
-                    text.includes("saburtalo")
-                )
+                text.includes("сабуртало") ||
+                text.includes("saburtalo")
             ) {
+
                 district = "Saburtalo";
+
             }
 
             else if (
-                !district &&
-                (
-                    text.includes("ваке") ||
-                    text.includes("vake")
-                )
+                text.includes("ваке") ||
+                text.includes("vake")
             ) {
+
                 district = "Vake";
+
             }
 
             else if (
-                !district &&
-                (
-                    text.includes("вера") ||
-                    text.includes("vera")
-                )
+                text.includes("вера") ||
+                text.includes("vera")
             ) {
+
                 district = "Vera";
+
             }
 
             else if (
-                !district &&
                 text.includes("исани")
             ) {
+
                 district = "Isani";
+
             }
 
             else if (
-                !district &&
                 text.includes("ортачала")
             ) {
+
                 district = "Ortachala";
+
             }
 
             else if (
-                !district &&
                 text.includes("диди дигоми")
             ) {
+
                 district = "Didi Digomi";
             }
-
         }
 
 
@@ -186,102 +200,168 @@ console.log(
         // CARD
         // =========================
 
-        container.innerHTML += `
+        const card =
+            document.createElement("div");
 
-            <div class="card">
-
-                ${
-                    post.status === "rented"
-                        ? `
-                            <div class="rented-badge">
-                                🔴 СДАНО
-                            </div>
-                          `
-                        : ""
-                }
+        card.className = "card";
 
 
-                <img
-                    src="${image}"
-                    class="card-image"
-                    loading="lazy"
+        card.innerHTML = `
 
-                    onclick="
-                        event.stopPropagation();
-                        openGallery('${post.id}')
-                    "
-
-                    onerror="
-                        this.src='https://via.placeholder.com/600x400?text=No+Photo';
-                    "
-                >
+            ${
+                post.status === "rented"
+                    ? `
+                        <div class="rented-badge">
+                            🔴 СДАНО
+                        </div>
+                    `
+                    : ""
+            }
 
 
-                <div class="info">
+            <img
+                src="${image}"
+                class="card-image"
+                loading="lazy"
+                data-post-id="${post.id}"
+                alt="Apartment ${post.id}"
+            >
 
 
-                    <div class="price">
-                        $${post.price || "-"}
-                    </div>
+            <div class="info">
+
+                <div class="price">
+                    $${post.price || "-"}
+                </div>
 
 
-                    <div class="details">
+                <div class="details">
 
-                        📍 <b>Район:</b>
-                        ${district}
+                    📍 <b>Район:</b>
+                    ${district}
 
-                        <br><br>
+                    <br><br>
 
-                        📌 <b>Адрес:</b>
-                        ${post.street || "-"}
+                    📌 <b>Адрес:</b>
+                    ${post.street || "-"}
 
-                        <br><br>
+                    <br><br>
 
-                        🛏 <b>Комнат:</b>
-                        ${post.rooms || "-"}
+                    🛏 <b>Комнат:</b>
+                    ${post.rooms || "-"}
 
-                        <br><br>
+                    <br><br>
 
-                        📐 <b>Площадь:</b>
-                        ${post.area || "-"} м²
-
-                    </div>
-
-
-                    <button
-                        class="details-btn"
-
-                        onclick="
-                            location.href='details.html?id=${post.id}'
-                        "
-                    >
-                        Подробнее
-                    </button>
-
-
-                    ${
-                        post.telegramLink
-                            ? `
-                                <a
-                                    class="telegram-btn"
-                                    href="${post.telegramLink}"
-                                    target="_blank"
-                                    onclick="
-                                        event.stopPropagation()
-                                    "
-                                >
-                                    📲 Смотреть в Telegram
-                                </a>
-                              `
-                            : ""
-                    }
-
+                    📐 <b>Площадь:</b>
+                    ${post.area || "-"} м²
 
                 </div>
 
-            </div>
 
+                <button
+                    class="details-btn"
+                    type="button"
+                >
+                    Подробнее
+                </button>
+
+
+                ${
+                    post.telegramLink
+                        ? `
+                            <a
+                                class="telegram-btn"
+                                href="${post.telegramLink}"
+                                target="_blank"
+                                rel="noopener"
+                            >
+                                📲 Смотреть в Telegram
+                            </a>
+                        `
+                        : ""
+                }
+
+            </div>
         `;
+
+
+        // =========================
+        // IMAGE CLICK
+        // =========================
+
+        const img =
+            card.querySelector(".card-image");
+
+
+        if (img) {
+
+            img.addEventListener(
+                "click",
+                function(event) {
+
+                    event.stopPropagation();
+
+                    console.log(
+                        "🖼 CLICK IMAGE:",
+                        post.id,
+                        post.images?.[0]
+                    );
+
+                    openGallery(
+                        String(post.id)
+                    );
+                }
+            );
+
+
+            img.addEventListener(
+                "error",
+                function() {
+
+                    console.error(
+                        "❌ IMAGE ERROR:",
+                        post.id,
+                        post.images?.[0]
+                    );
+
+                    this.src =
+                        "https://via.placeholder.com/600x400?text=No+Photo";
+                }
+            );
+        }
+
+
+        // =========================
+        // DETAILS BUTTON
+        // =========================
+
+        const detailsButton =
+            card.querySelector(".details-btn");
+
+
+        if (detailsButton) {
+
+            detailsButton.addEventListener(
+                "click",
+                function(event) {
+
+                    event.stopPropagation();
+
+                    location.href =
+                        "details.html?id=" +
+                        encodeURIComponent(
+                            String(post.id)
+                        );
+                }
+            );
+        }
+
+
+        // =========================
+        // ADD CARD
+        // =========================
+
+        container.appendChild(card);
 
     });
 
@@ -330,7 +410,6 @@ function filterPosts() {
     const filtered =
         allPosts.filter(post => {
 
-
             // =========================
             // TEXT
             // =========================
@@ -356,46 +435,64 @@ function filterPosts() {
                     text.includes("сабуртало") ||
                     text.includes("saburtalo")
                 ) {
-                    postDistrict = "saburtalo";
+
+                    postDistrict =
+                        "saburtalo";
+
                 }
 
                 else if (
                     text.includes("ваке") ||
                     text.includes("vake")
                 ) {
-                    postDistrict = "vake";
+
+                    postDistrict =
+                        "vake";
+
                 }
 
                 else if (
                     text.includes("вера") ||
                     text.includes("vera")
                 ) {
-                    postDistrict = "vera";
+
+                    postDistrict =
+                        "vera";
+
                 }
 
                 else if (
                     text.includes("исани")
                 ) {
-                    postDistrict = "isani";
+
+                    postDistrict =
+                        "isani";
+
                 }
 
                 else if (
                     text.includes("ортачала")
                 ) {
-                    postDistrict = "ortachala";
+
+                    postDistrict =
+                        "ortachala";
+
                 }
 
                 else if (
+                    text.includes("დidi дигomi") ||
                     text.includes("диди дигоми")
                 ) {
-                    postDistrict = "didi digomi";
-                }
 
+                    postDistrict =
+                        "didi digomi";
+                }
             }
 
 
-            // ქართული/რუსული/ინგლისური ვარიანტების
-            // ნორმალიზაცია
+            // =========================
+            // NORMALIZE DISTRICT
+            // =========================
 
             const normalizedDistrict =
                 postDistrict
@@ -409,6 +506,7 @@ function filterPosts() {
 
             const selectedDistrict =
                 district
+                    .replace("сაბურთало", "saburtalo")
                     .replace("сабуртало", "saburtalo")
                     .replace("საბურთალო", "saburtalo")
                     .replace("ваке", "vake")
@@ -425,21 +523,18 @@ function filterPosts() {
                 Number(post.rooms) || 0;
 
 
-            // თუ rooms ცარიელია,
-            // ვცდილობთ ტექსტიდან ამოვიღოთ
-
             if (!postRooms && text) {
 
                 const roomMatch =
                     text.match(
-                        /количество комнат\s*:\s*(\d+)/i
+                        /количество\s*комнат\s*:\s*(\d+)/i
                     );
 
                 if (roomMatch) {
+
                     postRooms =
                         Number(roomMatch[1]);
                 }
-
             }
 
 
@@ -464,9 +559,9 @@ function filterPosts() {
                     !text.includes(search) &&
                     !normalizedDistrict.includes(search)
                 ) {
+
                     return false;
                 }
-
             }
 
 
@@ -481,9 +576,9 @@ function filterPosts() {
                         selectedDistrict
                     )
                 ) {
+
                     return false;
                 }
-
             }
 
 
@@ -503,18 +598,16 @@ function filterPosts() {
                         return false;
                     }
 
-                }
-
-                else {
+                } else {
 
                     if (
-                        postRooms !== selectedRooms
+                        postRooms !==
+                        selectedRooms
                     ) {
+
                         return false;
                     }
-
                 }
-
             }
 
 
@@ -537,11 +630,8 @@ function filterPosts() {
         });
 
 
-    // აქ უკვე მხოლოდ გაფილტრულ ბინებს
-    // ვაჩვენებთ
-
+    // მხოლოდ გაფილტრულ ბინებს ვაჩვენებთ
     renderPosts(filtered);
-
 }
 
 
@@ -560,9 +650,6 @@ function openGallery(id) {
         id
     );
 
-
-    // ვეძებთ მხოლოდ იმ ბინას,
-    // რომლის ID-საც დავაჭირეთ
 
     const post =
         visiblePosts.find(
@@ -590,8 +677,6 @@ function openGallery(id) {
         post.price
     );
 
-
-    // მხოლოდ ამ ბინის ფოტოები
 
     currentImages =
         Array.isArray(post.images)
@@ -629,9 +714,7 @@ function openGallery(id) {
 
     viewer.style.display = "block";
 
-
     updateGallery();
-
 }
 
 
@@ -646,35 +729,26 @@ function updateGallery() {
     }
 
 
-    const image =
-        document.getElementById(
-            "viewerImage"
-        );
+    const imagePath =
+        String(
+            currentImages[currentIndex]
+        )
+        .replace(/^\/+/, "");
 
 
-    const counter =
-        document.getElementById(
-            "counter"
-        );
-
-
-    if (!image) {
-        return;
-    }
-
-
-    image.src =
+    document.getElementById(
+        "viewerImage"
+    ).src =
         "/" +
-        currentImages[currentIndex];
+        imagePath +
+        "?v=" +
+        Date.now();
 
 
-    if (counter) {
-
-        counter.innerHTML =
-            `${currentIndex + 1} / ${currentImages.length}`;
-
-    }
-
+    document.getElementById(
+        "counter"
+    ).innerHTML =
+        `${currentIndex + 1} / ${currentImages.length}`;
 }
 
 
@@ -693,7 +767,6 @@ function nextPhoto() {
 
         updateGallery();
     }
-
 }
 
 
@@ -709,7 +782,6 @@ function prevPhoto() {
 
         updateGallery();
     }
-
 }
 
 
@@ -720,18 +792,11 @@ function prevPhoto() {
 function closeViewer() {
 
     const viewer =
-        document.getElementById(
-            "viewer"
-        );
-
+        document.getElementById("viewer");
 
     if (viewer) {
-
-        viewer.style.display =
-            "none";
-
+        viewer.style.display = "none";
     }
-
 }
 
 
@@ -747,16 +812,13 @@ document.addEventListener(
             closeViewer();
         }
 
-
         if (e.key === "ArrowRight") {
             nextPhoto();
         }
 
-
         if (e.key === "ArrowLeft") {
             prevPhoto();
         }
-
     }
 );
 
