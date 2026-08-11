@@ -102,7 +102,12 @@ function renderPosts(posts) {
     post.images.length
         ? "/" + post.images[0] + "?post=" + post.id
         : "https://via.placeholder.com/600x400?text=No+Photo";
-
+console.log(
+    "CARD:",
+    post.id,
+    "IMAGE:",
+    post.images?.[0]
+);
 
         // =========================
         // DISTRICT
