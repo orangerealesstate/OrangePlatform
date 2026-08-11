@@ -17,33 +17,401 @@ async function loadPosts() {
             }
         );
 
+
         if (!response.ok) {
             throw new Error("Server error");
         }
 
-        allPosts = await response.json();
+
+        const rawPosts = await response.json();
+
 
         console.log(
-            "✅ Loaded posts:",
+            "📦 RAW POSTS:",
+            rawPosts.length
+        );
+
+
+        // ==========================================
+        // REMOVE TELEGRAM ALBUM DUPLICATES
+        // ==========================================
+
+        const groups = new Map();
+
+
+        rawPosts.forEach((post) => {
+
+            const groupKey =
+                post.groupId !== undefined &&
+                post.groupId !== null &&
+                String(post.groupId).trim()
+                    ? String(post.groupId).trim()
+                    : `single-${post.id}`;
+
+
+            const existing =
+                groups.get(groupKey);
+
+
+            if (!existing) {
+
+                groups.set(
+                    groupKey,
+                    post
+                );
+
+                return;
+            }
+
+
+            const existingText =
+                String(
+                    existing.text || ""
+                ).trim();
+
+
+            const currentText =
+                String(
+                    post.text || ""
+                ).trim();
+
+
+            /*
+             * თუ ერთი groupId-ის რამდენიმე ჩანაწერია,
+             * ვინახავთ იმ ჩანაწერს, რომელსაც
+             * უფრო სრული ტექსტი აქვს.
+             */
+
+            if (
+                currentText.length >
+                existingText.length
+            ) {
+
+                groups.set(
+                    groupKey,
+                    post
+                );
+
+            }
+
+            else if (
+                currentText.length ===
+                existingText.length
+            ) {
+
+                if (
+                    (post.images?.length || 0) >
+                    (existing.images?.length || 0)
+                ) {
+
+                    groups.set(
+                        groupKey,
+                        post
+                    );
+                }
+            }
+
+        });
+
+
+        allPosts =
+            Array.from(
+                groups.values()
+            );
+
+
+        console.log(
+            "✅ UNIQUE APARTMENTS:",
             allPosts.length
         );
 
+
         renderPosts(allPosts);
+
 
     } catch (err) {
 
-        console.error(err);
+        console.error(
+            "❌ LOAD ERROR:",
+            err
+        );
 
-        document.getElementById("posts").innerHTML = `
-            <h2 style="
-                text-align:center;
-                padding:40px;
-            ">
-                Ошибка загрузки объявлений
-            </h2>
-        `;
+
+        const container =
+            document.getElementById(
+                "posts"
+            );
+
+
+        if (container) {
+
+            container.innerHTML = `
+                <h2 style="
+                    text-align:center;
+                    padding:40px;
+                ">
+                    Ошибка загрузки объявлений
+                </h2>
+            `;
+        }
+
     }
+
 }
+
+
+
+// =========================
+// DISTRICT HELPER
+// =========================
+
+function getDistrict(post) {
+
+    const text =
+        String(
+            post?.text || ""
+        ).toLowerCase();
+
+
+    const stored =
+        String(
+            post?.district || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    const districts = [
+
+        [
+            "didi digomi",
+            [
+                "диди дигоми",
+                "დიდი დიღომი",
+                "didi digomi",
+                "didi dighomi"
+            ]
+        ],
+
+        [
+            "saburtalo",
+            [
+                "сабуртало",
+                "საბურთალო",
+                "saburtalo"
+            ]
+        ],
+
+        [
+            "vake",
+            [
+                "ваке",
+                "ვაკე",
+                "vake"
+            ]
+        ],
+
+        [
+            "vera",
+            [
+                "вера",
+                "ვერა",
+                "vera"
+            ]
+        ],
+
+        [
+            "mtatsminda",
+            [
+                "мтацминда",
+                "მთაწმინდა",
+                "mtatsminda"
+            ]
+        ],
+
+        [
+            "krtsanisi",
+            [
+                "крцаниси",
+                "კრწანისი",
+                "krtsanisi"
+            ]
+        ],
+
+        [
+            "didube",
+            [
+                "дидубе",
+                "დიდუბე",
+                "didube"
+            ]
+        ],
+
+        [
+            "nadzaladevi",
+            [
+                "надзаладеви",
+                "ნაძალადევი",
+                "nadzaladevi"
+            ]
+        ],
+
+        [
+            "isani",
+            [
+                "исани",
+                "ისანი",
+                "isani"
+            ]
+        ],
+
+        [
+            "ortachala",
+            [
+                "ортачала",
+                "ორთაჭალა",
+                "ortachala"
+            ]
+        ],
+
+        [
+            "gldani",
+            [
+                "глдани",
+                "გლდანი",
+                "gldani"
+            ]
+        ],
+
+        [
+            "chughureti",
+            [
+                "чугурети",
+                "ჩუღურეთი",
+                "chughureti"
+            ]
+        ],
+
+        [
+            "sololaki",
+            [
+                "сололаки",
+                "სოლოლაკი",
+                "sololaki"
+            ]
+        ],
+
+        [
+            "avlabari",
+            [
+                "авлабари",
+                "ავლაბარი",
+                "avlabari"
+            ]
+        ],
+
+        [
+            "samgori",
+            [
+                "самгори",
+                "სამგორი",
+                "samgori"
+            ]
+        ],
+
+        [
+            "ponichala",
+            [
+                "поничала",
+                "ფონიჭალა",
+                "ponichala"
+            ]
+        ],
+
+        [
+            "dighomi",
+            [
+                "дигоми",
+                "დიღომი",
+                "dighomi"
+            ]
+        ]
+
+    ];
+
+
+    // =========================
+    // CHECK STORED DISTRICT
+    // =========================
+
+    for (
+        const [
+            normalized,
+            variants
+        ]
+        of districts
+    ) {
+
+        if (
+            variants.some(
+                value =>
+                    stored.includes(value)
+            )
+        ) {
+
+            return normalized;
+        }
+
+    }
+
+
+    // =========================
+    // CHECK TEXT
+    // =========================
+
+    for (
+        const [
+            normalized,
+            variants
+        ]
+        of districts
+    ) {
+
+        if (
+            variants.some(
+                value =>
+                    text.includes(value)
+            )
+        ) {
+
+            return normalized;
+        }
+
+    }
+
+
+    return "-";
+
+}
+
+
+
+// =========================
+// NORMALIZE DISTRICT
+// =========================
+
+function normalizeDistrict(value) {
+
+    return String(
+        value || ""
+    )
+        .toLowerCase()
+        .trim()
+        .replace(/ё/g, "е")
+        .replace(/\s+/g, " ");
+
+}
+
 
 
 // =========================
@@ -52,18 +420,30 @@ async function loadPosts() {
 
 function renderPosts(posts) {
 
+
     // ძალიან მნიშვნელოვანია:
     // ვინახავთ ზუსტად იმ ბინებს,
     // რომლებიც ამ მომენტში ჩანს
-    visiblePosts = [...posts];
+
+    visiblePosts =
+        [...posts];
+
 
     const container =
-        document.getElementById("posts");
+        document.getElementById(
+            "posts"
+        );
+
 
     if (!container) {
-        console.error("❌ #posts not found");
+
+        console.error(
+            "❌ #posts not found"
+        );
+
         return;
     }
+
 
     container.innerHTML = "";
 
@@ -83,289 +463,294 @@ function renderPosts(posts) {
     }
 
 
-    posts.forEach((post, index) => {
 
-        // =========================
-        // IMAGE
-        // =========================
-
-        let image =
-            "https://via.placeholder.com/600x400?text=No+Photo";
+    posts.forEach(
+        (post, index) => {
 
 
-        if (
-            Array.isArray(post.images) &&
-            post.images.length
-        ) {
+            // =========================
+            // IMAGE
+            // =========================
 
-            const imagePath =
-                String(post.images[0])
-                    .replace(/^\/+/, "");
-
-            image =
-                "/" +
-                imagePath +
-                "?v=" +
-                encodeURIComponent(
-                    String(post.id)
-                );
-        }
-
-
-        console.log(
-            "CARD:",
-            post.id,
-            "IMAGE:",
-            post.images?.[0]
-        );
-
-
-        // =========================
-        // DISTRICT
-        // =========================
-
-        let district =
-            String(post.district || "")
-                .trim();
-
-
-        if (
-            (!district || district === "-") &&
-            post.text
-        ) {
-
-            const text =
-                String(post.text)
-                    .toLowerCase();
+            let image =
+                "https://via.placeholder.com/600x400?text=No+Photo";
 
 
             if (
-                text.includes("сабуртало") ||
-                text.includes("saburtalo")
+                Array.isArray(
+                    post.images
+                ) &&
+                post.images.length
             ) {
 
-                district = "Saburtalo";
+                const imagePath =
+                    String(
+                        post.images[0]
+                    )
+                    .replace(
+                        /^\/+/,
+                        ""
+                    );
+
+
+                image =
+                    "/" +
+                    imagePath +
+                    "?v=" +
+                    encodeURIComponent(
+                        String(
+                            post.id
+                        )
+                    );
 
             }
 
-            else if (
-                text.includes("ваке") ||
-                text.includes("vake")
-            ) {
-
-                district = "Vake";
-
-            }
-
-            else if (
-                text.includes("вера") ||
-                text.includes("vera")
-            ) {
-
-                district = "Vera";
-
-            }
-
-            else if (
-                text.includes("исани")
-            ) {
-
-                district = "Isani";
-
-            }
-
-            else if (
-                text.includes("ортачала")
-            ) {
-
-                district = "Ortachala";
-
-            }
-
-            else if (
-                text.includes("диди дигоми")
-            ) {
-
-                district = "Didi Digomi";
-            }
-        }
 
 
-        if (!district) {
-            district = "-";
-        }
+            console.log(
+                "CARD:",
+                post.id,
+                "IMAGE:",
+                post.images?.[0]
+            );
 
 
-        // =========================
-        // CARD
-        // =========================
 
-        const card =
-            document.createElement("div");
+            // =========================
+            // DISTRICT
+            // =========================
 
-        card.className = "card";
-
-
-        card.innerHTML = `
-
-            ${
-                post.status === "rented"
-                    ? `
-                        <div class="rented-badge">
-                            🔴 СДАНО
-                        </div>
-                    `
-                    : ""
-            }
+            const district =
+                getDistrict(post);
 
 
-            <img
-                src="${image}"
-                class="card-image"
-                loading="lazy"
-                data-post-id="${post.id}"
-                alt="Apartment ${post.id}"
-            >
+
+            // =========================
+            // CARD
+            // =========================
+
+            const card =
+                document.createElement(
+                    "div"
+                );
 
 
-            <div class="info">
-
-                <div class="price">
-                    $${post.price || "-"}
-                </div>
+            card.className =
+                "card";
 
 
-                <div class="details">
-
-                    📍 <b>Район:</b>
-                    ${district}
-
-                    <br><br>
-
-                    📌 <b>Адрес:</b>
-                    ${post.street || "-"}
-
-                    <br><br>
-
-                    🛏 <b>Комнат:</b>
-                    ${post.rooms || "-"}
-
-                    <br><br>
-
-                    📐 <b>Площадь:</b>
-                    ${post.area || "-"} м²
-
-                </div>
-
-
-                <button
-                    class="details-btn"
-                    type="button"
-                >
-                    Подробнее
-                </button>
-
+            card.innerHTML = `
 
                 ${
-                    post.telegramLink
+                    post.status === "rented"
                         ? `
-                            <a
-                                class="telegram-btn"
-                                href="${post.telegramLink}"
-                                target="_blank"
-                                rel="noopener"
-                            >
-                                📲 Смотреть в Telegram
-                            </a>
-                        `
+                            <div class="rented-badge">
+                                🔴 СДАНО
+                            </div>
+                          `
                         : ""
                 }
 
-            </div>
-        `;
+
+                <img
+                    src="${image}"
+                    class="card-image"
+                    loading="lazy"
+                    data-post-id="${post.id}"
+                    alt="Apartment ${post.id}"
+                >
 
 
-        // =========================
-        // IMAGE CLICK
-        // =========================
-
-        const img =
-            card.querySelector(".card-image");
+                <div class="info">
 
 
-        if (img) {
-
-            img.addEventListener(
-                "click",
-                function(event) {
-
-                    event.stopPropagation();
-
-                    console.log(
-                        "🖼 CLICK IMAGE:",
-                        post.id,
-                        post.images?.[0]
-                    );
-
-                    openGallery(
-                        String(post.id)
-                    );
-                }
-            );
+                    <div class="price">
+                        $${post.price || "-"}
+                    </div>
 
 
-            img.addEventListener(
-                "error",
-                function() {
+                    <div class="details">
 
-                    console.error(
-                        "❌ IMAGE ERROR:",
-                        post.id,
-                        post.images?.[0]
-                    );
+                        📍 <b>Район:</b>
+                        ${district}
 
-                    this.src =
-                        "https://via.placeholder.com/600x400?text=No+Photo";
-                }
-            );
-        }
+                        <br><br>
 
+                        📌 <b>Адрес:</b>
+                        ${post.street || "-"}
 
-        // =========================
-        // DETAILS BUTTON
-        // =========================
+                        <br><br>
 
-        const detailsButton =
-            card.querySelector(".details-btn");
+                        🛏 <b>Комнат:</b>
+                        ${post.rooms || "-"}
+
+                        <br><br>
+
+                        📐 <b>Площадь:</b>
+                        ${post.area || "-"} м²
+
+                    </div>
 
 
-        if (detailsButton) {
+                    <button
+                        class="details-btn"
+                        type="button"
+                    >
+                        Подробнее
+                    </button>
 
-            detailsButton.addEventListener(
-                "click",
-                function(event) {
 
-                    event.stopPropagation();
+                    ${
+                        post.telegramLink
+                            ? `
+                                <a
+                                    class="telegram-btn"
+                                    href="${post.telegramLink}"
+                                    target="_blank"
+                                    rel="noopener"
+                                >
+                                    📲 Смотреть в Telegram
+                                </a>
+                              `
+                            : ""
+                    }
 
-                    location.href =
-                        "details.html?id=" +
-                        encodeURIComponent(
-                            String(post.id)
+
+                </div>
+
+            `;
+
+
+
+            // =========================
+            // IMAGE CLICK
+            // =========================
+
+            const img =
+                card.querySelector(
+                    ".card-image"
+                );
+
+
+            if (img) {
+
+                img.addEventListener(
+                    "click",
+                    function(event) {
+
+                        event.stopPropagation();
+
+
+                        console.log(
+                            "🖼 CLICK IMAGE:",
+                            post.id,
+                            post.images?.[0]
                         );
-                }
+
+
+                        openGallery(
+                            String(
+                                post.id
+                            )
+                        );
+
+                    }
+                );
+
+
+                img.addEventListener(
+                    "error",
+                    function() {
+
+                        console.error(
+                            "❌ IMAGE ERROR:",
+                            post.id,
+                            post.images?.[0]
+                        );
+
+
+                        this.src =
+                            "https://via.placeholder.com/600x400?text=No+Photo";
+
+                    }
+                );
+
+            }
+
+
+
+            // =========================
+            // DETAILS BUTTON
+            // =========================
+
+            const detailsButton =
+                card.querySelector(
+                    ".details-btn"
+                );
+
+
+            if (detailsButton) {
+
+                detailsButton.addEventListener(
+                    "click",
+                    function(event) {
+
+                        event.stopPropagation();
+
+
+                        location.href =
+                            "details.html?id=" +
+                            encodeURIComponent(
+                                String(
+                                    post.id
+                                )
+                            );
+
+                    }
+                );
+
+            }
+
+
+
+            // =========================
+            // TELEGRAM BUTTON
+            // =========================
+
+            const telegramButton =
+                card.querySelector(
+                    ".telegram-btn"
+                );
+
+
+            if (telegramButton) {
+
+                telegramButton.addEventListener(
+                    "click",
+                    function(event) {
+
+                        event.stopPropagation();
+
+                    }
+                );
+
+            }
+
+
+
+            // =========================
+            // ADD CARD
+            // =========================
+
+            container.appendChild(
+                card
             );
+
         }
-
-
-        // =========================
-        // ADD CARD
-        // =========================
-
-        container.appendChild(card);
-
-    });
+    );
 
 }
+
 
 
 // =========================
@@ -374,265 +759,237 @@ function renderPosts(posts) {
 
 function filterPosts() {
 
+
     const search =
-        document.getElementById("search")
-            ?.value
-            .toLowerCase()
-            .trim() || "";
+        document.getElementById(
+            "search"
+        )
+        ?.value
+        .toLowerCase()
+        .trim() || "";
 
 
-    const district =
-        document.getElementById("districtFilter")
-            ?.value
-            .toLowerCase()
-            .trim() || "";
+    const selectedDistrict =
+        normalizeDistrict(
+            document.getElementById(
+                "districtFilter"
+            )
+            ?.value || ""
+        );
 
 
     const rooms =
-        document.getElementById("roomsFilter")
-            ?.value || "";
+        document.getElementById(
+            "roomsFilter"
+        )
+        ?.value || "";
 
 
     const minPrice =
         Number(
-            document.getElementById("minPrice")
-                ?.value
+            document.getElementById(
+                "minPrice"
+            )
+            ?.value
         ) || 0;
 
 
     const maxPrice =
         Number(
-            document.getElementById("maxPrice")
-                ?.value
+            document.getElementById(
+                "maxPrice"
+            )
+            ?.value
         ) || 99999999;
 
 
+
     const filtered =
-        allPosts.filter(post => {
+        allPosts.filter(
+            post => {
 
-            // =========================
-            // TEXT
-            // =========================
 
-            const text =
-                String(post.text || "")
+                const text =
+                    String(
+                        post.text || ""
+                    )
                     .toLowerCase();
 
 
-            // =========================
-            // DISTRICT
-            // =========================
+                const district =
+                    normalizeDistrict(
+                        getDistrict(
+                            post
+                        )
+                    );
 
-            let postDistrict =
-                String(post.district || "")
+
+                const street =
+                    String(
+                        post.street || ""
+                    )
                     .toLowerCase()
                     .trim();
 
 
-            if (!postDistrict) {
 
-                if (
-                    text.includes("сабуртало") ||
-                    text.includes("saburtalo")
-                ) {
+                // =========================
+                // SEARCH
+                // =========================
 
-                    postDistrict =
-                        "saburtalo";
+                if (search) {
 
-                }
+                    const searchable =
+                        `${text} ${district} ${street}`
+                        .toLowerCase();
 
-                else if (
-                    text.includes("ваке") ||
-                    text.includes("vake")
-                ) {
-
-                    postDistrict =
-                        "vake";
-
-                }
-
-                else if (
-                    text.includes("вера") ||
-                    text.includes("vera")
-                ) {
-
-                    postDistrict =
-                        "vera";
-
-                }
-
-                else if (
-                    text.includes("исани")
-                ) {
-
-                    postDistrict =
-                        "isani";
-
-                }
-
-                else if (
-                    text.includes("ортачала")
-                ) {
-
-                    postDistrict =
-                        "ortachala";
-
-                }
-
-                else if (
-                    text.includes("დidi дигomi") ||
-                    text.includes("диди дигоми")
-                ) {
-
-                    postDistrict =
-                        "didi digomi";
-                }
-            }
-
-
-            // =========================
-            // NORMALIZE DISTRICT
-            // =========================
-
-            const normalizedDistrict =
-                postDistrict
-                    .replace("сабуртало", "saburtalo")
-                    .replace("საბურთალო", "saburtalo")
-                    .replace("ваке", "vake")
-                    .replace("ვაკე", "vake")
-                    .replace("вера", "vera")
-                    .replace("ვერა", "vera");
-
-
-            const selectedDistrict =
-                district
-                    .replace("сაბურთало", "saburtalo")
-                    .replace("сабуртало", "saburtalo")
-                    .replace("საბურთალო", "saburtalo")
-                    .replace("ваке", "vake")
-                    .replace("ვაკე", "vake")
-                    .replace("вера", "vera")
-                    .replace("ვერა", "vera");
-
-
-            // =========================
-            // ROOMS
-            // =========================
-
-            let postRooms =
-                Number(post.rooms) || 0;
-
-
-            if (!postRooms && text) {
-
-                const roomMatch =
-                    text.match(
-                        /количество\s*комнат\s*:\s*(\d+)/i
-                    );
-
-                if (roomMatch) {
-
-                    postRooms =
-                        Number(roomMatch[1]);
-                }
-            }
-
-
-            // =========================
-            // PRICE
-            // =========================
-
-            const postPrice =
-                Number(
-                    String(post.price || "")
-                        .replace(/[^\d.]/g, "")
-                ) || 0;
-
-
-            // =========================
-            // SEARCH
-            // =========================
-
-            if (search) {
-
-                if (
-                    !text.includes(search) &&
-                    !normalizedDistrict.includes(search)
-                ) {
-
-                    return false;
-                }
-            }
-
-
-            // =========================
-            // DISTRICT FILTER
-            // =========================
-
-            if (selectedDistrict) {
-
-                if (
-                    !normalizedDistrict.includes(
-                        selectedDistrict
-                    )
-                ) {
-
-                    return false;
-                }
-            }
-
-
-            // =========================
-            // ROOMS FILTER
-            // =========================
-
-            if (rooms) {
-
-                const selectedRooms =
-                    Number(rooms);
-
-
-                if (selectedRooms === 5) {
-
-                    if (postRooms < 5) {
-                        return false;
-                    }
-
-                } else {
 
                     if (
-                        postRooms !==
-                        selectedRooms
+                        !searchable.includes(
+                            search
+                        )
                     ) {
 
                         return false;
                     }
+
                 }
+
+
+
+                // =========================
+                // DISTRICT FILTER
+                // =========================
+
+                if (
+                    selectedDistrict
+                ) {
+
+                    if (
+                        district !==
+                        selectedDistrict
+                    ) {
+
+                        return false;
+                    }
+
+                }
+
+
+
+                // =========================
+                // ROOMS
+                // =========================
+
+                const postRooms =
+                    Number(
+                        String(
+                            post.rooms || ""
+                        )
+                        .replace(
+                            /[^\d]/g,
+                            ""
+                        )
+                    ) || 0;
+
+
+
+                if (rooms) {
+
+                    const selectedRooms =
+                        Number(
+                            rooms
+                        );
+
+
+                    // 5 = 5+
+                    if (
+                        selectedRooms ===
+                        5
+                    ) {
+
+                        if (
+                            postRooms < 5
+                        ) {
+
+                            return false;
+                        }
+
+                    }
+
+                    else {
+
+                        if (
+                            postRooms !==
+                            selectedRooms
+                        ) {
+
+                            return false;
+                        }
+
+                    }
+
+                }
+
+
+
+                // =========================
+                // PRICE
+                // =========================
+
+                const postPrice =
+                    Number(
+                        String(
+                            post.price || ""
+                        )
+                        .replace(
+                            /[^\d.]/g,
+                            ""
+                        )
+                    ) || 0;
+
+
+
+                if (
+                    postPrice <
+                    minPrice
+                ) {
+
+                    return false;
+                }
+
+
+                if (
+                    postPrice >
+                    maxPrice
+                ) {
+
+                    return false;
+                }
+
+
+
+                return true;
+
             }
+        );
 
 
-            // =========================
-            // PRICE FILTER
-            // =========================
 
-            if (postPrice < minPrice) {
-                return false;
-            }
-
-
-            if (postPrice > maxPrice) {
-                return false;
-            }
+    console.log(
+        "🔎 FILTER:",
+        filtered.length,
+        "/",
+        allPosts.length
+    );
 
 
-            return true;
+    renderPosts(
+        filtered
+    );
 
-        });
-
-
-    // მხოლოდ გაფილტრულ ბინებს ვაჩვენებთ
-    renderPosts(filtered);
 }
+
 
 
 // =========================
@@ -643,7 +1000,9 @@ let currentImages = [];
 let currentIndex = 0;
 
 
+
 function openGallery(id) {
+
 
     console.log(
         "🖼 Opening gallery for ID:",
@@ -651,12 +1010,21 @@ function openGallery(id) {
     );
 
 
+
+    // აქ ვეძებთ მხოლოდ იმ ბინას,
+    // რომელიც ამ მომენტში ჩანს
+
     const post =
         visiblePosts.find(
             p =>
-                String(p.id) ===
-                String(id)
+                String(
+                    p.id
+                ) ===
+                String(
+                    id
+                )
         );
+
 
 
     if (!post) {
@@ -670,6 +1038,7 @@ function openGallery(id) {
     }
 
 
+
     console.log(
         "🏠 Apartment:",
         post.id,
@@ -678,19 +1047,30 @@ function openGallery(id) {
     );
 
 
+
+    // =========================
+    // ONLY THIS APARTMENT IMAGES
+    // =========================
+
     currentImages =
-        Array.isArray(post.images)
+        Array.isArray(
+            post.images
+        )
             ? [...post.images]
             : [];
+
 
 
     currentIndex = 0;
 
 
-    if (!currentImages.length) {
+
+    if (
+        !currentImages.length
+    ) {
 
         console.warn(
-            "No images for:",
+            "⚠️ No images for:",
             post.id
         );
 
@@ -698,8 +1078,12 @@ function openGallery(id) {
     }
 
 
+
     const viewer =
-        document.getElementById("viewer");
+        document.getElementById(
+            "viewer"
+        );
+
 
 
     if (!viewer) {
@@ -712,10 +1096,15 @@ function openGallery(id) {
     }
 
 
-    viewer.style.display = "block";
+
+    viewer.style.display =
+        "block";
+
 
     updateGallery();
+
 }
+
 
 
 // =========================
@@ -724,32 +1113,69 @@ function openGallery(id) {
 
 function updateGallery() {
 
-    if (!currentImages.length) {
+
+    if (
+        !currentImages.length
+    ) {
+
         return;
     }
 
 
+
     const imagePath =
         String(
-            currentImages[currentIndex]
+            currentImages[
+                currentIndex
+            ]
         )
-        .replace(/^\/+/, "");
+        .replace(
+            /^\/+/,
+            ""
+        );
 
 
-    document.getElementById(
-        "viewerImage"
-    ).src =
+
+    const viewerImage =
+        document.getElementById(
+            "viewerImage"
+        );
+
+
+    if (!viewerImage) {
+
+        console.error(
+            "❌ #viewerImage not found"
+        );
+
+        return;
+    }
+
+
+
+    viewerImage.src =
         "/" +
         imagePath +
         "?v=" +
         Date.now();
 
 
-    document.getElementById(
-        "counter"
-    ).innerHTML =
-        `${currentIndex + 1} / ${currentImages.length}`;
+
+    const counter =
+        document.getElementById(
+            "counter"
+        );
+
+
+    if (counter) {
+
+        counter.innerHTML =
+            `${currentIndex + 1} / ${currentImages.length}`;
+
+    }
+
 }
+
 
 
 // =========================
@@ -758,6 +1184,7 @@ function updateGallery() {
 
 function nextPhoto() {
 
+
     if (
         currentIndex <
         currentImages.length - 1
@@ -765,9 +1192,13 @@ function nextPhoto() {
 
         currentIndex++;
 
+
         updateGallery();
+
     }
+
 }
+
 
 
 // =========================
@@ -776,28 +1207,44 @@ function nextPhoto() {
 
 function prevPhoto() {
 
-    if (currentIndex > 0) {
+
+    if (
+        currentIndex > 0
+    ) {
 
         currentIndex--;
 
+
         updateGallery();
+
     }
+
 }
 
 
+
 // =========================
-// CLOSE
+// CLOSE VIEWER
 // =========================
 
 function closeViewer() {
 
+
     const viewer =
-        document.getElementById("viewer");
+        document.getElementById(
+            "viewer"
+        );
+
 
     if (viewer) {
-        viewer.style.display = "none";
+
+        viewer.style.display =
+            "none";
+
     }
+
 }
+
 
 
 // =========================
@@ -808,19 +1255,39 @@ document.addEventListener(
     "keydown",
     (e) => {
 
-        if (e.key === "Escape") {
+
+        if (
+            e.key ===
+            "Escape"
+        ) {
+
             closeViewer();
+
         }
 
-        if (e.key === "ArrowRight") {
+
+        if (
+            e.key ===
+            "ArrowRight"
+        ) {
+
             nextPhoto();
+
         }
 
-        if (e.key === "ArrowLeft") {
+
+        if (
+            e.key ===
+            "ArrowLeft"
+        ) {
+
             prevPhoto();
+
         }
+
     }
 );
+
 
 
 // =========================
