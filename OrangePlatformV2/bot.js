@@ -2,7 +2,6 @@ require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
 
 const token = process.env.BOT_TOKEN;
-console.log("Token starts with:", token.substring(0, 10));
 
 if (!token) {
     console.log("❌ BOT_TOKEN ვერ მოიძებნა .env ფაილში");
