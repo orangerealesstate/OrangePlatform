@@ -1,5 +1,59 @@
 [
   {
+    "id": 186178,
+    "groupId": "14292229103725922",
+    "date": 1786528637,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/186178",
+    "text": "#Сдается #2комнатная квартира в #Тбилиси\n\n🍊 Код: 25709118\n\n🌃 Новостройка: Да\n\n📍 Адрес: Ketevan Dedofali Avenue, 47\n\n🛋 #Комнат2\n\n🛏 #Спален1\n\n🛁 #Санузел1\n\n📐 площадь: 53\n\n🍊 Этаж: 1/10\n\n🍊 Бытовая техника: ✅ #Посудомоечная_машина, ✅#духовка, ✅#стиральная_машина, ✅#кондиционер,✅ #телевизор \n\n🐶🐈‍⬛ #Животные:🚫\n\n📅Срок ареньди: 12\n\n🍊 Описание:Сдается двухуровневая квартира в 1 минуте ходьбы от станции метро #300_Арагвели. Квартира полностью меблирована и оборудована всей необходимой мебелью и бытовой техникой. Рядом находятся #магазины, #аптеки, №спорт_залы и заведения быстрого питания.\n\n🍊 #Цена_650\n\n📱 По всем вопросам: @sandroorange\n\n🍊Отзиви👉 @otziviorange1\n\n🌃 Поиск с фильтрами: @TBILISI2026_BOT\n\n#аренда #Комлпекс #Сниму #АрендаТбилиси #ТбилисиАренда #сдам #сдаю #премиум #Центр",
+    "images": [
+      "downloads/186178.jpg",
+      "downloads/186179.jpg",
+      "downloads/186180.jpg",
+      "downloads/186181.jpg",
+      "downloads/186182.jpg",
+      "downloads/186183.jpg"
+    ],
+    "price": "650",
+    "district": "тбилиси",
+    "street": "Ketevan Dedofali Avenue, 47",
+    "rooms": "2",
+    "bedrooms": "1",
+    "area": "53",
+    "floor": "1/10",
+    "lat": null,
+    "lng": null,
+    "agent": "",
+    "status": "active"
+  },
+  {
+    "id": 186170,
+    "groupId": "14292224424102810",
+    "date": 1786528053,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/186170",
+    "text": "#Сдается #2комнатная квартира в #Сабуртало\n\n\n🍊 Код: 25732973\n\n🌃 Новостройка: Да\n\n📍 Адрес: M3 Saburtalo\n\n🛋 #Комнат2\n\n🛏 #Спален1\n\n🛁 #Санузел1\n\n📐 площадь: 46\n\n🍊 Этаж: 2\n\n🍊 Бытовая техника: ✅ #Посудомоечная_машина, ✅#духовка, ✅#стиральная_машина, ✅#кондиционер,✅ #телевизор \n\n🐶🐈‍⬛ #Животные:         \n\n📅Срок ареньди: 6-12\n\n🍊 Описание:\n\n🍊 #Цена_550💲\n\n📱 По всем вопросам: @Orangerealestatetbilisi\n\n🍊Отзиви👉 @otziviorange1\n\n🌃 Поиск с фильтрами: @TBILISI2026_BOT\n\n#аренда #Комлпекс #Сниму #АрендаТбилиси #ТбилисиАренда #сдам #сдаю #премиум #Центр",
+    "images": [
+      "downloads/186170.jpg",
+      "downloads/186171.jpg",
+      "downloads/186172.jpg",
+      "downloads/186173.jpg",
+      "downloads/186174.jpg",
+      "downloads/186175.jpg",
+      "downloads/186176.jpg",
+      "downloads/186177.jpg"
+    ],
+    "price": "550",
+    "district": "saburtalo",
+    "street": "M3 Saburtalo",
+    "rooms": "2",
+    "bedrooms": "1",
+    "area": "46",
+    "floor": "2",
+    "lat": null,
+    "lng": null,
+    "agent": "",
+    "status": "active"
+  },
+  {
     "id": 186160,
     "groupId": "14292179715099138",
     "date": 1786522464,
@@ -1527,6 +1581,32 @@
     "lng": null,
     "agent": "",
     "telegramLink": "https://t.me/kvartiri_tbilisi2023/185679",
+    "status": "active"
+  },
+  {
+    "id": 185673,
+    "groupId": "14288033354945770",
+    "date": 1786004169,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/185673",
+    "text": "",
+    "images": [
+      "downloads/185673.jpg",
+      "downloads/185674.jpg",
+      "downloads/185675.jpg",
+      "downloads/185676.jpg",
+      "downloads/185677.jpg",
+      "downloads/185678.jpg"
+    ],
+    "price": "-",
+    "district": "-",
+    "street": "-",
+    "rooms": "-",
+    "bedrooms": "-",
+    "area": "-",
+    "floor": "-",
+    "lat": null,
+    "lng": null,
+    "agent": "",
     "status": "active"
   },
   {

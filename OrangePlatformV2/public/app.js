@@ -1,3 +1,4 @@
+console.log("🔥 ORANGE APP.JS LOADED - TEST");
 let allPosts = [];
 const telegramWebApp = window.Telegram?.WebApp;
 
