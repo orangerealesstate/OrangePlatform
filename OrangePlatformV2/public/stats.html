@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Orange Statistics</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .stat-icon {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .stat-title {
+            margin-top: 6px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .posts {
+            margin-top: 25px;
+        }
+
+        .post-row {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .post-id {
+            font-weight: bold;
+        }
+
+        .post-views {
+            font-weight: bold;
+        }
+
+        #error {
+            text-align: center;
+            color: red;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>📊 Orange Statistics</h1>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number" id="totalUsers">0</div>
+            <div class="stat-title">Пользователи</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">👀</div>
+            <div class="stat-number" id="totalAppViews">0</div>
+            <div class="stat-title">Открытия приложения</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🏠</div>
+            <div class="stat-number" id="totalPostViews">0</div>
+            <div class="stat-title">Просмотры квартир</div>
+        </div>
+
+    </div>
+
+    <div class="posts">
+
+        <h2>🏠 Просмотры объявлений</h2>
+
+        <div id="postsList">
+            Загрузка...
+        </div>
+
+    </div>
+
+    <div id="error"></div>
+
+    <script>
+
+        const tg = window.Telegram?.WebApp;
+
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        const telegramUserId =
+            tg?.initDataUnsafe?.user?.id || null;
+
+
+        async function loadStats() {
+
+            if (!telegramUserId) {
+
+                document.getElementById("error").innerText =
+                    "❌ Telegram user not found";
+
+                return;
+            }
+
+            try {
+
+                const response = await fetch(
+                    `/api/stats?userId=${telegramUserId}`
+                );
+
+                if (!response.ok) {
+
+                    document.getElementById("error").innerText =
+                        "❌ Доступ запрещён";
+
+                    return;
+                }
+
+                const stats = await response.json();
+
+
+                document.getElementById("totalUsers").innerText =
+                    stats.totalUsers || 0;
+
+                document.getElementById("totalAppViews").innerText =
+                    stats.totalAppViews || 0;
+
+                document.getElementById("totalPostViews").innerText =
+                    stats.totalPostViews || 0;
+
+
+                const postsList =
+                    document.getElementById("postsList");
+
+                postsList.innerHTML = "";
+
+
+                const postViews =
+                    stats.postViews || {};
+
+
+                const entries =
+                    Object.entries(postViews)
+                        .sort((a, b) => b[1] - a[1]);
+
+
+                if (!entries.length) {
+
+                    postsList.innerHTML =
+                        "<p>Пока нет просмотров</p>";
+
+                    return;
+                }
+
+
+                entries.forEach(([postId, views]) => {
+
+                    postsList.innerHTML += `
+
+                        <div class="post-row">
+
+                            <div class="post-id">
+                                🏠 Код: ${postId}
+                            </div>
+
+                            <div class="post-views">
+                                👀 ${views}
+                            </div>
+
+                        </div>
+
+                    `;
+
+                });
+
+            } catch (error) {
+
+                console.error(error);
+
+                document.getElementById("error").innerText =
+                    "❌ Ошибка загрузки статистики";
+            }
+        }
+
+
+        loadStats();
+
+    </script>
+
+</body>
+</html>

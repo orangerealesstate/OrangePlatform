@@ -1,14 +1,13 @@
 let allPosts = [];
-const tg = window.Telegram?.WebApp;
+const telegramWebApp = window.Telegram?.WebApp;
 
-if (tg) {
-    tg.ready();
-    tg.expand();
+if (telegramWebApp) {
+    telegramWebApp.ready();
+    telegramWebApp.expand();
 }
 
 const telegramUserId =
-    tg?.initDataUnsafe?.user?.id || null;
-
+    telegramWebApp?.initDataUnsafe?.user?.id || null;
 async function loadPosts() {
 
     try {
