@@ -1029,3 +1029,7 @@ body{
 
     box-sizing: border-box;
 }
+.green-date {
+    color: #22a447;
+    font-weight: 600;
+}

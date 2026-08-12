@@ -112,8 +112,8 @@ document.getElementById("content").innerHTML = `
 $${post.price || "-"}
 </div>
 
-<div class="publish-date">
-🕒 ${new Date(post.date * 1000).toLocaleDateString("ru-RU")}
+<div class="publish-date green-date">
+    🕐 ${new Date(post.date * 1000).toLocaleDateString("ru-RU")}
 </div>
 
 </div>
@@ -168,9 +168,7 @@ ${images}
 </div>
 
 </div>
-<div class="property-code">
-    🍊 Код: ${post.id || "-"}
-</div>
+
 
 ${
 window.Telegram?.WebApp?.initDataUnsafe?.user?.id === 5172653731
