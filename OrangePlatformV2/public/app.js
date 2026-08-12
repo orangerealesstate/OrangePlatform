@@ -67,7 +67,6 @@ if (loader) {
 }function renderPosts(posts) {
     console.log("FILTER WORKS");
 console.log("Posts received:", posts.length);
-console.log(posts);
     const container = document.getElementById("posts");
 
     container.innerHTML = "";
