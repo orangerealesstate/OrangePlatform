@@ -16,6 +16,40 @@ app.use(
 
 const POSTS_FILE = path.join(__dirname, "posts.json");
 const FAVORITES_FILE = path.join(__dirname, "favorites.json");
+const STATS_FILE = path.join(__dirname, "stats.json");
+function getStats() {
+    try {
+        if (!fs.existsSync(STATS_FILE)) {
+            return {
+                users: {},
+                appViews: 0,
+                postViews: {}
+            };
+        }
+
+        return JSON.parse(
+            fs.readFileSync(STATS_FILE, "utf8")
+        );
+
+    } catch (err) {
+        console.error("Error reading stats:", err);
+
+        return {
+            users: {},
+            appViews: 0,
+            postViews: {}
+        };
+    }
+}
+
+
+function saveStats(stats) {
+    fs.writeFileSync(
+        STATS_FILE,
+        JSON.stringify(stats, null, 2),
+        "utf8"
+    );
+}
 
 function getFavorites() {
     try {
@@ -150,6 +184,138 @@ app.get("/api/post/:id", (req, res) => {
 
     res.json(post);
 
+});
+// =========================
+// STATISTICS
+// =========================
+
+app.post("/api/stats/app", (req, res) => {
+
+    try {
+
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                error: "userId required"
+            });
+        }
+
+        const stats = getStats();
+
+        stats.appViews++;
+
+        const id = String(userId);
+
+        if (!stats.users[id]) {
+            stats.users[id] = {
+                views: 0,
+                firstSeen: new Date().toISOString(),
+                lastSeen: new Date().toISOString()
+            };
+        }
+
+        stats.users[id].views++;
+        stats.users[id].lastSeen = new Date().toISOString();
+
+        saveStats(stats);
+
+        res.json({
+            success: true
+        });
+
+    } catch (err) {
+
+        console.error("Stats app error:", err);
+
+        res.status(500).json({
+            success: false
+        });
+    }
+});
+
+
+app.post("/api/stats/post", (req, res) => {
+
+    try {
+
+        const { userId, postId } = req.body;
+
+        if (!userId || !postId) {
+            return res.status(400).json({
+                success: false,
+                error: "userId and postId required"
+            });
+        }
+
+        const stats = getStats();
+
+        const id = String(postId);
+
+        if (!stats.postViews[id]) {
+            stats.postViews[id] = 0;
+        }
+
+        stats.postViews[id]++;
+
+        saveStats(stats);
+
+        res.json({
+            success: true
+        });
+
+    } catch (err) {
+
+        console.error("Stats post error:", err);
+
+        res.status(500).json({
+            success: false
+        });
+    }
+});
+app.get("/api/stats", (req, res) => {
+
+    try {
+
+        const adminId = "5172653731";
+        const userId = String(req.query.userId || "");
+
+        if (userId !== adminId) {
+            return res.status(403).json({
+                success: false,
+                error: "Access denied"
+            });
+        }
+
+        const stats = getStats();
+
+        const users = Object.keys(stats.users || {});
+
+        const totalUsers = users.length;
+
+        const totalAppViews = stats.appViews || 0;
+
+        const postViews = stats.postViews || {};
+
+        const totalPostViews = Object.values(postViews)
+            .reduce((sum, value) => sum + Number(value || 0), 0);
+
+        res.json({
+            totalUsers,
+            totalAppViews,
+            totalPostViews,
+            postViews
+        });
+
+    } catch (err) {
+
+        console.error("Stats API error:", err);
+
+        res.status(500).json({
+            success: false
+        });
+    }
 });
 app.post("/api/post/update", (req, res) => {
 

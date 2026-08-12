@@ -1,8 +1,30 @@
 let allPosts = [];
+const tg = window.Telegram?.WebApp;
+
+if (tg) {
+    tg.ready();
+    tg.expand();
+}
+
+const telegramUserId =
+    tg?.initDataUnsafe?.user?.id || null;
 
 async function loadPosts() {
 
     try {
+        if (telegramUserId) {
+            fetch("/api/stats/app", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    userId: telegramUserId
+                })
+            }).catch(err => {
+                console.log("Stats error:", err);
+            });
+        }
 
         const response = await fetch("/api/posts?t=" + Date.now(), {
     cache: "no-store"

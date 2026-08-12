@@ -95,7 +95,27 @@
     Загрузка...
 
 </div>
+<button
+    id="statsBtn"
+    style="display:none;"
+    onclick="window.location.href='stats.html'">
+    📊 Статистика
+</button>
 
+<script>
+    const tg = window.Telegram?.WebApp;
+
+    if (tg) {
+        tg.ready();
+
+        const userId =
+            tg.initDataUnsafe?.user?.id;
+
+        if (String(userId) === "5172653731") {
+            document.getElementById("statsBtn").style.display = "block";
+        }
+    }
+</script>
 <script src="app.js"></script>
 
 </body>
