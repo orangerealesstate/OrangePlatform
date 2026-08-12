@@ -15,6 +15,30 @@ app.use(
 );
 
 const POSTS_FILE = path.join(__dirname, "posts.json");
+const FAVORITES_FILE = path.join(__dirname, "favorites.json");
+
+function getFavorites() {
+    try {
+        if (!fs.existsSync(FAVORITES_FILE)) {
+            return {};
+        }
+
+        return JSON.parse(
+            fs.readFileSync(FAVORITES_FILE, "utf8")
+        );
+    } catch (err) {
+        console.error("Error reading favorites:", err);
+        return {};
+    }
+}
+
+function saveFavorites(data) {
+    fs.writeFileSync(
+        FAVORITES_FILE,
+        JSON.stringify(data, null, 2),
+        "utf8"
+    );
+}
 
 function savePosts(posts) {
     fs.writeFileSync(
@@ -50,6 +74,64 @@ app.get("/api/posts", (req, res) => {
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
     res.json(getPosts());
+});
+// FAVORITES
+
+app.get("/api/favorites/:userId", (req, res) => {
+    const favorites = getFavorites();
+    const userId = String(req.params.userId);
+
+    res.json(favorites[userId] || []);
+});
+
+app.post("/api/favorites", (req, res) => {
+    const favorites = getFavorites();
+
+    const userId = String(req.body.userId);
+    const postId = String(req.body.postId);
+
+    if (!favorites[userId]) {
+        favorites[userId] = [];
+    }
+
+    if (!favorites[userId].includes(postId)) {
+        favorites[userId].push(postId);
+    }
+
+    fs.writeFileSync(
+        FAVORITES_FILE,
+        JSON.stringify(favorites, null, 2),
+        "utf8"
+    );
+
+    res.json({
+        success: true,
+        favorites: favorites[userId]
+    });
+});
+
+app.delete("/api/favorites/:userId/:postId", (req, res) => {
+    const favorites = getFavorites();
+
+    const userId = String(req.params.userId);
+    const postId = String(req.params.postId);
+
+    if (favorites[userId]) {
+        favorites[userId] = favorites[userId].filter(
+            id => String(id) !== postId
+        );
+    }
+
+    fs.writeFileSync(
+        FAVORITES_FILE,
+        JSON.stringify(favorites, null, 2),
+        "utf8"
+    );
+
+    res.json({
+        success: true,
+        favorites: favorites[userId] || []
+    });
 });
 // One post
 app.get("/api/post/:id", (req, res) => {
