@@ -72,19 +72,21 @@
 
     </select>
 
-    <input
-        id="minPrice"
-        type="number"
-        placeholder="Цена от"
-        onkeyup="filterPosts()"
-    >
+    <<input
+    id="minPrice"
+    type="number"
+    placeholder="Цена от"
+    onkeyup="filterPosts()"
+    onkeydown="if(event.key==='Enter') this.blur()"
+>
 
     <input
-        id="maxPrice"
-        type="number"
-        placeholder="Цена до"
-        onkeyup="filterPosts()"
-    >
+    id="maxPrice"
+    type="number"
+    placeholder="Цена до"
+    onkeyup="filterPosts()"
+    onkeydown="if(event.key==='Enter') this.blur()"
+>
 
 </section>
 

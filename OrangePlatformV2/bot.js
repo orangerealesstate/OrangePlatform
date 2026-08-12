@@ -37,6 +37,7 @@ bot.onText(/\/start/, (msg) => {
                         }
                     ],
                     ["🆕 Новые объявления"],
+                      ["❤️ Избранное"],
                     ["📞 Связаться с нами"]
                 ],
                 resize_keyboard: true
@@ -51,6 +52,13 @@ bot.on("message", (msg) => {
         bot.sendMessage(
             msg.chat.id,
             "Откройте каталог и используйте сортировку по новым объявлениям."
+        );
+    }
+
+    if (msg.text === "❤️ Избранное") {
+        bot.sendMessage(
+            msg.chat.id,
+            "❤️ Ваше избранное пока пусто."
         );
     }
 
