@@ -661,9 +661,9 @@ body{
     max-width:900px;
 
     display:flex;
-    gap:10px;
+    gap:6px;
 
-    padding:10px;
+    padding:7px;
     background:rgba(255,255,255,.92);
     backdrop-filter:blur(18px);
 
@@ -676,22 +676,25 @@ body{
     z-index:9999;
 }
 .action-btn{
-    flex:1;
-    height:62px;
+    flex:1 1 0;
+    min-width:0;
+    height:48px;
 
     border:none;
-    border-radius:18px;
+    border-radius:14px;
 
-    font-size:16px;
+    font-size:14px;
     font-weight:700;
 
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:8px;
 
-    transition:.25s;
-    box-shadow:0 8px 20px rgba(0,0,0,.15);
+    gap:4px;
+    padding:0 6px;
+
+    white-space:nowrap;
+    overflow:hidden;
 }
 
 .action-btn:hover{
