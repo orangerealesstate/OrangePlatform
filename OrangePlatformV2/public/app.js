@@ -60,35 +60,37 @@ console.log(posts);
 
     posts.forEach((post, index) => {
 
-        const images =
-    post.images && post.images.length
-        ? post.images
-        : ["https://via.placeholder.com/600x400?text=No+Photo"];
-const image = images[0];
-        const district = post.district || "-";
+    const postIndex = allPosts.indexOf(post);
 
-        container.innerHTML += `
+    const images =
+        post.images && post.images.length
+            ? post.images
+            : ["https://via.placeholder.com/600x400?text=No+Photo"];
+
+    const image = images[0];
+    const district = post.district || "-";
+
+    container.innerHTML += `
         <div class="card">
 
-<div class="card-slider">
+            <div class="card-slider">
 
-    <button class="prev-btn"
-        onclick="event.stopPropagation(); prevCardImage(${index})">
-        ◀
-    </button>
+                <button class="prev-btn"
+                    onclick="event.stopPropagation(); prevCardImage(${postIndex})">
+                    ◀
+                </button>
 
-    <img
-        id="card-image-${index}"
-        src="${images[0]}"
-        class="card-image"
-        onclick="openGallery(allPosts.indexOf(post))"
-    >
+                <img
+                    id="card-image-${postIndex}"
+                    src="${images[0]}"
+                    class="card-image"
+                    onclick="openGallery(${postIndex})"
+                >
 
-    <button class="next-btn"
-        onclick="event.stopPropagation(); nextCardImage(${index})">
-        ▶
-    </button>
-
+                <button class="next-btn"
+                    onclick="event.stopPropagation(); nextCardImage(${postIndex})">
+                    ▶
+                </button>
 </div>
 
     <div class="info">
