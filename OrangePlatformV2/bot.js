@@ -65,7 +65,7 @@ bot.on("message", (msg) => {
     if (msg.text === "📞 Связаться с нами") {
         bot.sendMessage(
             msg.chat.id,
-            "📞 +995...\n📲 Telegram: @OrangeRealEstate"
+            "📲 Telegram: @Orangerealestatetbilisi"
         );
     }
 
