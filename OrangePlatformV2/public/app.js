@@ -10,6 +10,8 @@ if (telegramWebApp) {
 const telegramUserId =
     telegramWebApp?.initDataUnsafe?.user?.id || null;
     console.log("🔥 TELEGRAM USER ID:", telegramUserId);
+    console.log("🔥 TG INIT DATA:", telegramWebApp?.initData);
+console.log("🔥 TG PLATFORM:", telegramWebApp?.platform);
 async function loadPosts() {
 
     try {
