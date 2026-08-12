@@ -1004,3 +1004,28 @@ body{
 
     backdrop-filter:blur(8px);
 }
+.telegram-action-btn{
+    background:#229ED9;
+    color:white;
+}
+
+.telegram-action-btn:hover{
+    background:#1b8ac2;
+}
+.property-code {
+    width: calc(100% - 40px);
+    margin: 20px auto;
+
+    padding: 16px 20px;
+
+    background: #fff;
+    border: 2px solid #ff6600;
+    border-radius: 16px;
+
+    color: #ff6600;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+
+    box-sizing: border-box;
+}

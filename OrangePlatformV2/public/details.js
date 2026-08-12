@@ -15,8 +15,19 @@ async function loadDetails() {
         }
 
         const post = await res.json();
+        console.log("TELEGRAM LINK:", post.telegramLink);
         console.log(post.date);
+const telegramBtn = document.getElementById("telegramBtn");
 
+if (telegramBtn) {
+    if (post.telegramLink) {
+        telegramBtn.onclick = () => {
+            window.open(post.telegramLink, "_blank");
+        };
+    } else {
+        telegramBtn.style.display = "none";
+    }
+}
         currentImages = Array.isArray(post.images)
             ? post.images
             : [];
@@ -95,7 +106,7 @@ document.getElementById("content").innerHTML = `
 ← Назад
 </button>
 
-<h2>🏠 Apartment</h2>
+<h2>🏠 Сдается ${post.rooms || "-"}-комнатная квартира в ${post.district || "-"}</h2>
 
 <div class="price">
 $${post.price || "-"}
@@ -110,6 +121,7 @@ $${post.price || "-"}
 <div class="gallery">
 ${images}
 </div>
+
 
 <div class="stats-grid">
 
@@ -155,6 +167,9 @@ ${images}
 <div class="label">Цена</div>
 </div>
 
+</div>
+<div class="property-code">
+    🍊 Код: ${post.id || "-"}
 </div>
 
 ${
@@ -294,38 +309,27 @@ if (!ADMIN_IDS.includes(userId)) {
 
 function sharePost(post){
 
-    const url = window.location.href;
-
-    const text =
-`🏠 Apartment
-
-📍 ${post.district || "-"}
-
-💰 $${post.price || "-"}
-
-${url}`;
-
-    if(navigator.share){
-
-        navigator.share({
-
-            title:"Orange Real Estate",
-
-            text,
-
-            url
-
-        });
-
-    }else{
-
-        navigator.clipboard.writeText(url);
-
-        alert("🔗 Link copied");
-
+    if (!post.telegramLink) {
+        alert("Telegram-пост для этого объявления не найден");
+        return;
     }
 
+    const shareUrl =
+        "https://t.me/share/url?url=" +
+        encodeURIComponent(post.telegramLink);
+
+    if (window.Telegram?.WebApp?.openTelegramLink) {
+
+        window.Telegram.WebApp.openTelegramLink(shareUrl);
+
+    } else {
+
+        window.open(shareUrl, "_blank");
+
+    }
 }
+
+
 const ADMIN_ID = 5172653731;
 
 const isAdmin =
@@ -367,6 +371,7 @@ function prevImage() {
 
     document.getElementById("viewerImage").src =
         "/" + currentImages[currentIndex];
+    
 
 }
 
