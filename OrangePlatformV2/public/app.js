@@ -9,6 +9,7 @@ if (telegramWebApp) {
 
 const telegramUserId =
     telegramWebApp?.initDataUnsafe?.user?.id || null;
+    console.log("🔥 TELEGRAM USER ID:", telegramUserId);
 async function loadPosts() {
 
     try {
