@@ -27,7 +27,7 @@ bot.onText(/\/start/, (msg) => {
         "🍊 Добро пожаловать в Orange Real Estate!\n\nВыберите действие:",
         {
             reply_markup: {
-                keyboard: [
+                inline_keyboard: [
                     [
                         {
                             text: "🏠 Открыть каталог",
@@ -36,14 +36,54 @@ bot.onText(/\/start/, (msg) => {
                             }
                         }
                     ],
-                    ["🆕 Новые объявления"],
-                      ["❤️ Избранное"],
-                    ["📞 Связаться с нами"]
-                ],
-                resize_keyboard: true
+                    [
+                        {
+                            text: "🆕 Новые объявления",
+                            callback_data: "new_posts"
+                        }
+                    ],
+                    [
+                        {
+                            text: "❤️ Избранное",
+                            callback_data: "favorites"
+                        }
+                    ],
+                    [
+                        {
+                            text: "📞 Связаться с нами",
+                            callback_data: "contact"
+                        }
+                    ]
+                ]
             }
         }
     );
+});
+bot.on("callback_query", (query) => {
+    const chatId = query.message.chat.id;
+
+    if (query.data === "new_posts") {
+        bot.sendMessage(
+            chatId,
+            "Откройте каталог и используйте сортировку по новым объявлениям."
+        );
+    }
+
+    if (query.data === "favorites") {
+        bot.sendMessage(
+            chatId,
+            "❤️ Ваше избранное пока пусто."
+        );
+    }
+
+    if (query.data === "contact") {
+        bot.sendMessage(
+            chatId,
+            "📲 Telegram: @Orangerealestatetbilisi"
+        );
+    }
+
+    bot.answerCallbackQuery(query.id);
 });
 
 bot.on("message", (msg) => {
