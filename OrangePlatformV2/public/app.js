@@ -1,1310 +1,1232 @@
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
+console.log("🔥 ORANGE APP.JS LOADED");
 
-require("./parser");
-require("./bot");
+let allPosts = [];
 
-const app = express();
-
-app.use(express.json());
-
-const PORT = 3000;
+const telegramWebApp =
+    window.Telegram?.WebApp;
 
 
-// =========================================================
-// STATIC FILES
-// =========================================================
+if (telegramWebApp) {
 
-app.use(
-    express.static(
-        path.join(__dirname, "public")
-    )
-);
+    telegramWebApp.ready();
 
-app.use(
-    "/downloads",
-    express.static(
-        path.join(__dirname, "downloads")
-    )
+    telegramWebApp.expand();
+
+}
+
+
+const telegramUserId =
+    telegramWebApp?.initDataUnsafe?.user?.id || null;
+
+
+console.log(
+    "🔥 TELEGRAM USER ID:",
+    telegramUserId
 );
 
 
-// =========================================================
-// FILES
-// =========================================================
+/* =========================================================
+   LOAD POSTS
+========================================================= */
 
-const POSTS_FILE =
-    path.join(
-        __dirname,
-        "posts.json"
-    );
-
-const FAVORITES_FILE =
-    path.join(
-        __dirname,
-        "favorites.json"
-    );
-
-const STATS_FILE =
-    path.join(
-        __dirname,
-        "stats.json"
-    );
-
-
-// =========================================================
-// STATS
-// =========================================================
-
-function getStats() {
+async function loadPosts() {
 
     try {
 
-        if (
-            !fs.existsSync(
-                STATS_FILE
-            )
-        ) {
+        /* =====================================================
+           APP STATISTICS
+        ===================================================== */
 
-            return {
+        if (telegramUserId) {
 
-                users: {},
+            fetch(
+                "/api/stats/app",
+                {
 
-                appViews: 0,
+                    method: "POST",
 
-                postViews: {}
+                    headers: {
 
-            };
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        userId:
+                            telegramUserId
+
+                    })
+
+                }
+
+            ).catch(
+                err =>
+                    console.log(
+                        "Stats error:",
+                        err
+                    )
+            );
 
         }
 
 
-        return JSON.parse(
+        /* =====================================================
+           LOAD POSTS
+        ===================================================== */
 
-            fs.readFileSync(
-                STATS_FILE,
-                "utf8"
-            )
+        const response =
+            await fetch(
+                "/api/posts?t=" +
+                Date.now(),
+                {
+                    cache: "no-store"
+                }
+            );
 
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load posts"
+            );
+
+        }
+
+
+        allPosts =
+            await response.json();
+
+
+        console.log(
+            "Posts received:",
+            allPosts.length
         );
+
+
+        renderPosts(
+            allPosts
+        );
+
+
+        hideLoader();
 
     }
 
     catch (err) {
 
         console.error(
-            "Error reading stats:",
             err
         );
 
 
-        return {
-
-            users: {},
-
-            appViews: 0,
-
-            postViews: {}
-
-        };
-
-    }
-
-}
-
-
-function saveStats(stats) {
-
-    fs.writeFileSync(
-
-        STATS_FILE,
-
-        JSON.stringify(
-            stats,
-            null,
-            2
-        ),
-
-        "utf8"
-
-    );
-
-}
-
-
-// =========================================================
-// FAVORITES
-// =========================================================
-
-function getFavorites() {
-
-    try {
-
-        if (
-            !fs.existsSync(
-                FAVORITES_FILE
-            )
-        ) {
-
-            return {};
-
-        }
-
-
-        return JSON.parse(
-
-            fs.readFileSync(
-                FAVORITES_FILE,
-                "utf8"
-            )
-
-        );
-
-    }
-
-    catch (err) {
-
-        console.error(
-            "Error reading favorites:",
-            err
-        );
-
-
-        return {};
-
-    }
-
-}
-
-
-function saveFavorites(data) {
-
-    fs.writeFileSync(
-
-        FAVORITES_FILE,
-
-        JSON.stringify(
-            data,
-            null,
-            2
-        ),
-
-        "utf8"
-
-    );
-
-}
-
-
-// =========================================================
-// POSTS
-// =========================================================
-
-function savePosts(posts) {
-
-    fs.writeFileSync(
-
-        POSTS_FILE,
-
-        JSON.stringify(
-            posts,
-            null,
-            2
-        ),
-
-        "utf8"
-
-    );
-
-}
-
-
-// =========================================================
-// READ POSTS
-// =========================================================
-
-function getPosts() {
-
-    try {
-
-        if (
-            !fs.existsSync(
-                POSTS_FILE
-            )
-        ) {
-
-            return [];
-
-        }
-
-
-        const data =
-
-            fs.readFileSync(
-                POSTS_FILE,
-                "utf8"
+        const posts =
+            document.getElementById(
+                "posts"
             );
 
 
-        return JSON.parse(
-            data
-        );
-
-    }
-
-    catch (err) {
-
-        console.error(
-            "Error reading posts.json:",
-            err
-        );
-
-
-        return [];
-
-    }
-
-}
-
-
-// =========================================================
-// 30 DAY POST FILTER
-// =========================================================
-
-const POST_MAX_AGE_DAYS = 30;
-
-
-function parsePostDate(value) {
-
-    if (!value) {
-
-        return null;
-
-    }
-
-
-    // Date object
-    if (
-        value instanceof Date
-    ) {
-
-        return isNaN(
-            value.getTime()
-        )
-
-            ? null
-
-            : value;
-
-    }
-
-
-    // Unix timestamp
-    if (
-        typeof value === "number"
-    ) {
-
-        const ms =
-
-            value < 100000000000
-
-                ? value * 1000
-
-                : value;
-
-
-        const date =
-            new Date(ms);
-
-
-        return isNaN(
-            date.getTime()
-        )
-
-            ? null
-
-            : date;
-
-    }
-
-
-    const raw =
-        String(value).trim();
-
-
-    if (!raw) {
-
-        return null;
-
-    }
-
-
-    // ISO / normal JS date
-
-    let date =
-        new Date(raw);
-
-
-    if (
-        !isNaN(
-            date.getTime()
-        )
-    ) {
-
-        return date;
-
-    }
-
-
-    // DD.MM.YYYY
-    // DD.MM.YYYY HH:mm
-
-    const match =
-
-        raw.match(
-
-            /^(\d{1,2})[./-](\d{1,2})[./-](\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/
-
-        );
-
-
-    if (match) {
-
-        const day =
-            Number(
-                match[1]
-            );
-
-        const month =
-            Number(
-                match[2]
-            ) - 1;
-
-        const year =
-            Number(
-                match[3]
-            );
-
-        const hour =
-            Number(
-                match[4] || 0
-            );
-
-        const minute =
-            Number(
-                match[5] || 0
-            );
-
-
-        date = new Date(
-
-            year,
-
-            month,
-
-            day,
-
-            hour,
-
-            minute
-
-        );
-
-
-        if (
-
-            date.getFullYear()
-                === year &&
-
-            date.getMonth()
-                === month &&
-
-            date.getDate()
-                === day
-
-        ) {
-
-            return date;
+        if (posts) {
+
+            posts.innerHTML = `
+
+                <h2
+                    style="
+                        text-align:center;
+                        padding:40px;
+                    "
+                >
+                    ❌ Ошибка загрузки объявлений
+                </h2>
+
+            `;
 
         }
 
     }
 
+}
 
-    return null;
+
+/* =========================================================
+   HIDE LOADER
+========================================================= */
+
+function hideLoader() {
+
+    const loader =
+        document.getElementById(
+            "loader"
+        );
+
+
+    if (!loader) return;
+
+
+    loader.classList.add(
+        "loader-hide"
+    );
+
+
+    setTimeout(
+        () => {
+
+            if (
+                loader &&
+                loader.parentNode
+            ) {
+
+                loader.remove();
+
+            }
+
+        },
+        600
+    );
 
 }
 
 
-// =========================================================
-// ONLY POSTS FROM LAST 30 DAYS
-// =========================================================
+/* =========================================================
+   RENDER POSTS
+========================================================= */
 
-function getVisiblePosts() {
+function renderPosts(posts) {
 
-    const posts =
-        getPosts();
-
-
-    const now =
-        Date.now();
+    console.log(
+        "FILTER WORKS"
+    );
 
 
-    const maxAgeMs =
-
-        POST_MAX_AGE_DAYS *
-
-        24 *
-
-        60 *
-
-        60 *
-
-        1000;
+    console.log(
+        "Posts received:",
+        posts.length
+    );
 
 
-    return posts.filter(
-        post => {
+    const container =
+        document.getElementById(
+            "posts"
+        );
 
 
-            const rawDate =
+    if (!container) {
 
-                post.date ??
+        return;
 
-                post.createdAt ??
-
-                post.created_at ??
-
-                post.publishedAt ??
-
-                post.published_at;
+    }
 
 
-            const postDate =
+    container.innerHTML = "";
 
-                parsePostDate(
-                    rawDate
-                );
+
+    if (!posts.length) {
+
+        container.innerHTML = `
+
+            <h2
+                style="
+                    text-align:center;
+                    padding:40px;
+                "
+            >
+                Объявления не найдены
+            </h2>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    posts.forEach(
+        (post) => {
 
 
             /*
-             * თუ თარიღი საერთოდ არ აქვს
-             * ან უცნობ ფორმატშია,
-             * განცხადებას არ ვშლით.
-             */
+               ВАЖНО:
+               Не используем index из filtered массива
+               для управления фотографиями.
+            */
 
-            if (!postDate) {
+            const postIndex =
+                allPosts.findIndex(
+                    p =>
+                        String(p.id) ===
+                        String(post.id)
+                );
+
+
+            const images =
+
+                Array.isArray(
+                    post.images
+                ) && post.images.length
+
+                    ? post.images
+
+                    : [
+                        "https://via.placeholder.com/600x400?text=No+Photo"
+                    ];
+
+
+            const district =
+                post.district || "-";
+
+
+            const currentImage =
+                currentCardImage[
+                    postIndex
+                ] || 0;
+
+
+            const image =
+                images[currentImage] ||
+                images[0];
+
+
+            /* =================================================
+               CARD
+            ================================================= */
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "card";
+
+
+            card.innerHTML = `
+
+                <div
+                    class="card-slider"
+                    data-post-index="${postIndex}"
+                >
+
+
+                    <button
+                        type="button"
+                        class="prev-btn"
+                        data-action="prev"
+                        data-index="${postIndex}"
+                    >
+                        ◀
+                    </button>
+
+
+                    <img
+                        id="card-image-${postIndex}"
+                        src="${image.startsWith("http")
+                            ? image
+                            : "/" + image}"
+                        class="card-image"
+                        data-action="gallery"
+                        data-index="${postIndex}"
+                    >
+
+
+                    <button
+                        type="button"
+                        class="next-btn"
+                        data-action="next"
+                        data-index="${postIndex}"
+                    >
+                        ▶
+                    </button>
+
+
+                    <div
+                        class="card-photo-counter"
+                        id="card-counter-${postIndex}"
+                    >
+                        ${currentImage + 1} / ${images.length}
+                    </div>
+
+
+                </div>
+
+
+                <div class="info">
+
+
+                    <div class="price">
+                        $${post.price || "-"}
+                    </div>
+
+
+                    <div class="details">
+
+                        📍 <b>Район:</b>
+                        ${district}
+
+                        <br><br>
+
+                        📌 <b>Адрес:</b>
+                        ${post.street || "-"}
+
+                        <br><br>
+
+                        🛏 <b>Комнат:</b>
+                        ${post.rooms || "-"}
+
+                        <br><br>
+
+                        📐 <b>Площадь:</b>
+                        ${post.area || "-"} м²
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="details-btn"
+                        data-action="details"
+                        data-id="${post.id}"
+                    >
+                        Подробнее
+                    </button>
+
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+
+            /* =================================================
+               PREVIOUS PHOTO
+            ================================================= */
+
+            const prevBtn =
+                card.querySelector(
+                    '[data-action="prev"]'
+                );
+
+
+            prevBtn.addEventListener(
+                "click",
+                (event) => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    prevCardImage(
+                        postIndex
+                    );
+
+                }
+            );
+
+
+            /* =================================================
+               NEXT PHOTO
+            ================================================= */
+
+            const nextBtn =
+                card.querySelector(
+                    '[data-action="next"]'
+                );
+
+
+            nextBtn.addEventListener(
+                "click",
+                (event) => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    nextCardImage(
+                        postIndex
+                    );
+
+                }
+            );
+
+
+            /* =================================================
+               IMAGE CLICK
+            ================================================= */
+
+            const imageElement =
+                card.querySelector(
+                    '[data-action="gallery"]'
+                );
+
+
+            imageElement.addEventListener(
+                "click",
+                (event) => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    openGallery(
+                        postIndex
+                    );
+
+                }
+            );
+
+
+            /* =================================================
+               DETAILS
+            ================================================= */
+
+            const detailsBtn =
+                card.querySelector(
+                    '[data-action="details"]'
+                );
+
+
+            detailsBtn.addEventListener(
+                "click",
+                (event) => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    window.location.href =
+                        `details.html?id=${post.id}`;
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+function filterPosts() {
+
+    console.log(
+        "filterPosts called"
+    );
+
+
+    const districtEl =
+        document.getElementById(
+            "districtFilter"
+        );
+
+
+    const roomsEl =
+        document.getElementById(
+            "roomsFilter"
+        );
+
+
+    const minPriceEl =
+        document.getElementById(
+            "minPrice"
+        );
+
+
+    const maxPriceEl =
+        document.getElementById(
+            "maxPrice"
+        );
+
+
+    if (
+        !districtEl ||
+        !roomsEl ||
+        !minPriceEl ||
+        !maxPriceEl
+    ) {
+
+        console.log(
+            "Filter elements missing"
+        );
+
+        return;
+
+    }
+
+
+    const district =
+        districtEl.value
+            .toLowerCase()
+            .trim();
+
+
+    const rooms =
+        roomsEl.value;
+
+
+    const minPrice =
+        Number(
+            minPriceEl.value
+        ) || 0;
+
+
+    const maxPrice =
+        Number(
+            maxPriceEl.value
+        ) || 999999999;
+
+
+    const filtered =
+        allPosts.filter(
+            post => {
+
+
+                const postText =
+                    (
+                        post.text || ""
+                    )
+                    .toLowerCase();
+
+
+                const postDistrict =
+                    (
+                        post.district || ""
+                    )
+                    .toLowerCase();
+
+
+                const postRooms =
+                    Number(
+                        post.rooms
+                    ) || 0;
+
+
+                const postPrice =
+                    Number(
+                        post.price
+                    ) || 0;
+
+
+                /* =============================================
+                   DISTRICT
+                ============================================= */
+
+                if (
+
+                    district &&
+
+                    !postDistrict.includes(
+                        district
+                    ) &&
+
+                    !postText.includes(
+                        district
+                    )
+
+                ) {
+
+                    return false;
+
+                }
+
+
+                /* =============================================
+                   ROOMS
+                ============================================= */
+
+                if (rooms) {
+
+                    if (
+                        rooms === "5"
+                    ) {
+
+                        if (
+                            postRooms < 5
+                        ) {
+
+                            return false;
+
+                        }
+
+                    }
+
+                    else {
+
+                        if (
+                            postRooms !==
+                            Number(rooms)
+                        ) {
+
+                            return false;
+
+                        }
+
+                    }
+
+                }
+
+
+                /* =============================================
+                   PRICE
+                ============================================= */
+
+                if (
+                    postPrice <
+                    minPrice
+                ) {
+
+                    return false;
+
+                }
+
+
+                if (
+                    postPrice >
+                    maxPrice
+                ) {
+
+                    return false;
+
+                }
+
 
                 return true;
 
             }
+        );
 
 
-            const ageMs =
-
-                now -
-
-                postDate.getTime();
+    renderPosts(
+        filtered
+    );
 
 
-            /*
-             * მომავლის თარიღიც დაშვებულია.
-             */
+    hideLoader();
 
-            return (
-                ageMs <=
-                maxAgeMs
-            );
+}
 
-        }
 
+/* =========================================================
+   CARD PHOTO INDEX
+========================================================= */
+
+const currentCardImage = {};
+
+
+/* =========================================================
+   NEXT CARD PHOTO
+========================================================= */
+
+function nextCardImage(index) {
+
+    const post =
+        allPosts[index];
+
+
+    if (
+        !post ||
+        !Array.isArray(
+            post.images
+        ) ||
+        post.images.length < 2
+    ) {
+
+        return;
+
+    }
+
+
+    currentCardImage[index] =
+
+        (
+            (
+                currentCardImage[index] ||
+                0
+            ) + 1
+        )
+        %
+        post.images.length;
+
+
+    updateCardImage(
+        index
     );
 
 }
 
 
-// =========================================================
-// DIRECT ACCESS TO posts.json
-// =========================================================
+/* =========================================================
+   PREVIOUS CARD PHOTO
+========================================================= */
 
-app.get(
-    "/posts.json",
-    (req, res) => {
+function prevCardImage(index) {
 
-        res.sendFile(
-            POSTS_FILE
-        );
-
-    }
-);
+    const post =
+        allPosts[index];
 
 
-// =========================================================
-// API POSTS
-// ONLY LAST 30 DAYS
-// =========================================================
+    if (
+        !post ||
+        !Array.isArray(
+            post.images
+        ) ||
+        post.images.length < 2
+    ) {
 
-app.get(
-    "/api/posts",
-    (req, res) => {
-
-
-        res.setHeader(
-            "Cache-Control",
-            "no-store, no-cache, must-revalidate, proxy-revalidate"
-        );
-
-
-        res.setHeader(
-            "Pragma",
-            "no-cache"
-        );
-
-
-        res.setHeader(
-            "Expires",
-            "0"
-        );
-
-
-        res.json(
-            getVisiblePosts()
-        );
+        return;
 
     }
-);
 
 
-// =========================================================
-// FAVORITES
-// =========================================================
+    currentCardImage[index] =
 
-app.get(
-    "/api/favorites/:userId",
-    (req, res) => {
-
-
-        const favorites =
-            getFavorites();
-
-
-        const userId =
-            String(
-                req.params.userId
-            );
+        (
+            (
+                currentCardImage[index] ||
+                0
+            ) -
+            1 +
+            post.images.length
+        )
+        %
+        post.images.length;
 
 
-        res.json(
+    updateCardImage(
+        index
+    );
 
-            favorites[userId]
-                || []
+}
 
-        );
+
+/* =========================================================
+   UPDATE CARD IMAGE
+========================================================= */
+
+function updateCardImage(index) {
+
+    const post =
+        allPosts[index];
+
+
+    if (!post) {
+
+        return;
 
     }
-);
 
 
-app.post(
-    "/api/favorites",
-    (req, res) => {
+    const images =
+        Array.isArray(
+            post.images
+        )
+            ? post.images
+            : [];
 
 
-        const favorites =
-            getFavorites();
+    if (!images.length) {
+
+        return;
+
+    }
 
 
-        const userId =
-            String(
-                req.body.userId
-            );
+    const imageIndex =
+        currentCardImage[index] || 0;
 
 
-        const postId =
-            String(
-                req.body.postId
-            );
+    const image =
+        images[imageIndex];
 
 
-        if (
-            !favorites[userId]
-        ) {
+    const imageElement =
+        document.getElementById(
+            `card-image-${index}`
+        );
 
-            favorites[userId] = [];
+
+    const counter =
+        document.getElementById(
+            `card-counter-${index}`
+        );
+
+
+    if (imageElement) {
+
+        imageElement.src =
+            image.startsWith("http")
+                ? image
+                : "/" + image;
+
+    }
+
+
+    if (counter) {
+
+        counter.textContent =
+
+            `${imageIndex + 1} / ${images.length}`;
+
+    }
+
+}
+
+
+/* =========================================================
+   OPEN GALLERY
+========================================================= */
+
+function openGallery(index) {
+
+    const post =
+        allPosts[index];
+
+
+    if (
+        !post ||
+        !post.images ||
+        post.images.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    let current =
+        currentCardImage[index] || 0;
+
+
+    const viewer =
+        document.createElement(
+            "div"
+        );
+
+
+    viewer.id =
+        "viewer";
+
+
+    viewer.innerHTML = `
+
+        <div class="viewer">
+
+
+            <button
+                id="closeViewer"
+                type="button"
+            >
+                ✕
+            </button>
+
+
+            <button
+                id="prevPhoto"
+                type="button"
+            >
+                ◀
+            </button>
+
+
+            <img
+                id="galleryImage"
+                src="${
+                    post.images[current].startsWith("http")
+                        ? post.images[current]
+                        : "/" + post.images[current]
+                }"
+            >
+
+
+            <button
+                id="nextPhoto"
+                type="button"
+            >
+                ▶
+            </button>
+
+
+            <div id="counter">
+
+                ${current + 1}
+                /
+                ${post.images.length}
+
+            </div>
+
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        viewer
+    );
+
+
+    const image =
+        document.getElementById(
+            "galleryImage"
+        );
+
+
+    const counter =
+        document.getElementById(
+            "counter"
+        );
+
+
+    /* =====================================================
+       NEXT
+    ===================================================== */
+
+    document.getElementById(
+        "nextPhoto"
+    ).addEventListener(
+        "click",
+        (event) => {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+
+            current++;
+
+
+            if (
+                current >=
+                post.images.length
+            ) {
+
+                current = 0;
+
+            }
+
+
+            image.src =
+
+                post.images[
+                    current
+                ].startsWith("http")
+
+                    ? post.images[
+                        current
+                    ]
+
+                    : "/" +
+                        post.images[
+                            current
+                        ];
+
+
+            counter.innerHTML =
+
+                `${current + 1} / ${post.images.length}`;
 
         }
+    );
 
 
-        if (
-            !favorites[userId]
-                .includes(postId)
-        ) {
+    /* =====================================================
+       PREVIOUS
+    ===================================================== */
 
-            favorites[userId]
-                .push(postId);
+    document.getElementById(
+        "prevPhoto"
+    ).addEventListener(
+        "click",
+        (event) => {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+
+            current--;
+
+
+            if (
+                current < 0
+            ) {
+
+                current =
+                    post.images.length - 1;
+
+            }
+
+
+            image.src =
+
+                post.images[
+                    current
+                ].startsWith("http")
+
+                    ? post.images[
+                        current
+                    ]
+
+                    : "/" +
+                        post.images[
+                            current
+                        ];
+
+
+            counter.innerHTML =
+
+                `${current + 1} / ${post.images.length}`;
 
         }
+    );
 
 
-        fs.writeFileSync(
+    /* =====================================================
+       CLOSE
+    ===================================================== */
 
-            FAVORITES_FILE,
+    document.getElementById(
+        "closeViewer"
+    ).addEventListener(
+        "click",
+        (event) => {
 
-            JSON.stringify(
-                favorites,
-                null,
-                2
-            ),
+            event.preventDefault();
 
-            "utf8"
-
-        );
-
-
-        res.json({
-
-            success: true,
-
-            favorites:
-                favorites[userId]
-
-        });
-
-    }
-);
+            event.stopPropagation();
 
 
-app.delete(
-    "/api/favorites/:userId/:postId",
-    (req, res) => {
+            viewer.remove();
+
+        }
+    );
 
 
-        const favorites =
-            getFavorites();
+    /* =====================================================
+       BACKGROUND CLOSE
+    ===================================================== */
+
+    viewer.addEventListener(
+        "click",
+        (event) => {
+
+            if (
+                event.target ===
+                viewer
+            ) {
+
+                viewer.remove();
+
+            }
+
+        }
+    );
+
+}
 
 
-        const userId =
-            String(
-                req.params.userId
-            );
+/* =========================================================
+   FIRST LOAD
+========================================================= */
+
+loadPosts();
 
 
-        const postId =
-            String(
-                req.params.postId
-            );
+/* =========================================================
+   AUTO REFRESH
+   EVERY 30 SECONDS
+========================================================= */
 
+setInterval(
+    async () => {
 
-        if (
-            favorites[userId]
-        ) {
+        try {
 
-            favorites[userId] =
-
-                favorites[userId].filter(
-
-                    id =>
-                        String(id)
-                        !== postId
-
+            const response =
+                await fetch(
+                    "/api/posts?t=" +
+                    Date.now(),
+                    {
+                        cache: "no-store"
+                    }
                 );
 
-        }
+
+            if (!response.ok) {
+
+                return;
+
+            }
 
 
-        fs.writeFileSync(
-
-            FAVORITES_FILE,
-
-            JSON.stringify(
-                favorites,
-                null,
-                2
-            ),
-
-            "utf8"
-
-        );
+            const posts =
+                await response.json();
 
 
-        res.json({
+            /*
+               მხოლოდ რაოდენობის ცვლილებაზე
+               აღარ ვამოწმებთ — თუ პოსტი შეიცვალა
+               (მაგ. ფოტო/ფასი), განვაახლოთ.
+            */
 
-            success: true,
-
-            favorites:
-                favorites[userId]
-                || []
-
-        });
-
-    }
-);
-
-
-// =========================================================
-// ONE POST
-// ALSO HIDDEN AFTER 30 DAYS
-// =========================================================
-
-app.get(
-    "/api/post/:id",
-    (req, res) => {
-
-
-        const posts =
-            getVisiblePosts();
-
-
-        const post =
-            posts.find(
-
-                p =>
-                    String(p.id)
-                    ===
-                    String(
-                        req.params.id
+            const oldIds =
+                allPosts
+                    .map(
+                        p =>
+                            String(p.id)
                     )
+                    .join(",");
 
-            );
 
-
-        if (!post) {
-
-            return res
-                .status(404)
-                .json({
-
-                    error:
-                        "Apartment not found"
-
-                });
-
-        }
-
-
-        res.json(
-            post
-        );
-
-    }
-);
-
-
-// =========================================================
-// STATISTICS
-// =========================================================
-
-app.post(
-    "/api/stats/app",
-    (req, res) => {
-
-        try {
-
-            const {
-                userId
-            } = req.body;
-
-
-            if (!userId) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        success: false,
-
-                        error:
-                            "userId required"
-
-                    });
-
-            }
-
-
-            const stats =
-                getStats();
-
-
-            stats.appViews++;
-
-
-            const id =
-                String(
-                    userId
-                );
-
-
-            if (
-                !stats.users[id]
-            ) {
-
-                stats.users[id] = {
-
-                    views: 0,
-
-                    firstSeen:
-                        new Date()
-                            .toISOString(),
-
-                    lastSeen:
-                        new Date()
-                            .toISOString()
-
-                };
-
-            }
-
-
-            stats.users[id]
-                .views++;
-
-
-            stats.users[id]
-                .lastSeen =
-
-                new Date()
-                    .toISOString();
-
-
-            saveStats(
-                stats
-            );
-
-
-            res.json({
-
-                success: true
-
-            });
-
-        }
-
-        catch (err) {
-
-            console.error(
-                "Stats app error:",
-                err
-            );
-
-
-            res
-                .status(500)
-                .json({
-
-                    success: false
-
-                });
-
-        }
-
-    }
-);
-
-
-// =========================================================
-// POST VIEW STATISTICS
-// =========================================================
-
-app.post(
-    "/api/stats/post",
-    (req, res) => {
-
-        try {
-
-            const {
-                userId,
-                postId
-            } = req.body;
-
-
-            if (
-                !userId ||
-                !postId
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        success: false,
-
-                        error:
-                            "userId and postId required"
-
-                    });
-
-            }
-
-
-            const stats =
-                getStats();
-
-
-            const id =
-                String(
-                    postId
-                );
-
-
-            if (
-                !stats.postViews[id]
-            ) {
-
-                stats.postViews[id] = 0;
-
-            }
-
-
-            stats.postViews[id]++;
-
-
-            saveStats(
-                stats
-            );
-
-
-            res.json({
-
-                success: true
-
-            });
-
-        }
-
-        catch (err) {
-
-            console.error(
-                "Stats post error:",
-                err
-            );
-
-
-            res
-                .status(500)
-                .json({
-
-                    success: false
-
-                });
-
-        }
-
-    }
-);
-
-
-// =========================================================
-// ADMIN STATISTICS
-// =========================================================
-
-app.get(
-    "/api/stats",
-    (req, res) => {
-
-        try {
-
-            const adminId =
-                "5172653731";
-
-
-            const userId =
-                String(
-                    req.query.userId
-                    || ""
-                );
-
-
-            if (
-                userId !== adminId
-            ) {
-
-                return res
-                    .status(403)
-                    .json({
-
-                        success: false,
-
-                        error:
-                            "Access denied"
-
-                    });
-
-            }
-
-
-            const stats =
-                getStats();
-
-
-            const users =
-                Object.keys(
-                    stats.users
-                    || {}
-                );
-
-
-            const totalUsers =
-                users.length;
-
-
-            const totalAppViews =
-                stats.appViews
-                || 0;
-
-
-            const postViews =
-                stats.postViews
-                || {};
-
-
-            const totalPostViews =
-
-                Object.values(
-                    postViews
-                )
-
-                .reduce(
-
-                    (
-                        sum,
-                        value
-                    ) =>
-
-                        sum +
-                        Number(
-                            value
-                            || 0
-                        ),
-
-                    0
-
-                );
-
-
-            res.json({
-
-                totalUsers,
-
-                totalAppViews,
-
-                totalPostViews,
-
-                postViews
-
-            });
-
-        }
-
-        catch (err) {
-
-            console.error(
-                "Stats API error:",
-                err
-            );
-
-
-            res
-                .status(500)
-                .json({
-
-                    success: false
-
-                });
-
-        }
-
-    }
-);
-
-
-// =========================================================
-// UPDATE POST
-// =========================================================
-
-app.post(
-    "/api/post/update",
-    (req, res) => {
-
-        try {
-
-            const posts =
-                getPosts();
-
-
-            const updated =
-                req.body;
-
-
-            const index =
-                posts.findIndex(
-
-                    p =>
-                        String(p.id)
-                        ===
-                        String(
-                            updated.id
-                        )
-
-                );
-
-
-            if (
-                index === -1
-            ) {
-
-                return res
-                    .status(404)
-                    .json({
-
-                        success: false,
-
-                        error:
-                            "Apartment not found"
-
-                    });
-
-            }
-
-
-            posts[index] = {
-
-                ...posts[index],
-
-                district:
-                    updated.district,
-
-                street:
-                    updated.street,
-
-                rooms:
-                    updated.rooms,
-
-                bedrooms:
-                    updated.bedrooms,
-
-                area:
-                    updated.area,
-
-                floor:
-                    updated.floor,
-
-                price:
-                    updated.price,
-
-                text:
-                    updated.text
-
-            };
-
-
-            savePosts(
+            const newIds =
                 posts
-            );
+                    .map(
+                        p =>
+                            String(p.id)
+                    )
+                    .join(",");
 
 
-            res.json({
-
-                success: true
-
-            });
-
-        }
-
-        catch (err) {
-
-            console.error(
-                err
-            );
+            const changed =
+                oldIds !== newIds ||
+                JSON.stringify(posts)
+                    !==
+                JSON.stringify(allPosts);
 
 
-            res
-                .status(500)
-                .json({
+            if (changed) {
 
-                    success: false
+                allPosts =
+                    posts;
 
-                });
+
+                filterPosts();
+
+            }
 
         }
 
-    }
-);
+        catch (e) {
 
-
-// =========================================================
-// DELETE POST
-// =========================================================
-
-app.post(
-    "/api/post/delete",
-    (req, res) => {
-
-        try {
-
-            const posts =
-                getPosts();
-
-
-            const filtered =
-                posts.filter(
-
-                    p =>
-
-                        String(p.id)
-                        !==
-                        String(
-                            req.body.id
-                        )
-
-                );
-
-
-            savePosts(
-                filtered
+            console.log(
+                "Auto refresh error:",
+                e
             );
-
-
-            res.json({
-
-                success: true
-
-            });
 
         }
 
-        catch (err) {
-
-            console.error(
-                err
-            );
-
-
-            res
-                .status(500)
-                .json({
-
-                    success: false
-
-                });
-
-        }
-
-    }
-);
-
-
-// =========================================================
-// START SERVER
-// =========================================================
-
-app.listen(
-    PORT,
-    () => {
-
-        console.log(
-            `✅ Server running: http://localhost:${PORT}`
-        );
-
-    }
+    },
+    30000
 );
