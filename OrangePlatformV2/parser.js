@@ -775,7 +775,7 @@ async function start() {
            same as your previous parser.
         */
 
-        if (false) {
+        if (!coords.lat || !coords.lng) {
 
             coords =
                 await geocodeAddress(
