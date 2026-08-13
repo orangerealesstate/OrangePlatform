@@ -1,4 +1,4 @@
-console.log("🔥 ORANGE APP.JS + MAP LOADED");
+console.log("🔥 ORANGE APP.JS LOADED - TEST");
 
 let allPosts = [];
 
@@ -13,22 +13,22 @@ const telegramUserId =
     telegramWebApp?.initDataUnsafe?.user?.id || null;
 
 console.log("🔥 TELEGRAM USER ID:", telegramUserId);
+console.log("🔥 TG INIT DATA:", telegramWebApp?.initData);
 console.log("🔥 TG PLATFORM:", telegramWebApp?.platform);
 
 
 /* =========================================================
-   MAP STATE
+   MAP
 ========================================================= */
 
 let mapInstance = null;
 let mapLayer = null;
-
 let currentView = "catalog";
 
 
 /* =========================================================
-   DISTRICT FALLBACK COORDINATES
-   ========================================================= */
+   DISTRICT CENTERS
+========================================================= */
 
 const districtCenters = {
 
@@ -52,492 +52,90 @@ const districtCenters = {
 
 
 /* =========================================================
-   LOAD POSTS
+   MAP MARKER DESIGN
 ========================================================= */
 
-async function loadPosts() {
+(function injectMapStyles() {
 
-    try {
+    const style = document.createElement("style");
 
-        if (telegramUserId) {
+    style.textContent = `
 
-            fetch("/api/stats/app", {
+        .orange-map-icon {
+            background: transparent !important;
+            border: 0 !important;
+        }
 
-                method: "POST",
+        .price-marker {
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            background: #1f63e9 !important;
 
-                body: JSON.stringify({
-                    userId: telegramUserId
-                })
+            color: #fff !important;
 
-            }).catch(err => {
+            border: 2px solid #fff !important;
 
-                console.log("Stats error:", err);
+            border-radius: 18px !important;
 
-            });
+            box-shadow:
+                0 2px 7px rgba(0,0,0,.25) !important;
+
+            padding: 6px 10px !important;
+
+            font-weight: 800 !important;
+
+            font-size: 13px !important;
+
+            line-height: 1.05 !important;
+
+            white-space: nowrap !important;
+
+            text-align: center !important;
 
         }
 
 
-        const response =
-            await fetch("/api/posts?t=" + Date.now(), {
-                cache: "no-store"
-            });
+        .cluster-marker {
 
+            background: #1f63e9 !important;
 
-        if (!response.ok) {
+            color: #fff !important;
 
-            throw new Error("Failed to load posts");
+            border: 3px solid #fff !important;
 
-        }
+            border-radius: 22px !important;
 
+            box-shadow:
+                0 2px 8px rgba(0,0,0,.25) !important;
 
-        allPosts = await response.json();
+            width: 70px !important;
 
+            min-height: 44px !important;
 
-        renderPosts(allPosts);
+            padding: 5px 8px !important;
 
+            box-sizing: border-box !important;
 
-        const loader =
-            document.getElementById("loader");
+            display: flex !important;
 
+            align-items: center !important;
 
-        if (loader) {
+            justify-content: center !important;
 
-            setTimeout(() => {
+            text-align: center !important;
 
-                loader.classList.add("loader-hide");
+            font-weight: 800 !important;
 
+            font-size: 12px !important;
 
-                setTimeout(() => {
-
-                    loader.remove();
-
-                }, 600);
-
-            }, 300);
+            line-height: 1.05 !important;
 
         }
 
-    }
+    `;
 
-    catch (err) {
+    document.head.appendChild(style);
 
-        console.error(err);
-
-
-        const posts =
-            document.getElementById("posts");
-
-
-        if (posts) {
-
-            posts.innerHTML = `
-
-                <h2 style="
-                    text-align:center;
-                    padding:40px;
-                ">
-
-                    ❌ Ошибка загрузки объявлений
-
-                </h2>
-
-            `;
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   RENDER POSTS
-========================================================= */
-
-function renderPosts(posts) {
-
-    console.log("FILTER WORKS");
-    console.log("Posts received:", posts.length);
-
-
-    const container =
-        document.getElementById("posts");
-
-
-    if (!container) return;
-
-
-    container.innerHTML = "";
-
-
-    /*
-       თუ რუკის რეჟიმში ვართ,
-       განცხადებები არ გამოჩნდეს.
-    */
-
-    if (currentView === "map") {
-
-        setTimeout(() => {
-
-            renderMap(posts);
-
-        }, 0);
-
-    }
-
-
-    if (!posts.length) {
-
-        container.innerHTML = `
-
-            <h2 style="
-                text-align:center;
-                padding:40px;
-            ">
-
-                Объявления не найдены
-
-            </h2>
-
-        `;
-
-        return;
-
-    }
-
-
-    posts.forEach((post) => {
-
-
-        /*
-           IMPORTANT:
-
-           filtered array-ში index-ის გამოყენება არ შეიძლება,
-           ამიტომ ყოველთვის ვპოულობთ ნამდვილ index-ს allPosts-ში.
-        */
-
-        const postIndex =
-            allPosts.indexOf(post);
-
-
-        const images =
-            post.images &&
-            post.images.length
-
-                ? post.images
-
-                : [
-                    "https://via.placeholder.com/600x400?text=No+Photo"
-                ];
-
-
-        const district =
-            post.district || "-";
-
-
-        container.innerHTML += `
-
-            <div class="card">
-
-
-                <div class="card-slider">
-
-
-                    <button
-                        class="prev-btn"
-
-                        onclick="
-                            event.stopPropagation();
-                            prevCardImage(${postIndex})
-                        "
-                    >
-
-                        ◀
-
-                    </button>
-
-
-                    <img
-
-                        id="card-image-${postIndex}"
-
-                        src="${images[0]}"
-
-                        class="card-image"
-
-                        onclick="
-                            openGallery(${postIndex})
-                        "
-
-                    >
-
-
-                    <button
-                        class="next-btn"
-
-                        onclick="
-                            event.stopPropagation();
-                            nextCardImage(${postIndex})
-                        "
-                    >
-
-                        ▶
-
-                    </button>
-
-
-                </div>
-
-
-                <div class="info">
-
-
-                    <div class="price">
-
-                        $${post.price || "-"}
-
-                    </div>
-
-
-                    <div class="details">
-
-
-                        📍 <b>Район:</b>
-                        ${district}
-
-                        <br><br>
-
-
-                        📌 <b>Адрес:</b>
-                        ${post.street || "-"}
-
-                        <br><br>
-
-
-                        🛏 <b>Комнат:</b>
-                        ${post.rooms || "-"}
-
-                        <br><br>
-
-
-                        📐 <b>Площадь:</b>
-                        ${post.area || "-"} м²
-
-
-                    </div>
-
-
-                    <button
-
-                        class="details-btn"
-
-                        onclick="
-                            location.href='details.html?id=${post.id}'
-                        "
-
-                    >
-
-                        Подробнее
-
-                    </button>
-
-
-                </div>
-
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-/* =========================================================
-   FILTER
-========================================================= */
-
-function filterPosts() {
-
-    console.log("filterPosts called");
-
-
-    const districtEl =
-        document.getElementById("districtFilter");
-
-
-    const roomsEl =
-        document.getElementById("roomsFilter");
-
-
-    const minPriceEl =
-        document.getElementById("minPrice");
-
-
-    const maxPriceEl =
-        document.getElementById("maxPrice");
-
-
-    if (
-        !districtEl ||
-        !roomsEl ||
-        !minPriceEl ||
-        !maxPriceEl
-    ) {
-
-        return;
-
-    }
-
-
-    const district =
-        districtEl.value.toLowerCase();
-
-
-    const rooms =
-        roomsEl.value;
-
-
-    const minPrice =
-        Number(minPriceEl.value) || 0;
-
-
-    const maxPrice =
-        Number(maxPriceEl.value) || 999999999;
-
-
-    const filtered =
-        allPosts.filter(post => {
-
-
-            const text =
-                (post.text || "").toLowerCase();
-
-
-            const postDistrict =
-                (post.district || "").toLowerCase();
-
-
-            const postRooms =
-                Number(post.rooms) || 0;
-
-
-            const postPrice =
-                Number(post.price) || 0;
-
-
-            /*
-               DISTRICT
-            */
-
-            if (
-
-                district &&
-
-                !postDistrict.includes(district) &&
-
-                !text.includes(district)
-
-            ) {
-
-                return false;
-
-            }
-
-
-            /*
-               ROOMS
-            */
-
-            if (rooms) {
-
-
-                if (rooms === "5") {
-
-                    if (postRooms < 5) {
-
-                        return false;
-
-                    }
-
-                }
-
-                else {
-
-                    if (
-                        postRooms !== Number(rooms)
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-            }
-
-
-            /*
-               PRICE
-            */
-
-            if (postPrice < minPrice) {
-
-                return false;
-
-            }
-
-
-            if (postPrice > maxPrice) {
-
-                return false;
-
-            }
-
-
-            return true;
-
-        });
-
-
-    renderPosts(filtered);
-
-
-    /*
-       თუ რუკა ღიაა,
-       რუკაც განვაახლოთ.
-    */
-
-    if (currentView === "map") {
-
-        setTimeout(() => {
-
-            initMap();
-
-            renderMap(filtered);
-
-        }, 50);
-
-    }
-
-
-    const loader =
-        document.getElementById("loader");
-
-
-    if (loader) {
-
-        loader.classList.add("loader-hide");
-
-    }
-
-}
+})();
 
 
 /* =========================================================
@@ -592,11 +190,6 @@ function showCatalog() {
 
     }
 
-
-    /*
-       უკან კატალოგში დაბრუნებისას
-       იგივე ფილტრები შევინარჩუნოთ.
-    */
 
     renderPosts(getFilteredPosts());
 
@@ -801,6 +394,553 @@ function getFilteredPosts() {
 
 
 /* =========================================================
+   LOAD POSTS
+========================================================= */
+
+async function loadPosts() {
+
+    try {
+
+
+        if (telegramUserId) {
+
+            fetch(
+                "/api/stats/app",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        userId:
+                            telegramUserId
+
+                    })
+
+                }
+
+            ).catch(err => {
+
+                console.log(
+                    "Stats error:",
+                    err
+                );
+
+            });
+
+        }
+
+
+        const response =
+
+            await fetch(
+                "/api/posts?t=" + Date.now(),
+                {
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load posts"
+            );
+
+        }
+
+
+        allPosts =
+            await response.json();
+
+
+        renderPosts(allPosts);
+
+
+        const loader =
+            document.getElementById(
+                "loader"
+            );
+
+
+        if (loader) {
+
+            setTimeout(() => {
+
+                loader.classList.add(
+                    "loader-hide"
+                );
+
+
+                setTimeout(() => {
+
+                    loader.remove();
+
+                }, 600);
+
+            }, 300);
+
+        }
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+
+        const posts =
+            document.getElementById(
+                "posts"
+            );
+
+
+        if (posts) {
+
+            posts.innerHTML = `
+
+                <h2
+                    style="
+                        text-align:center;
+                        padding:40px;
+                    "
+                >
+
+                    ❌ Ошибка загрузки объявлений
+
+                </h2>
+
+            `;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER POSTS
+========================================================= */
+
+function renderPosts(posts) {
+
+    console.log(
+        "FILTER WORKS"
+    );
+
+    console.log(
+        "Posts received:",
+        posts.length
+    );
+
+
+    const container =
+        document.getElementById(
+            "posts"
+        );
+
+
+    if (!container) {
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    if (
+        currentView === "map"
+    ) {
+
+        setTimeout(() => {
+
+            renderMap(posts);
+
+        }, 0);
+
+    }
+
+
+    if (!posts.length) {
+
+        container.innerHTML = `
+
+            <h2
+                style="
+                    text-align:center;
+                    padding:40px;
+                "
+            >
+
+                Объявления не найдены
+
+            </h2>
+
+        `;
+
+        return;
+
+    }
+
+
+    posts.forEach(post => {
+
+
+        const postIndex =
+            allPosts.indexOf(post);
+
+
+        const images =
+
+            post.images &&
+            post.images.length
+
+                ? post.images
+
+                : [
+                    "https://via.placeholder.com/600x400?text=No+Photo"
+                ];
+
+
+        const district =
+            post.district || "-";
+
+
+        container.innerHTML += `
+
+            <div class="card">
+
+
+                <div class="card-slider">
+
+
+                    <button
+
+                        class="prev-btn"
+
+                        onclick="
+                            event.stopPropagation();
+                            prevCardImage(${postIndex})
+                        "
+
+                    >
+
+                        ◀
+
+                    </button>
+
+
+                    <img
+
+                        id="
+                            card-image-${postIndex}
+                        "
+
+                        src="${images[0]}"
+
+                        class="card-image"
+
+                        onclick="
+                            openGallery(${postIndex})
+                        "
+
+                    >
+
+
+                    <button
+
+                        class="next-btn"
+
+                        onclick="
+                            event.stopPropagation();
+                            nextCardImage(${postIndex})
+                        "
+
+                    >
+
+                        ▶
+
+                    </button>
+
+
+                </div>
+
+
+                <div class="info">
+
+
+                    <div class="price">
+
+                        $${post.price || "-"}
+
+                    </div>
+
+
+                    <div class="details">
+
+
+                        📍
+                        <b>Район:</b>
+                        ${district}
+
+                        <br><br>
+
+
+                        📌
+                        <b>Адрес:</b>
+                        ${post.street || "-"}
+
+                        <br><br>
+
+
+                        🛏
+                        <b>Комнат:</b>
+                        ${post.rooms || "-"}
+
+                        <br><br>
+
+
+                        📐
+                        <b>Площадь:</b>
+                        ${post.area || "-"} м²
+
+
+                    </div>
+
+
+                    <button
+
+                        class="details-btn"
+
+                        onclick="
+                            location.href=
+                            'details.html?id=${post.id}'
+                        "
+
+                    >
+
+                        Подробнее
+
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================================================
+   FILTER POSTS
+========================================================= */
+
+function filterPosts() {
+
+    console.log(
+        "filterPosts called"
+    );
+
+
+    const districtEl =
+        document.getElementById(
+            "districtFilter"
+        );
+
+
+    const roomsEl =
+        document.getElementById(
+            "roomsFilter"
+        );
+
+
+    const minPriceEl =
+        document.getElementById(
+            "minPrice"
+        );
+
+
+    const maxPriceEl =
+        document.getElementById(
+            "maxPrice"
+        );
+
+
+    if (
+        !districtEl ||
+        !roomsEl ||
+        !minPriceEl ||
+        !maxPriceEl
+    ) {
+
+        return;
+
+    }
+
+
+    const district =
+        districtEl.value.toLowerCase();
+
+
+    const rooms =
+        roomsEl.value;
+
+
+    const minPrice =
+        Number(minPriceEl.value) || 0;
+
+
+    const maxPrice =
+        Number(maxPriceEl.value) || 999999999;
+
+
+    const filtered =
+
+        allPosts.filter(post => {
+
+
+            const text =
+                (post.text || "")
+                    .toLowerCase();
+
+
+            const postDistrict =
+                (post.district || "")
+                    .toLowerCase();
+
+
+            const postRooms =
+                Number(post.rooms) || 0;
+
+
+            const postPrice =
+                Number(post.price) || 0;
+
+
+            if (
+
+                district &&
+
+                !postDistrict.includes(
+                    district
+                ) &&
+
+                !text.includes(
+                    district
+                )
+
+            ) {
+
+                return false;
+
+            }
+
+
+            if (rooms) {
+
+
+                if (
+                    rooms === "5"
+                ) {
+
+                    if (
+                        postRooms < 5
+                    ) {
+
+                        return false;
+
+                    }
+
+                }
+
+                else {
+
+                    if (
+                        postRooms !==
+                        Number(rooms)
+                    ) {
+
+                        return false;
+
+                    }
+
+                }
+
+            }
+
+
+            if (
+                postPrice < minPrice
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                postPrice > maxPrice
+            ) {
+
+                return false;
+
+            }
+
+
+            return true;
+
+        });
+
+
+    renderPosts(filtered);
+
+
+    if (
+        currentView === "map"
+    ) {
+
+        setTimeout(() => {
+
+            initMap();
+
+            renderMap(filtered);
+
+        }, 50);
+
+    }
+
+
+    const loader =
+        document.getElementById(
+            "loader"
+        );
+
+
+    if (loader) {
+
+        loader.classList.add(
+            "loader-hide"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
    INIT MAP
 ========================================================= */
 
@@ -820,17 +960,23 @@ function initMap() {
     if (!mapInstance) {
 
 
-        mapInstance = L.map("map", {
+        mapInstance =
 
-            zoomControl: true
+            L.map(
+                "map",
+                {
+                    zoomControl: true
+                }
+            ).setView(
 
-        }).setView(
+                [
+                    41.7151,
+                    44.8271
+                ],
 
-            [41.7151, 44.8271],
+                12
 
-            12
-
-        );
+            );
 
 
         L.tileLayer(
@@ -846,11 +992,14 @@ function initMap() {
 
             }
 
-        ).addTo(mapInstance);
+        ).addTo(
+            mapInstance
+        );
 
 
         mapLayer =
-            L.layerGroup().addTo(mapInstance);
+            L.layerGroup()
+                .addTo(mapInstance);
 
     }
 
@@ -870,68 +1019,83 @@ function initMap() {
 
 function getPostCoordinates(post) {
 
+    const lat =
+        Number(
+
+            post.latitude ??
+
+            post.lat ??
+
+            post.location?.latitude ??
+
+            post.location?.lat
+
+        );
+
+
+    const lng =
+        Number(
+
+            post.longitude ??
+
+            post.lng ??
+
+            post.lon ??
+
+            post.location?.longitude ??
+
+            post.location?.lng
+
+        );
+
 
     /*
-       თუ posts.json-ში უკვე გვაქვს
-       latitude / longitude,
-       ვიყენებთ ზუსტ კოორდინატებს.
+       მხოლოდ თბილისთან ახლო
+       რეალურ კოორდინატებს ვიყენებთ.
     */
 
-    const lat = Number(
-
-        post.latitude ??
-
-        post.lat ??
-
-        post.location?.latitude ??
-
-        post.location?.lat
-
-    );
-
-
-    const lng = Number(
-
-        post.longitude ??
-
-        post.lng ??
-
-        post.lon ??
-
-        post.location?.longitude ??
-
-        post.location?.lng
-
-    );
-
-
-    if (
+    const isTbilisiCoordinate =
 
         Number.isFinite(lat) &&
 
         Number.isFinite(lng) &&
 
-        lat !== 0 &&
+        lat >= 41.60 &&
 
-        lng !== 0
+        lat <= 41.84 &&
 
+        lng >= 44.62 &&
+
+        lng <= 44.98;
+
+
+    if (
+        isTbilisiCoordinate
     ) {
 
-        return [lat, lng];
+        return [
+            lat,
+            lng
+        ];
 
     }
 
 
     /*
-       დროებითი fallback
+       თუ რეალური კოორდინატა
+       არ გვაქვს, ვიყენებთ რაიონს.
     */
 
     const district =
-        (post.district || "").toLowerCase();
+        (post.district || "")
+            .toLowerCase();
 
 
     for (
-        const key of Object.keys(districtCenters)
+        const key of
+        Object.keys(
+            districtCenters
+        )
     ) {
 
 
@@ -939,7 +1103,9 @@ function getPostCoordinates(post) {
             district.includes(key)
         ) {
 
-            return districtCenters[key];
+            return districtCenters[
+                key
+            ];
 
         }
 
@@ -947,16 +1113,20 @@ function getPostCoordinates(post) {
 
 
     /*
-       district თუ ცალკე ველში არ არის,
-       ვეძებთ text-ში.
+       district-ში ვერ ვიპოვეთ —
+       ვეძებთ განცხადების ტექსტში.
     */
 
     const text =
-        (post.text || "").toLowerCase();
+        (post.text || "")
+            .toLowerCase();
 
 
     for (
-        const key of Object.keys(districtCenters)
+        const key of
+        Object.keys(
+            districtCenters
+        )
     ) {
 
 
@@ -964,7 +1134,9 @@ function getPostCoordinates(post) {
             text.includes(key)
         ) {
 
-            return districtCenters[key];
+            return districtCenters[
+                key
+            ];
 
         }
 
@@ -972,15 +1144,13 @@ function getPostCoordinates(post) {
 
 
     /*
-       თბილისის ცენტრი
+       საბოლოო fallback —
+       თბილისის ცენტრი.
     */
 
     return [
-
         41.7151,
-
         44.8271
-
     ];
 
 }
@@ -991,44 +1161,84 @@ function getPostCoordinates(post) {
 ========================================================= */
 
 function createPriceMarker(
+
     lat,
+
     lng,
+
     text,
-    className = "price-marker"
+
+    className =
+        "price-marker"
+
 ) {
+
+
+    const isCluster =
+        className ===
+        "cluster-marker";
 
 
     return L.marker(
 
-        [lat, lng],
+        [
+            lat,
+            lng
+        ],
 
         {
 
-            icon: L.divIcon({
+            icon:
 
-                className: "",
+                L.divIcon({
 
-                html: `
+                    className:
+                        "orange-map-icon",
 
-                    <div class="${className}">
 
-                        ${text}
+                    html: `
 
-                    </div>
+                        <div
+                            class="${className}"
+                        >
 
-                `,
+                            ${text}
 
-                iconSize: null,
+                        </div>
 
-                iconAnchor:
+                    `,
 
-                    className === "cluster-marker"
 
-                        ? [24, 24]
+                    iconSize:
 
-                        : [0, 18]
+                        isCluster
 
-            })
+                            ? [
+                                70,
+                                44
+                            ]
+
+                            : [
+                                100,
+                                34
+                            ],
+
+
+                    iconAnchor:
+
+                        isCluster
+
+                            ? [
+                                35,
+                                22
+                            ]
+
+                            : [
+                                50,
+                                17
+                            ]
+
+                })
 
         }
 
@@ -1056,11 +1266,20 @@ function renderMap(posts) {
     mapLayer.clearLayers();
 
 
+    const tbilisiCenter = [
+
+        41.7151,
+
+        44.8271
+
+    ];
+
+
     if (!posts.length) {
 
         mapInstance.setView(
 
-            [41.7151, 44.8271],
+            tbilisiCenter,
 
             12
 
@@ -1071,42 +1290,55 @@ function renderMap(posts) {
     }
 
 
-    const groups = new Map();
+    const groups =
+        new Map();
 
 
     /*
-       ვაჯგუფებთ ერთსა და იმავე
-       კოორდინატაზე მდებარე ბინებს.
+       ახლო ბინებს ვაჯგუფებთ.
     */
 
     posts.forEach(post => {
 
 
         const [
-
             lat,
-
             lng
+        ] =
+            getPostCoordinates(
+                post
+            );
 
-        ] = getPostCoordinates(post);
 
+        /*
+           დაახლოებით 100-200 მეტრის
+           დაჯგუფება.
+        */
 
         const key =
 
-            `${lat.toFixed(5)},${lng.toFixed(5)}`;
+            `${lat.toFixed(3)},${lng.toFixed(3)}`;
 
 
-        if (!groups.has(key)) {
+        if (
+            !groups.has(key)
+        ) {
 
-            groups.set(key, {
+            groups.set(
 
-                lat: lat,
+                key,
 
-                lng: lng,
+                {
 
-                posts: []
+                    lat,
 
-            });
+                    lng,
+
+                    posts: []
+
+                }
+
+            );
 
         }
 
@@ -1122,136 +1354,155 @@ function renderMap(posts) {
     const bounds = [];
 
 
-    groups.forEach(group => {
+    groups.forEach(
+        group => {
 
 
-        const groupPosts =
-            group.posts;
+            const groupPosts =
+                group.posts;
 
 
-        bounds.push([
+            bounds.push([
 
-            group.lat,
+                group.lat,
 
-            group.lng
+                group.lng
 
-        ]);
-
-
-        /*
-           მხოლოდ ერთი ბინა
-        */
-
-        if (
-            groupPosts.length === 1
-        ) {
+            ]);
 
 
-            const post =
-                groupPosts[0];
+            /*
+               ერთი ბინა.
+            */
+
+            if (
+                groupPosts.length === 1
+            ) {
 
 
-            const price =
-                Number(post.price) || 0;
+                const post =
+                    groupPosts[0];
 
 
-            const marker =
-                createPriceMarker(
+                const price =
+                    Number(
+                        post.price
+                    ) || 0;
 
-                    group.lat,
 
-                    group.lng,
+                const marker =
 
-                    price
+                    createPriceMarker(
 
-                        ? `$${price}`
+                        group.lat,
 
-                        : "Цена"
+                        group.lng,
 
+                        price
+
+                            ? `$${price}`
+
+                            : "Цена"
+
+                    );
+
+
+                marker.bindPopup(`
+
+                    <div
+                        class="map-popup"
+                    >
+
+                        <div
+                            class="map-price"
+                        >
+
+                            ${
+                                price
+
+                                    ? `$${price}`
+
+                                    : "Цена не указана"
+                            }
+
+                        </div>
+
+
+                        <div
+                            class="map-title"
+                        >
+
+                            📍
+                            ${post.district || "-"}
+
+                            <br>
+
+                            🛏
+                            ${post.rooms || "-"}
+                            комн.
+
+                            ·
+
+                            ${post.area || "-"}
+                            м²
+
+                        </div>
+
+
+                        <button
+
+                            onclick="
+                                location.href=
+                                'details.html?id=${post.id}'
+                            "
+
+                        >
+
+                            Подробнее
+
+                        </button>
+
+
+                    </div>
+
+                `);
+
+
+                marker.addTo(
+                    mapLayer
                 );
 
 
-            marker.bindPopup(`
+                return;
 
-                <div class="map-popup">
-
-
-                    <div class="map-price">
-
-                        ${
-                            price
-                                ? `$${price}`
-                                : "Цена не указана"
-                        }
-
-                    </div>
+            }
 
 
-                    <div class="map-title">
-
-                        📍 ${
-                            post.district || "-"
-                        }
-
-                        <br>
-
-                        🛏 ${
-                            post.rooms || "-"
-                        } комн.
-
-                        ·
-
-                        ${
-                            post.area || "-"
-                        } м²
-
-                    </div>
-
-
-                    <button
-
-                        onclick="
-                            location.href=
-                            'details.html?id=${post.id}'
-                        "
-
-                    >
-
-                        Подробнее
-
-                    </button>
-
-
-                </div>
-
-            `);
-
-
-            marker.addTo(mapLayer);
-
-        }
-
-
-        /*
-           რამდენიმე ბინა ერთ ადგილზე
-        */
-
-        else {
-
+            /*
+               რამდენიმე ბინა
+               ერთ ადგილას.
+            */
 
             const prices =
 
                 groupPosts
 
                     .map(
-                        p => Number(p.price)
+                        p =>
+                            Number(
+                                p.price
+                            )
                     )
 
                     .filter(
                         p =>
-                            Number.isFinite(p)
-                            &&
+
+                            Number.isFinite(
+                                p
+                            ) &&
+
                             p > 0
+
                     );
 
 
@@ -1259,9 +1510,38 @@ function renderMap(posts) {
 
                 prices.length
 
-                    ? Math.min(...prices)
+                    ? Math.min(
+                        ...prices
+                    )
 
                     : 0;
+
+
+            const markerText =
+
+                minPrice
+
+                    ? `
+
+                        От ${minPrice}
+
+                        <br>
+
+                        <span
+                            style="
+                                font-size:11px
+                            "
+                        >
+
+                            (${groupPosts.length})
+
+                        </span>
+
+                      `
+
+                    :
+
+                        `${groupPosts.length}`;
 
 
             const marker =
@@ -1272,27 +1552,7 @@ function renderMap(posts) {
 
                     group.lng,
 
-                    minPrice
-
-                        ? `
-
-                            От $${minPrice}
-
-                            <br>
-
-                            <span
-                                style="
-                                    font-size:11px
-                                "
-                            >
-
-                                (${groupPosts.length})
-
-                            </span>
-
-                          `
-
-                        : groupPosts.length,
+                    markerText,
 
                     "cluster-marker"
 
@@ -1308,16 +1568,22 @@ function renderMap(posts) {
 
                         groupPosts
 
-                            .slice(0, 30)
+                            .slice(
+                                0,
+                                30
+                            )
 
-                            .map(post => `
+                            .map(
+                                post => `
 
                                 <div
+
                                     style="
                                         padding:7px 0;
                                         border-bottom:
                                             1px solid #eee;
                                     "
+
                                 >
 
                                     <b>
@@ -1343,7 +1609,7 @@ function renderMap(posts) {
                                             border:0;
                                             border-radius:7px;
                                             padding:6px;
-                                            background:#ff7a00;
+                                            background:#1f63e9;
                                             color:#fff;
                                         "
 
@@ -1361,7 +1627,8 @@ function renderMap(posts) {
 
                                 </div>
 
-                            `)
+                            `
+                            )
 
                             .join("");
 
@@ -1370,14 +1637,17 @@ function renderMap(posts) {
 
                         .bindPopup(`
 
-                            <div class="map-popup">
-
+                            <div
+                                class="map-popup"
+                            >
 
                                 <div
                                     class="map-price"
                                 >
 
-                                    От $${minPrice || "-"}
+                                    От
+                                    $${minPrice || "-"}
+
                                     (${groupPosts.length})
 
                                 </div>
@@ -1393,36 +1663,91 @@ function renderMap(posts) {
                         .openPopup();
 
                 }
+
             );
 
 
-            marker.addTo(mapLayer);
+            marker.addTo(
+                mapLayer
+            );
 
         }
 
-    });
+    );
 
 
     /*
-       რუკა ავტომატურად მოერგოს ბინებს
+       მხოლოდ თბილისის კოორდინატები
+       მონაწილეობს Zoom-ში.
     */
 
-    if (bounds.length) {
+    const tbilisiBounds =
+
+        bounds.filter(
+            ([lat, lng]) =>
+
+                lat >= 41.60 &&
+
+                lat <= 41.84 &&
+
+                lng >= 44.62 &&
+
+                lng <= 44.98
+
+        );
+
+
+    if (
+        tbilisiBounds.length === 1
+    ) {
+
+
+        mapInstance.setView(
+
+            tbilisiBounds[0],
+
+            14
+
+        );
+
+    }
+
+
+    else if (
+        tbilisiBounds.length > 1
+    ) {
+
 
         mapInstance.fitBounds(
 
-            bounds,
+            L.latLngBounds(
+                tbilisiBounds
+            ),
 
             {
 
                 padding: [
-                    30,
-                    30
+                    40,
+                    40
                 ],
 
-                maxZoom: 14
+                maxZoom: 13
 
             }
+
+        );
+
+    }
+
+
+    else {
+
+
+        mapInstance.setView(
+
+            tbilisiCenter,
+
+            12
 
         );
 
@@ -1456,25 +1781,34 @@ function openGallery(index) {
 
 
     const viewer =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
-    viewer.id = "viewer";
+    viewer.id =
+        "viewer";
 
 
     viewer.innerHTML = `
 
-        <div class="viewer">
+        <div
+            class="viewer"
+        >
 
 
-            <button id="closeViewer">
+            <button
+                id="closeViewer"
+            >
 
                 ✕
 
             </button>
 
 
-            <button id="prevPhoto">
+            <button
+                id="prevPhoto"
+            >
 
                 ◀
 
@@ -1490,16 +1824,21 @@ function openGallery(index) {
             >
 
 
-            <button id="nextPhoto">
+            <button
+                id="nextPhoto"
+            >
 
                 ▶
 
             </button>
 
 
-            <div id="counter">
+            <div
+                id="counter"
+            >
 
-                1 / ${post.images.length}
+                1 /
+                ${post.images.length}
 
             </div>
 
@@ -1509,7 +1848,9 @@ function openGallery(index) {
     `;
 
 
-    document.body.appendChild(viewer);
+    document.body.appendChild(
+        viewer
+    );
 
 
     const image =
@@ -1533,7 +1874,8 @@ function openGallery(index) {
 
 
         if (
-            current >= post.images.length
+            current >=
+            post.images.length
         ) {
 
             current = 0;
@@ -1561,7 +1903,9 @@ function openGallery(index) {
         current--;
 
 
-        if (current < 0) {
+        if (
+            current < 0
+        ) {
 
             current =
                 post.images.length - 1;
@@ -1590,18 +1934,20 @@ function openGallery(index) {
     };
 
 
-    viewer.onclick = (e) => {
+    viewer.onclick =
+        (e) => {
 
 
-        if (
-            e.target === viewer
-        ) {
+            if (
+                e.target ===
+                viewer
+            ) {
 
-            viewer.remove();
+                viewer.remove();
 
-        }
+            }
 
-    };
+        };
 
 }
 
@@ -1633,23 +1979,35 @@ function nextCardImage(index) {
     currentCardImage[index] =
 
         (
-            (currentCardImage[index] || 0)
+
+            (
+                currentCardImage[index]
+                || 0
+            )
+
             + 1
+
         )
+
         %
+
         post.images.length;
 
 
     const image =
         document.getElementById(
+
             `card-image-${index}`
+
         );
 
 
     if (image) {
 
         image.src =
+
             "/" +
+
             post.images[
                 currentCardImage[index]
             ];
@@ -1679,24 +2037,37 @@ function prevCardImage(index) {
     currentCardImage[index] =
 
         (
-            (currentCardImage[index] || 0)
+
+            (
+                currentCardImage[index]
+                || 0
+            )
+
             - 1
+
             + post.images.length
+
         )
+
         %
+
         post.images.length;
 
 
     const image =
         document.getElementById(
+
             `card-image-${index}`
+
         );
 
 
     if (image) {
 
         image.src =
+
             "/" +
+
             post.images[
                 currentCardImage[index]
             ];
@@ -1717,70 +2088,77 @@ loadPosts();
    AUTO REFRESH
 ========================================================= */
 
-setInterval(async () => {
+setInterval(
+    async () => {
 
 
-    try {
+        try {
 
 
-        const res =
+            const res =
 
-            await fetch(
-                "/api/posts?t=" + Date.now(),
-                {
-                    cache: "no-store"
-                }
-            );
+                await fetch(
 
+                    "/api/posts?t=" +
+                    Date.now(),
 
-        const posts =
-            await res.json();
+                    {
+                        cache:
+                            "no-store"
+                    }
 
-
-        if (
-            posts.length !==
-            allPosts.length
-        ) {
+                );
 
 
-            allPosts =
-                posts;
+            const posts =
+                await res.json();
 
-
-            /*
-               ფილტრი შევინარჩუნოთ
-            */
-
-            const filtered =
-                getFilteredPosts();
-
-
-            renderPosts(filtered);
-
-
-            /*
-               რუკაც განვაახლოთ
-            */
 
             if (
-                currentView === "map"
+                posts.length !==
+                allPosts.length
             ) {
 
-                renderMap(filtered);
+
+                allPosts =
+                    posts;
+
+
+                const filtered =
+                    getFilteredPosts();
+
+
+                renderPosts(
+                    filtered
+                );
+
+
+                if (
+                    currentView ===
+                    "map"
+                ) {
+
+                    renderMap(
+                        filtered
+                    );
+
+                }
 
             }
 
         }
 
-    }
+        catch (e) {
 
-    catch (e) {
+            console.log(
+                "Auto refresh error:",
+                e
+            );
 
-        console.log(
-            "Auto refresh error:",
-            e
-        );
+        }
 
-    }
+    },
 
-}, 30000);
+    30000
+
+);
