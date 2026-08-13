@@ -1,6 +1,9 @@
-console.log("🔥 ORANGE APP.JS LOADED");
+console.log("🍊 ORANGE APP.JS + MAP + CATALOG + GALLERY LOADED");
 
-let allPosts = [];
+
+/* =========================================================
+   TELEGRAM
+========================================================= */
 
 const telegramWebApp =
     window.Telegram?.WebApp;
@@ -20,9 +23,66 @@ const telegramUserId =
 
 
 console.log(
-    "🔥 TELEGRAM USER ID:",
+    "Telegram user:",
     telegramUserId
 );
+
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let allPosts = [];
+
+let currentView = "catalog";
+
+let mapInstance = null;
+
+let mapLayer = null;
+
+const currentCardImage = {};
+
+
+/* =========================================================
+   DISTRICT CENTERS
+========================================================= */
+
+const districtCenters = {
+
+    saburtalo:
+        [41.7260, 44.7470],
+
+    vake:
+        [41.7100, 44.7530],
+
+    vera:
+        [41.7085, 44.7830],
+
+    isani:
+        [41.6905, 44.8280],
+
+    "didi digomi":
+        [41.7850, 44.7300],
+
+    digomi:
+        [41.7850, 44.7300],
+
+    krtsanisi:
+        [41.6785, 44.8240],
+
+    ortachala:
+        [41.6805, 44.8150],
+
+    mtatsminda:
+        [41.7000, 44.7900],
+
+    didube:
+        [41.7250, 44.7800],
+
+    gldani:
+        [41.7950, 44.8200]
+
+};
 
 
 /* =========================================================
@@ -33,9 +93,7 @@ async function loadPosts() {
 
     try {
 
-        /* =====================================================
-           APP STATISTICS
-        ===================================================== */
+        /* APP STATISTICS */
 
         if (telegramUserId) {
 
@@ -43,24 +101,21 @@ async function loadPosts() {
                 "/api/stats/app",
                 {
 
-                    method: "POST",
+                    method:
+                        "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
-                    body: JSON.stringify({
-
-                        userId:
-                            telegramUserId
-
-                    })
+                    body:
+                        JSON.stringify({
+                            userId:
+                                telegramUserId
+                        })
 
                 }
-
             ).catch(
                 err =>
                     console.log(
@@ -72,16 +127,15 @@ async function loadPosts() {
         }
 
 
-        /* =====================================================
-           LOAD POSTS
-        ===================================================== */
+        /* LOAD */
 
         const response =
             await fetch(
                 "/api/posts?t=" +
                 Date.now(),
                 {
-                    cache: "no-store"
+                    cache:
+                        "no-store"
                 }
             );
 
@@ -100,24 +154,47 @@ async function loadPosts() {
 
 
         console.log(
-            "Posts received:",
+            "Posts:",
             allPosts.length
         );
 
 
         renderPosts(
-            allPosts
+            getFilteredPosts()
         );
 
 
         hideLoader();
 
+
+        /* IF MAP IS ACTIVE */
+
+        if (
+            currentView === "map"
+        ) {
+
+            setTimeout(
+                () => {
+
+                    initMap();
+
+                    renderMap(
+                        getFilteredPosts()
+                    );
+
+                },
+                100
+            );
+
+        }
+
     }
 
-    catch (err) {
+    catch (error) {
 
         console.error(
-            err
+            "LOAD POSTS ERROR:",
+            error
         );
 
 
@@ -150,7 +227,7 @@ async function loadPosts() {
 
 
 /* =========================================================
-   HIDE LOADER
+   LOADER
 ========================================================= */
 
 function hideLoader() {
@@ -189,21 +266,219 @@ function hideLoader() {
 
 
 /* =========================================================
-   RENDER POSTS
+   GET FILTERED POSTS
+========================================================= */
+
+function getFilteredPosts() {
+
+    const districtEl =
+        document.getElementById(
+            "districtFilter"
+        );
+
+
+    const roomsEl =
+        document.getElementById(
+            "roomsFilter"
+        );
+
+
+    const minPriceEl =
+        document.getElementById(
+            "minPrice"
+        );
+
+
+    const maxPriceEl =
+        document.getElementById(
+            "maxPrice"
+        );
+
+
+    if (
+        !districtEl ||
+        !roomsEl ||
+        !minPriceEl ||
+        !maxPriceEl
+    ) {
+
+        return allPosts;
+
+    }
+
+
+    const district =
+        districtEl.value
+            .toLowerCase()
+            .trim();
+
+
+    const rooms =
+        roomsEl.value;
+
+
+    const minPrice =
+        Number(
+            minPriceEl.value
+        ) || 0;
+
+
+    const maxPrice =
+        Number(
+            maxPriceEl.value
+        ) || 999999999;
+
+
+    return allPosts.filter(
+        post => {
+
+            const text =
+                (
+                    post.text ||
+                    ""
+                ).toLowerCase();
+
+
+            const postDistrict =
+                (
+                    post.district ||
+                    ""
+                ).toLowerCase();
+
+
+            const postRooms =
+                Number(
+                    post.rooms
+                ) || 0;
+
+
+            const postPrice =
+                Number(
+                    post.price
+                ) || 0;
+
+
+            /* DISTRICT */
+
+            if (
+
+                district &&
+
+                !postDistrict.includes(
+                    district
+                ) &&
+
+                !text.includes(
+                    district
+                )
+
+            ) {
+
+                return false;
+
+            }
+
+
+            /* ROOMS */
+
+            if (rooms) {
+
+                if (
+                    rooms === "5"
+                ) {
+
+                    if (
+                        postRooms < 5
+                    ) {
+
+                        return false;
+
+                    }
+
+                }
+
+                else if (
+
+                    postRooms !==
+                    Number(rooms)
+
+                ) {
+
+                    return false;
+
+                }
+
+            }
+
+
+            /* PRICE */
+
+            if (
+                postPrice <
+                minPrice
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                postPrice >
+                maxPrice
+            ) {
+
+                return false;
+
+            }
+
+
+            return true;
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FILTER POSTS
+========================================================= */
+
+function filterPosts() {
+
+    const filtered =
+        getFilteredPosts();
+
+
+    renderPosts(
+        filtered
+    );
+
+
+    if (
+        currentView === "map"
+    ) {
+
+        initMap();
+
+        renderMap(
+            filtered
+        );
+
+    }
+
+
+    hideLoader();
+
+}
+
+
+/* =========================================================
+   RENDER CATALOG
 ========================================================= */
 
 function renderPosts(posts) {
-
-    console.log(
-        "FILTER WORKS"
-    );
-
-
-    console.log(
-        "Posts received:",
-        posts.length
-    );
-
 
     const container =
         document.getElementById(
@@ -243,28 +518,27 @@ function renderPosts(posts) {
 
 
     posts.forEach(
-        (post) => {
-
+        post => {
 
             /*
-               ВАЖНО:
-               Не используем index из filtered массива
-               для управления фотографиями.
+               IMPORTANT:
+               ვპოულობთ ბინის რეალურ ინდექსს
+               allPosts-ში ID-ით.
             */
 
             const postIndex =
                 allPosts.findIndex(
-                    p =>
-                        String(p.id) ===
+                    item =>
+                        String(item.id) ===
                         String(post.id)
                 );
 
 
             const images =
-
                 Array.isArray(
                     post.images
-                ) && post.images.length
+                ) &&
+                post.images.length
 
                     ? post.images
 
@@ -273,24 +547,55 @@ function renderPosts(posts) {
                     ];
 
 
-            const district =
-                post.district || "-";
-
-
-            const currentImage =
+            if (
                 currentCardImage[
-                    postIndex
+                    post.id
+                ] === undefined
+            ) {
+
+                currentCardImage[
+                    post.id
+                ] = 0;
+
+            }
+
+
+            let imageIndex =
+                currentCardImage[
+                    post.id
                 ] || 0;
 
 
+            if (
+                imageIndex >=
+                images.length
+            ) {
+
+                imageIndex = 0;
+
+                currentCardImage[
+                    post.id
+                ] = 0;
+
+            }
+
+
             const image =
-                images[currentImage] ||
-                images[0];
+                images[
+                    imageIndex
+                ];
 
 
-            /* =================================================
-               CARD
-            ================================================= */
+            const imageSrc =
+                image.startsWith("http")
+                    ? image
+                    : "/" + image;
+
+
+            const district =
+                post.district ||
+                "-";
+
 
             const card =
                 document.createElement(
@@ -306,36 +611,31 @@ function renderPosts(posts) {
 
                 <div
                     class="card-slider"
-                    data-post-index="${postIndex}"
+                    style="
+                        position:relative;
+                    "
                 >
 
 
                     <button
                         type="button"
                         class="prev-btn"
-                        data-action="prev"
-                        data-index="${postIndex}"
                     >
                         ◀
                     </button>
 
 
                     <img
-                        id="card-image-${postIndex}"
-                        src="${image.startsWith("http")
-                            ? image
-                            : "/" + image}"
+                        id="card-image-${post.id}"
+                        src="${imageSrc}"
                         class="card-image"
-                        data-action="gallery"
-                        data-index="${postIndex}"
+                        alt=""
                     >
 
 
                     <button
                         type="button"
                         class="next-btn"
-                        data-action="next"
-                        data-index="${postIndex}"
                     >
                         ▶
                     </button>
@@ -343,9 +643,22 @@ function renderPosts(posts) {
 
                     <div
                         class="card-photo-counter"
-                        id="card-counter-${postIndex}"
+                        id="card-counter-${post.id}"
+                        style="
+                            position:absolute;
+                            right:10px;
+                            bottom:10px;
+                            background:rgba(0,0,0,.65);
+                            color:white;
+                            padding:4px 8px;
+                            border-radius:12px;
+                            font-size:12px;
+                            z-index:5;
+                        "
                     >
-                        ${currentImage + 1} / ${images.length}
+                        ${imageIndex + 1}
+                        /
+                        ${images.length}
                     </div>
 
 
@@ -386,8 +699,6 @@ function renderPosts(posts) {
                     <button
                         type="button"
                         class="details-btn"
-                        data-action="details"
-                        data-id="${post.id}"
                     >
                         Подробнее
                     </button>
@@ -403,19 +714,17 @@ function renderPosts(posts) {
             );
 
 
-            /* =================================================
-               PREVIOUS PHOTO
-            ================================================= */
+            /* PREVIOUS */
 
             const prevBtn =
                 card.querySelector(
-                    '[data-action="prev"]'
+                    ".prev-btn"
                 );
 
 
             prevBtn.addEventListener(
                 "click",
-                (event) => {
+                event => {
 
                     event.preventDefault();
 
@@ -423,26 +732,24 @@ function renderPosts(posts) {
 
 
                     prevCardImage(
-                        postIndex
+                        post.id
                     );
 
                 }
             );
 
 
-            /* =================================================
-               NEXT PHOTO
-            ================================================= */
+            /* NEXT */
 
             const nextBtn =
                 card.querySelector(
-                    '[data-action="next"]'
+                    ".next-btn"
                 );
 
 
             nextBtn.addEventListener(
                 "click",
-                (event) => {
+                event => {
 
                     event.preventDefault();
 
@@ -450,26 +757,24 @@ function renderPosts(posts) {
 
 
                     nextCardImage(
-                        postIndex
+                        post.id
                     );
 
                 }
             );
 
 
-            /* =================================================
-               IMAGE CLICK
-            ================================================= */
+            /* PHOTO */
 
             const imageElement =
                 card.querySelector(
-                    '[data-action="gallery"]'
+                    ".card-image"
                 );
 
 
             imageElement.addEventListener(
                 "click",
-                (event) => {
+                event => {
 
                     event.preventDefault();
 
@@ -477,26 +782,24 @@ function renderPosts(posts) {
 
 
                     openGallery(
-                        postIndex
+                        post.id
                     );
 
                 }
             );
 
 
-            /* =================================================
-               DETAILS
-            ================================================= */
+            /* DETAILS */
 
             const detailsBtn =
                 card.querySelector(
-                    '[data-action="details"]'
+                    ".details-btn"
                 );
 
 
             detailsBtn.addEventListener(
                 "click",
-                (event) => {
+                event => {
 
                     event.preventDefault();
 
@@ -516,223 +819,19 @@ function renderPosts(posts) {
 
 
 /* =========================================================
-   FILTER
-========================================================= */
-
-function filterPosts() {
-
-    console.log(
-        "filterPosts called"
-    );
-
-
-    const districtEl =
-        document.getElementById(
-            "districtFilter"
-        );
-
-
-    const roomsEl =
-        document.getElementById(
-            "roomsFilter"
-        );
-
-
-    const minPriceEl =
-        document.getElementById(
-            "minPrice"
-        );
-
-
-    const maxPriceEl =
-        document.getElementById(
-            "maxPrice"
-        );
-
-
-    if (
-        !districtEl ||
-        !roomsEl ||
-        !minPriceEl ||
-        !maxPriceEl
-    ) {
-
-        console.log(
-            "Filter elements missing"
-        );
-
-        return;
-
-    }
-
-
-    const district =
-        districtEl.value
-            .toLowerCase()
-            .trim();
-
-
-    const rooms =
-        roomsEl.value;
-
-
-    const minPrice =
-        Number(
-            minPriceEl.value
-        ) || 0;
-
-
-    const maxPrice =
-        Number(
-            maxPriceEl.value
-        ) || 999999999;
-
-
-    const filtered =
-        allPosts.filter(
-            post => {
-
-
-                const postText =
-                    (
-                        post.text || ""
-                    )
-                    .toLowerCase();
-
-
-                const postDistrict =
-                    (
-                        post.district || ""
-                    )
-                    .toLowerCase();
-
-
-                const postRooms =
-                    Number(
-                        post.rooms
-                    ) || 0;
-
-
-                const postPrice =
-                    Number(
-                        post.price
-                    ) || 0;
-
-
-                /* =============================================
-                   DISTRICT
-                ============================================= */
-
-                if (
-
-                    district &&
-
-                    !postDistrict.includes(
-                        district
-                    ) &&
-
-                    !postText.includes(
-                        district
-                    )
-
-                ) {
-
-                    return false;
-
-                }
-
-
-                /* =============================================
-                   ROOMS
-                ============================================= */
-
-                if (rooms) {
-
-                    if (
-                        rooms === "5"
-                    ) {
-
-                        if (
-                            postRooms < 5
-                        ) {
-
-                            return false;
-
-                        }
-
-                    }
-
-                    else {
-
-                        if (
-                            postRooms !==
-                            Number(rooms)
-                        ) {
-
-                            return false;
-
-                        }
-
-                    }
-
-                }
-
-
-                /* =============================================
-                   PRICE
-                ============================================= */
-
-                if (
-                    postPrice <
-                    minPrice
-                ) {
-
-                    return false;
-
-                }
-
-
-                if (
-                    postPrice >
-                    maxPrice
-                ) {
-
-                    return false;
-
-                }
-
-
-                return true;
-
-            }
-        );
-
-
-    renderPosts(
-        filtered
-    );
-
-
-    hideLoader();
-
-}
-
-
-/* =========================================================
-   CARD PHOTO INDEX
-========================================================= */
-
-const currentCardImage = {};
-
-
-/* =========================================================
    NEXT CARD PHOTO
 ========================================================= */
 
-function nextCardImage(index) {
+function nextCardImage(
+    postId
+) {
 
     const post =
-        allPosts[index];
+        allPosts.find(
+            item =>
+                String(item.id) ===
+                String(postId)
+        );
 
 
     if (
@@ -748,12 +847,15 @@ function nextCardImage(index) {
     }
 
 
-    currentCardImage[index] =
+    currentCardImage[
+        postId
+    ] =
 
         (
             (
-                currentCardImage[index] ||
-                0
+                currentCardImage[
+                    postId
+                ] || 0
             ) + 1
         )
         %
@@ -761,7 +863,7 @@ function nextCardImage(index) {
 
 
     updateCardImage(
-        index
+        post
     );
 
 }
@@ -771,10 +873,16 @@ function nextCardImage(index) {
    PREVIOUS CARD PHOTO
 ========================================================= */
 
-function prevCardImage(index) {
+function prevCardImage(
+    postId
+) {
 
     const post =
-        allPosts[index];
+        allPosts.find(
+            item =>
+                String(item.id) ===
+                String(postId)
+        );
 
 
     if (
@@ -790,12 +898,15 @@ function prevCardImage(index) {
     }
 
 
-    currentCardImage[index] =
+    currentCardImage[
+        postId
+    ] =
 
         (
             (
-                currentCardImage[index] ||
-                0
+                currentCardImage[
+                    postId
+                ] || 0
             ) -
             1 +
             post.images.length
@@ -805,7 +916,7 @@ function prevCardImage(index) {
 
 
     updateCardImage(
-        index
+        post
     );
 
 }
@@ -815,55 +926,38 @@ function prevCardImage(index) {
    UPDATE CARD IMAGE
 ========================================================= */
 
-function updateCardImage(index) {
-
-    const post =
-        allPosts[index];
-
-
-    if (!post) {
-
-        return;
-
-    }
-
-
-    const images =
-        Array.isArray(
-            post.images
-        )
-            ? post.images
-            : [];
-
-
-    if (!images.length) {
-
-        return;
-
-    }
-
+function updateCardImage(
+    post
+) {
 
     const imageIndex =
-        currentCardImage[index] || 0;
+        currentCardImage[
+            post.id
+        ] || 0;
 
 
     const image =
-        images[imageIndex];
+        post.images[
+            imageIndex
+        ];
 
 
     const imageElement =
         document.getElementById(
-            `card-image-${index}`
+            `card-image-${post.id}`
         );
 
 
     const counter =
         document.getElementById(
-            `card-counter-${index}`
+            `card-counter-${post.id}`
         );
 
 
-    if (imageElement) {
+    if (
+        imageElement &&
+        image
+    ) {
 
         imageElement.src =
             image.startsWith("http")
@@ -877,7 +971,7 @@ function updateCardImage(index) {
 
         counter.textContent =
 
-            `${imageIndex + 1} / ${images.length}`;
+            `${imageIndex + 1} / ${post.images.length}`;
 
     }
 
@@ -888,16 +982,24 @@ function updateCardImage(index) {
    OPEN GALLERY
 ========================================================= */
 
-function openGallery(index) {
+function openGallery(
+    postId
+) {
 
     const post =
-        allPosts[index];
+        allPosts.find(
+            item =>
+                String(item.id) ===
+                String(postId)
+        );
 
 
     if (
         !post ||
-        !post.images ||
-        post.images.length === 0
+        !Array.isArray(
+            post.images
+        ) ||
+        !post.images.length
     ) {
 
         return;
@@ -906,7 +1008,9 @@ function openGallery(index) {
 
 
     let current =
-        currentCardImage[index] || 0;
+        currentCardImage[
+            post.id
+        ] || 0;
 
 
     const viewer =
@@ -919,54 +1023,116 @@ function openGallery(index) {
         "viewer";
 
 
+    viewer.style.cssText = `
+
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.92);
+        z-index:99999;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+    `;
+
+
     viewer.innerHTML = `
 
-        <div class="viewer">
+        <button
+            id="closeViewer"
+            type="button"
+            style="
+                position:absolute;
+                top:25px;
+                right:25px;
+                z-index:10;
+                width:45px;
+                height:45px;
+                border:0;
+                border-radius:50%;
+                font-size:25px;
+            "
+        >
+            ✕
+        </button>
 
 
-            <button
-                id="closeViewer"
-                type="button"
-            >
-                ✕
-            </button>
+        <button
+            id="prevPhoto"
+            type="button"
+            style="
+                position:absolute;
+                left:15px;
+                top:50%;
+                transform:translateY(-50%);
+                z-index:10;
+                width:50px;
+                height:50px;
+                border:0;
+                border-radius:50%;
+                font-size:24px;
+            "
+        >
+            ◀
+        </button>
 
 
-            <button
-                id="prevPhoto"
-                type="button"
-            >
-                ◀
-            </button>
+        <img
+            id="galleryImage"
+            src="${
+                post.images[
+                    current
+                ].startsWith("http")
+                    ? post.images[
+                        current
+                    ]
+                    : "/" +
+                        post.images[
+                            current
+                        ]
+            }"
+            style="
+                max-width:90%;
+                max-height:85%;
+                object-fit:contain;
+            "
+        >
 
 
-            <img
-                id="galleryImage"
-                src="${
-                    post.images[current].startsWith("http")
-                        ? post.images[current]
-                        : "/" + post.images[current]
-                }"
-            >
+        <button
+            id="nextPhoto"
+            type="button"
+            style="
+                position:absolute;
+                right:15px;
+                top:50%;
+                transform:translateY(-50%);
+                z-index:10;
+                width:50px;
+                height:50px;
+                border:0;
+                border-radius:50%;
+                font-size:24px;
+            "
+        >
+            ▶
+        </button>
 
 
-            <button
-                id="nextPhoto"
-                type="button"
-            >
-                ▶
-            </button>
-
-
-            <div id="counter">
-
-                ${current + 1}
-                /
-                ${post.images.length}
-
-            </div>
-
-
+        <div
+            id="counter"
+            style="
+                position:absolute;
+                bottom:25px;
+                left:50%;
+                transform:translateX(-50%);
+                color:white;
+                font-size:18px;
+            "
+        >
+            ${current + 1}
+            /
+            ${post.images.length}
         </div>
 
     `;
@@ -978,26 +1144,23 @@ function openGallery(index) {
 
 
     const image =
-        document.getElementById(
-            "galleryImage"
+        viewer.querySelector(
+            "#galleryImage"
         );
 
 
     const counter =
-        document.getElementById(
-            "counter"
+        viewer.querySelector(
+            "#counter"
         );
 
 
-    /* =====================================================
-       NEXT
-    ===================================================== */
+    /* NEXT */
 
-    document.getElementById(
-        "nextPhoto"
-    ).addEventListener(
-        "click",
-        (event) => {
+    viewer.querySelector(
+        "#nextPhoto"
+    ).onclick =
+        event => {
 
             event.preventDefault();
 
@@ -1018,7 +1181,6 @@ function openGallery(index) {
 
 
             image.src =
-
                 post.images[
                     current
                 ].startsWith("http")
@@ -1033,23 +1195,19 @@ function openGallery(index) {
                         ];
 
 
-            counter.innerHTML =
+            counter.textContent =
 
                 `${current + 1} / ${post.images.length}`;
 
-        }
-    );
+        };
 
 
-    /* =====================================================
-       PREVIOUS
-    ===================================================== */
+    /* PREVIOUS */
 
-    document.getElementById(
-        "prevPhoto"
-    ).addEventListener(
-        "click",
-        (event) => {
+    viewer.querySelector(
+        "#prevPhoto"
+    ).onclick =
+        event => {
 
             event.preventDefault();
 
@@ -1070,7 +1228,6 @@ function openGallery(index) {
 
 
             image.src =
-
                 post.images[
                     current
                 ].startsWith("http")
@@ -1085,42 +1242,27 @@ function openGallery(index) {
                         ];
 
 
-            counter.innerHTML =
+            counter.textContent =
 
                 `${current + 1} / ${post.images.length}`;
 
-        }
-    );
+        };
 
 
-    /* =====================================================
-       CLOSE
-    ===================================================== */
+    /* CLOSE */
 
-    document.getElementById(
-        "closeViewer"
-    ).addEventListener(
-        "click",
-        (event) => {
-
-            event.preventDefault();
-
-            event.stopPropagation();
-
+    viewer.querySelector(
+        "#closeViewer"
+    ).onclick =
+        () => {
 
             viewer.remove();
 
-        }
-    );
+        };
 
 
-    /* =====================================================
-       BACKGROUND CLOSE
-    ===================================================== */
-
-    viewer.addEventListener(
-        "click",
-        (event) => {
+    viewer.onclick =
+        event => {
 
             if (
                 event.target ===
@@ -1131,6 +1273,391 @@ function openGallery(index) {
 
             }
 
+        };
+
+}
+
+
+/* =========================================================
+   CATALOG VIEW
+========================================================= */
+
+function showCatalog() {
+
+    currentView =
+        "catalog";
+
+
+    const posts =
+        document.getElementById(
+            "posts"
+        );
+
+
+    const map =
+        document.getElementById(
+            "map"
+        );
+
+
+    if (posts) {
+
+        posts.style.display =
+            "";
+
+    }
+
+
+    if (map) {
+
+        map.style.display =
+            "none";
+
+    }
+
+
+    document
+        .getElementById(
+            "catalogViewBtn"
+        )
+        ?.classList.add(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "mapViewBtn"
+        )
+        ?.classList.remove(
+            "active"
+        );
+
+
+    renderPosts(
+        getFilteredPosts()
+    );
+
+}
+
+
+/* =========================================================
+   MAP VIEW
+========================================================= */
+
+function showMap() {
+
+    currentView =
+        "map";
+
+
+    const posts =
+        document.getElementById(
+            "posts"
+        );
+
+
+    const map =
+        document.getElementById(
+            "map"
+        );
+
+
+    if (posts) {
+
+        posts.style.display =
+            "none";
+
+    }
+
+
+    if (map) {
+
+        map.style.display =
+            "block";
+
+    }
+
+
+    document
+        .getElementById(
+            "catalogViewBtn"
+        )
+        ?.classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "mapViewBtn"
+        )
+        ?.classList.add(
+            "active"
+        );
+
+
+    setTimeout(
+        () => {
+
+            initMap();
+
+            renderMap(
+                getFilteredPosts()
+            );
+
+        },
+        100
+    );
+
+}
+
+
+/* =========================================================
+   INIT MAP
+========================================================= */
+
+function initMap() {
+
+    if (!window.L) {
+
+        console.error(
+            "Leaflet is not loaded"
+        );
+
+        return;
+
+    }
+
+
+    const mapElement =
+        document.getElementById(
+            "map"
+        );
+
+
+    if (!mapElement) {
+
+        console.error(
+            "Map element #map not found"
+        );
+
+        return;
+
+    }
+
+
+    if (!mapInstance) {
+
+        mapInstance =
+            L.map(
+                "map",
+                {
+                    zoomControl:
+                        true
+                }
+            ).setView(
+                [41.7151, 44.8271],
+                12
+            );
+
+
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+
+                maxZoom: 19,
+
+                attribution:
+                    "&copy; OpenStreetMap contributors"
+
+            }
+        ).addTo(
+            mapInstance
+        );
+
+
+        mapLayer =
+            L.layerGroup()
+                .addTo(
+                    mapInstance
+                );
+
+    }
+
+
+    mapInstance.invalidateSize();
+
+}
+
+
+/* =========================================================
+   POST COORDINATES
+========================================================= */
+
+function getPostCoordinates(
+    post
+) {
+
+    const lat =
+        Number(
+            post.latitude ??
+            post.lat ??
+            post.location?.latitude ??
+            post.location?.lat
+        );
+
+
+    const lng =
+        Number(
+            post.longitude ??
+            post.lng ??
+            post.lon ??
+            post.location?.longitude ??
+            post.location?.lng
+        );
+
+
+    const valid =
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+
+        lat >= 41.60 &&
+        lat <= 41.84 &&
+
+        lng >= 44.62 &&
+        lng <= 44.98;
+
+
+    if (valid) {
+
+        return [
+            lat,
+            lng
+        ];
+
+    }
+
+
+    const district =
+        (
+            post.district ||
+            ""
+        ).toLowerCase();
+
+
+    for (
+        const key of
+        Object.keys(
+            districtCenters
+        )
+    ) {
+
+        if (
+            district.includes(
+                key
+            )
+        ) {
+
+            return districtCenters[
+                key
+            ];
+
+        }
+
+    }
+
+
+    const text =
+        (
+            post.text ||
+            ""
+        ).toLowerCase();
+
+
+    for (
+        const key of
+        Object.keys(
+            districtCenters
+        )
+    ) {
+
+        if (
+            text.includes(
+                key
+            )
+        ) {
+
+            return districtCenters[
+                key
+            ];
+
+        }
+
+    }
+
+
+    return [
+        41.7151,
+        44.8271
+    ];
+
+}
+
+
+/* =========================================================
+   PRICE MARKER
+========================================================= */
+
+function createPriceMarker(
+    lat,
+    lng,
+    text,
+    className =
+        "price-marker"
+) {
+
+    const isCluster =
+        className ===
+        "cluster-marker";
+
+
+    return L.marker(
+        [
+            lat,
+            lng
+        ],
+        {
+
+            icon:
+
+                L.divIcon({
+
+                    className:
+                        "orange-map-icon",
+
+                    html: `
+
+                        <div
+                            class="${className}"
+                        >
+                            ${text}
+                        </div>
+
+                    `,
+
+                    iconSize:
+                        isCluster
+                            ? [90, 50]
+                            : [100, 40],
+
+                    iconAnchor:
+                        isCluster
+                            ? [45, 25]
+                            : [50, 20]
+
+                })
+
         }
     );
 
@@ -1138,15 +1665,511 @@ function openGallery(index) {
 
 
 /* =========================================================
-   FIRST LOAD
+   RENDER MAP
 ========================================================= */
 
-loadPosts();
+function renderMap(
+    posts
+) {
+
+    if (
+        !mapInstance ||
+        !mapLayer
+    ) {
+
+        return;
+
+    }
+
+
+    mapLayer.clearLayers();
+
+
+    const tbilisiCenter =
+        [
+            41.7151,
+            44.8271
+        ];
+
+
+    if (!posts.length) {
+
+        mapInstance.setView(
+            tbilisiCenter,
+            12
+        );
+
+        return;
+
+    }
+
+
+    const groups =
+        new Map();
+
+
+    posts.forEach(
+        post => {
+
+            const [
+                lat,
+                lng
+            ] =
+                getPostCoordinates(
+                    post
+                );
+
+
+            const key =
+                `${lat.toFixed(3)},${lng.toFixed(3)}`;
+
+
+            if (
+                !groups.has(
+                    key
+                )
+            ) {
+
+                groups.set(
+                    key,
+                    {
+
+                        lat,
+                        lng,
+
+                        posts: []
+
+                    }
+                );
+
+            }
+
+
+            groups
+                .get(key)
+                .posts
+                .push(
+                    post
+                );
+
+        }
+    );
+
+
+    const bounds = [];
+
+
+    groups.forEach(
+        group => {
+
+            const groupPosts =
+                group.posts;
+
+
+            bounds.push(
+                [
+                    group.lat,
+                    group.lng
+                ]
+            );
+
+
+            /* =================================================
+               ONE APARTMENT
+            ================================================= */
+
+            if (
+                groupPosts.length ===
+                1
+            ) {
+
+                const post =
+                    groupPosts[0];
+
+
+                const price =
+                    Number(
+                        post.price
+                    ) || 0;
+
+
+                const marker =
+                    createPriceMarker(
+
+                        group.lat,
+
+                        group.lng,
+
+                        price
+                            ? `$${price}`
+                            : "Цена"
+
+                    );
+
+
+                marker.bindPopup(`
+
+                    <div
+                        class="map-popup"
+                        style="
+                            min-width:180px;
+                        "
+                    >
+
+                        <div
+                            style="
+                                font-size:20px;
+                                font-weight:bold;
+                                margin-bottom:6px;
+                            "
+                        >
+                            ${
+                                price
+                                    ? `$${price}`
+                                    : "Цена"
+                            }
+                        </div>
+
+
+                        <div>
+
+                            📍
+                            ${post.district || "-"}
+
+                            <br>
+
+                            🛏
+                            ${post.rooms || "-"}
+                            комн.
+
+                            <br>
+
+                            📐
+                            ${post.area || "-"}
+                            м²
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            style="
+                                margin-top:10px;
+                                width:100%;
+                                border:0;
+                                border-radius:8px;
+                                padding:9px;
+                                background:#1f63e9;
+                                color:white;
+                                font-weight:bold;
+                            "
+                            onclick="
+                                location.href='details.html?id=${post.id}'
+                            "
+                        >
+                            Подробнее
+                        </button>
+
+                    </div>
+
+                `);
+
+
+                marker.addTo(
+                    mapLayer
+                );
+
+
+                return;
+
+            }
+
+
+            /* =================================================
+               CLUSTER
+            ================================================= */
+
+            const prices =
+                groupPosts
+                    .map(
+                        post =>
+                            Number(
+                                post.price
+                            )
+                    )
+                    .filter(
+                        price =>
+                            Number.isFinite(
+                                price
+                            ) &&
+                            price > 0
+                    );
+
+
+            const minPrice =
+                prices.length
+                    ? Math.min(
+                        ...prices
+                    )
+                    : 0;
+
+
+            const markerText =
+
+                minPrice
+
+                    ? `
+
+                        От ${minPrice}
+
+                        <span
+                            style="
+                                font-size:11px;
+                            "
+                        >
+                            (${groupPosts.length})
+                        </span>
+
+                    `
+
+                    : `${groupPosts.length}`;
+
+
+            const marker =
+                createPriceMarker(
+
+                    group.lat,
+
+                    group.lng,
+
+                    markerText,
+
+                    "cluster-marker"
+
+                );
+
+
+            marker.on(
+                "click",
+                () => {
+
+                    const list =
+
+                        groupPosts
+                            .slice(
+                                0,
+                                30
+                            )
+                            .map(
+                                post => `
+
+                                    <div
+                                        style="
+                                            padding:8px 0;
+                                            border-bottom:1px solid #eee;
+                                        "
+                                    >
+
+                                        <b>
+                                            $${post.price || "-"}
+                                        </b>
+
+                                        ·
+
+                                        ${post.rooms || "-"}
+                                        комн.
+
+
+                                        <br>
+
+
+                                        <button
+                                            type="button"
+                                            style="
+                                                margin-top:5px;
+                                                width:100%;
+                                                border:0;
+                                                border-radius:7px;
+                                                padding:7px;
+                                                background:#1f63e9;
+                                                color:#fff;
+                                            "
+                                            onclick="
+                                                location.href='details.html?id=${post.id}'
+                                            "
+                                        >
+                                            Подробнее
+                                        </button>
+
+                                    </div>
+
+                                `
+                            )
+                            .join("");
+
+
+                    marker
+                        .bindPopup(`
+
+                            <div
+                                class="map-popup"
+                                style="
+                                    max-height:300px;
+                                    overflow:auto;
+                                "
+                            >
+
+                                <div
+                                    style="
+                                        font-size:18px;
+                                        font-weight:bold;
+                                        margin-bottom:8px;
+                                    "
+                                >
+                                    От
+                                    $${minPrice || "-"}
+                                    (${groupPosts.length})
+                                </div>
+
+                                ${list}
+
+                            </div>
+
+                        `)
+                        .openPopup();
+
+                }
+            );
+
+
+            marker.addTo(
+                mapLayer
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       MAP ZOOM
+    ===================================================== */
+
+    const tbilisiBounds =
+        bounds.filter(
+            ([lat, lng]) =>
+
+                lat >= 41.60 &&
+                lat <= 41.84 &&
+
+                lng >= 44.62 &&
+                lng <= 44.98
+
+        );
+
+
+    if (
+        tbilisiBounds.length ===
+        1
+    ) {
+
+        mapInstance.setView(
+            tbilisiBounds[0],
+            14
+        );
+
+    }
+
+    else if (
+        tbilisiBounds.length >
+        1
+    ) {
+
+        mapInstance.fitBounds(
+
+            L.latLngBounds(
+                tbilisiBounds
+            ),
+
+            {
+
+                padding:
+                    [40, 40],
+
+                maxZoom:
+                    13
+
+            }
+
+        );
+
+    }
+
+    else {
+
+        mapInstance.setView(
+            tbilisiCenter,
+            12
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   VIEW BUTTONS
+========================================================= */
+
+function setupViewButtons() {
+
+    const catalogBtn =
+        document.getElementById(
+            "catalogViewBtn"
+        );
+
+
+    const mapBtn =
+        document.getElementById(
+            "mapViewBtn"
+        );
+
+
+    if (catalogBtn) {
+
+        catalogBtn.onclick =
+            event => {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                showCatalog();
+
+            };
+
+    }
+
+
+    if (mapBtn) {
+
+        mapBtn.onclick =
+            event => {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                showMap();
+
+            };
+
+    }
+
+}
 
 
 /* =========================================================
    AUTO REFRESH
-   EVERY 30 SECONDS
 ========================================================= */
 
 setInterval(
@@ -1159,7 +2182,8 @@ setInterval(
                     "/api/posts?t=" +
                     Date.now(),
                     {
-                        cache: "no-store"
+                        cache:
+                            "no-store"
                     }
                 );
 
@@ -1175,58 +2199,74 @@ setInterval(
                 await response.json();
 
 
-            /*
-               მხოლოდ რაოდენობის ცვლილებაზე
-               აღარ ვამოწმებთ — თუ პოსტი შეიცვალა
-               (მაგ. ფოტო/ფასი), განვაახლოთ.
-            */
-
-            const oldIds =
-                allPosts
-                    .map(
-                        p =>
-                            String(p.id)
-                    )
-                    .join(",");
+            const oldData =
+                JSON.stringify(
+                    allPosts
+                );
 
 
-            const newIds =
-                posts
-                    .map(
-                        p =>
-                            String(p.id)
-                    )
-                    .join(",");
+            const newData =
+                JSON.stringify(
+                    posts
+                );
 
 
-            const changed =
-                oldIds !== newIds ||
-                JSON.stringify(posts)
-                    !==
-                JSON.stringify(allPosts);
-
-
-            if (changed) {
+            if (
+                oldData !==
+                newData
+            ) {
 
                 allPosts =
                     posts;
 
 
-                filterPosts();
+                renderPosts(
+                    getFilteredPosts()
+                );
+
+
+                if (
+                    currentView ===
+                    "map"
+                ) {
+
+                    initMap();
+
+                    renderMap(
+                        getFilteredPosts()
+                    );
+
+                }
 
             }
 
         }
 
-        catch (e) {
+        catch (error) {
 
             console.log(
                 "Auto refresh error:",
-                e
+                error
             );
 
         }
 
     },
     30000
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        setupViewButtons();
+
+        loadPosts();
+
+    }
 );
