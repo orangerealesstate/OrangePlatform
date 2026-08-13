@@ -2096,120 +2096,99 @@ marker.on("click", () => {
 
 
             marker.on(
-                "click",
-                () => {
-                    console.log("MARKER CLICKED");
-console.log("MAP POST:", groupPosts[0]);
-                    const list =
+    "click",
+    () => {
 
-                        groupPosts
-                            .slice(
-                                0,
-                                30
-                            )
-                            .map(
-                                post => `
-                                ${post.images?.[0] ? `
-    <img
-        src="${post.images[0]}"
-        style="
-            width:100%;
-            height:120px;
-            object-fit:cover;
-            border-radius:8px;
-            margin-bottom:8px;
-        "
-    >
-` : ""}
+        console.log("MARKER CLICKED");
+        console.log("MAP POST:", groupPosts[0]);
 
-                                    <div
-                                        style="
-                                            padding:8px 0;
-                                            border-bottom:1px solid #eee;
-                                        "
-                                    >
+        const post = groupPosts[0];
 
-                                        <b>
-                                            $${post.price || "-"}
-                                        </b>
+        const images = Array.isArray(post.images)
+            ? post.images.filter(Boolean)
+            : [];
 
-                                        ·
+        const price = post.price
+            ? `$${post.price}`
+            : "Цена";
 
-                                        ${post.rooms || "-"}
-                                        комн.
+        const gallery = images.length
+            ? `
+                <div
+                    style="
+                        display:flex;
+                        overflow-x:auto;
+                        gap:8px;
+                        width:100%;
+                        margin-bottom:8px;
+                        scroll-snap-type:x mandatory;
+                    "
+                >
 
+                    ${images.map((img, index) => `
+                        <img
+                            src="${img}"
+                            onclick='openMapGallery(${JSON.stringify(images)}, ${index})'
+                            style="
+                                width:230px;
+                                min-width:230px;
+                                height:170px;
+                                object-fit:cover;
+                                border-radius:10px;
+                                cursor:pointer;
+                                scroll-snap-align:start;
+                            "
+                        >
+                    `).join("")}
 
-                                        <br>
+                </div>
 
-${post.images?.[0] ? `
-<img
-    src="${post.images[0]}"
-    style="
-        width:100%;
-        height:150px;
-        object-fit:cover;
-        border-radius:10px;
-        margin-bottom:8px;
-    "
->
-` : ""}
-                                        <button
-                                            type="button"
-                                            style="
-                                                margin-top:5px;
-                                                width:100%;
-                                                border:0;
-                                                border-radius:7px;
-                                                padding:7px;
-                                                background:#1f63e9;
-                                                color:#fff;
-                                            "
-                                            onclick="
-                                                location.href='details.html?id=${post.id}'
-                                            "
-                                        >
-                                            Подробнее
-                                        </button>
+                <div
+                    style="
+                        text-align:center;
+                        font-size:12px;
+                        color:#777;
+                        margin-bottom:8px;
+                    "
+                >
+                    ← გადაასრიალე ფოტოები →
+                </div>
+            `
+            : "";
 
-                                    </div>
+        marker.bindPopup(`
 
-                                `
-                            )
-                            .join("");
+            <div
+                class="map-popup"
+                style="
+                    width:240px;
+                "
+            >
 
+                <div
+                    style="
+                        font-size:22px;
+                        font-weight:bold;
+                        margin-bottom:8px;
+                    "
+                >
+                    ${price}
+                </div>
 
-                    marker
-                        .bindPopup(`
+                ${gallery}
 
-                            <div
-                                class="map-popup"
-                                style="
-                                    max-height:300px;
-                                    overflow:auto;
-                                "
-                            >
+                <div style="font-size:14px;">
+                    📍 ${post.district || "-"}<br>
+                    🛏 ${post.rooms || "-"} комн.<br>
+                    📐 ${post.area || "-"} м²
+                </div>
 
-                                <div
-                                    style="
-                                        font-size:18px;
-                                        font-weight:bold;
-                                        margin-bottom:8px;
-                                    "
-                                >
-                                    От
-                                    $${minPrice || "-"}
-                                    (${groupPosts.length})
-                                </div>
+            </div>
 
-                                ${list}
+        `).openPopup();
 
-                            </div>
-
-                        `)
-                        .openPopup();
-
-                }
-            );
+    }
+);
 
 
             marker.addTo(
