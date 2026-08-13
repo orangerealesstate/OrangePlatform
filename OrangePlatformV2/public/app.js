@@ -2095,7 +2095,7 @@ const key = addressKey;
             marker.on(
                 "click",
                 () => {
-
+console.log("MAP POST:", groupPosts[0]);
                     const list =
 
                         groupPosts
@@ -2105,6 +2105,18 @@ const key = addressKey;
                             )
                             .map(
                                 post => `
+                                ${post.images?.[0] ? `
+    <img
+        src="${post.images[0]}"
+        style="
+            width:100%;
+            height:120px;
+            object-fit:cover;
+            border-radius:8px;
+            margin-bottom:8px;
+        "
+    >
+` : ""}
 
                                     <div
                                         style="
