@@ -2047,17 +2047,7 @@ function renderMap(
                 );
 
 
-            const addressKey = String(
-    post.street ||
-    post.address ||
-    post.text?.match(/Адрес:\s*(.+)/i)?.[1] ||
-    post.id
-)
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
-
-const key = addressKey;
+            const key = String(post.id);
 
 
             if (
