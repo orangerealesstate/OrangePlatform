@@ -1948,7 +1948,10 @@ const key = addressKey;
                             : "Цена"
 
                     );
-
+marker.on("click", () => {
+    console.log("SINGLE MARKER CLICKED");
+    console.log("MAP POST:", post);
+});
 
                 marker.bindPopup(`
 
