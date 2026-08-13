@@ -1,414 +1,1098 @@
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
+const tg = window.Telegram?.WebApp;
+
+if (tg) {
+    tg.ready();
+    tg.expand();
+}
+
+const ADMIN_IDS = [
+    5172653731
+];
+
+const telegramUserId =
+    tg?.initDataUnsafe?.user?.id || null;
+
 let currentImages = [];
 let currentIndex = 0;
+
+
+/* =========================================================
+   ADMIN CHECK
+========================================================= */
+
+function isAdmin() {
+
+    const userId =
+        Number(
+            tg?.initDataUnsafe?.user?.id
+        );
+
+    return ADMIN_IDS.includes(
+        userId
+    );
+}
+
+
+/* =========================================================
+   LOAD DETAILS
+========================================================= */
 
 async function loadDetails() {
 
     try {
 
-        const res = await fetch(`/api/post/${id}`);
+        const res =
+            await fetch(
+                `/api/post/${id}?t=${Date.now()}`,
+                {
+                    cache: "no-store"
+                }
+            );
+
 
         if (!res.ok) {
-            throw new Error("Post not found");
+
+            throw new Error(
+                "Post not found"
+            );
+
         }
 
-        const post = await res.json();
-        console.log("TELEGRAM LINK:", post.telegramLink);
-        console.log(post.date);
-const telegramBtn = document.getElementById("telegramBtn");
 
-if (telegramBtn) {
-    if (post.telegramLink) {
-        telegramBtn.onclick = () => {
-            window.open(post.telegramLink, "_blank");
-        };
-    } else {
-        telegramBtn.style.display = "none";
-    }
-}
-        currentImages = Array.isArray(post.images)
-            ? post.images
-            : [];
+        const post =
+            await res.json();
+
+
+        console.log(
+            "TELEGRAM LINK:",
+            post.telegramLink
+        );
+
+
+        console.log(
+            "POST DATE:",
+            post.date
+        );
+
+
+        /* =====================================================
+           POST STATS
+        ===================================================== */
+
+        if (
+            telegramUserId &&
+            id
+        ) {
+
+            fetch(
+                "/api/stats/post",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        userId:
+                            telegramUserId,
+
+                        postId:
+                            id
+
+                    })
+
+                }
+
+            ).catch(
+                err =>
+                    console.log(
+                        "Post stats error:",
+                        err
+                    )
+            );
+
+        }
+
+
+        /* =====================================================
+           TELEGRAM BUTTON
+        ===================================================== */
+
+        const telegramBtn =
+            document.getElementById(
+                "telegramBtn"
+            );
+
+
+        if (telegramBtn) {
+
+            if (
+                post.telegramLink
+            ) {
+
+                telegramBtn.onclick =
+                    () => {
+
+                        if (
+                            tg?.openTelegramLink
+                        ) {
+
+                            tg.openTelegramLink(
+                                post.telegramLink
+                            );
+
+                        }
+
+                        else {
+
+                            window.open(
+                                post.telegramLink,
+                                "_blank"
+                            );
+
+                        }
+
+                    };
+
+            }
+
+            else {
+
+                telegramBtn.style.display =
+                    "none";
+
+            }
+
+        }
+
+
+        /* =====================================================
+           IMAGES
+        ===================================================== */
+
+        currentImages =
+            Array.isArray(
+                post.images
+            )
+                ? post.images
+                : [];
+
 
         currentIndex = 0;
+
 
         let images = "";
 
-        if (currentImages.length > 0) {
+
+        if (
+            currentImages.length > 0
+        ) {
 
             images = `
-<div class="image-wrapper">
 
-<div class="image-wrapper">
+                <div class="image-wrapper">
 
-<button class="gallery-prev" onclick="prevImage()">❮</button>
+                    <button
+                        class="gallery-prev"
+                        onclick="prevImage()"
+                    >
+                        ❮
+                    </button>
 
-<img
-    id="mainImage"
-    src="/${currentImages[0]}"
-    class="main-image"
-    onclick="openImage('/' + currentImages[currentIndex])"
->
 
-<button class="gallery-next" onclick="nextImage()">❯</button>
+                    <img
+                        id="mainImage"
+                        src="/${currentImages[0]}"
+                        class="main-image"
+                        onclick="
+                            openImage(
+                                '/' +
+                                currentImages[currentIndex]
+                            )
+                        "
+                    >
 
-<div class="photo-count">
-📷 <span id="photoNumber">1</span> / ${currentImages.length}
-</div>
 
-</div>
+                    <button
+                        class="gallery-next"
+                        onclick="nextImage()"
+                    >
+                        ❯
+                    </button>
 
-<div class="photo-count">
-📷 1 / ${currentImages.length}
-</div>
 
-</div>
-`;
+                    <div class="photo-count">
+
+                        📷
+
+                        <span id="photoNumber">
+                            1
+                        </span>
+
+                        /
+                        ${currentImages.length}
+
+                    </div>
+
+                </div>
+
+            `;
 
         }
 
-        if (currentImages.length) {
 
-     {
+        /* =====================================================
+           DATE
+        ===================================================== */
 
-    images = `
-<div class="image-wrapper">
-
-    <img
-        src="/${currentImages[0]}"
-        class="main-image"
-        onclick="openImage('/${currentImages[0]}')"
-    >
-
-    <div class="photo-count">
-        📷 1 / ${currentImages.length}
-    </div>
-
-</div>
-`;
-
-}
-
-}
-
-document.getElementById("content").innerHTML = `
-<div class="details-container">
-
-<header class="details-header">
-🍊 Orange Real Estate
-</header>
-
-<div class="title-block">
-
-<button class="back-btn" onclick="history.back()">
-← Назад
-</button>
-
-<h2>🏠 Сдается ${post.rooms || "-"}-комнатная квартира в ${post.district || "-"}</h2>
-
-<div class="price">
-$${post.price || "-"}
-</div>
-
-<div class="publish-date green-date">
-    🕐 ${new Date(post.date * 1000).toLocaleDateString("ru-RU")}
-</div>
-
-</div>
-
-<div class="gallery">
-${images}
-</div>
+        let postDate = "-";
 
 
-<div class="stats-grid">
+        if (post.date) {
 
-<div class="stat-card">
-<div class="icon">📍</div>
-<div class="value">${post.district || "-"}</div>
-<div class="label">Район</div>
-</div>
-
-<div class="stat-card">
-<div class="icon">📌</div>
-<div class="value">${post.street || "-"}</div>
-<div class="label">Улица</div>
-</div>
-
-<div class="stat-card">
-<div class="icon">🚪</div>
-<div class="value">${post.rooms || "-"}</div>
-<div class="label">Комнаты</div>
-</div>
-
-<div class="stat-card">
-<div class="icon">🛏</div>
-<div class="value">${post.bedrooms || "-"}</div>
-<div class="label">Спальни</div>
-</div>
-
-<div class="stat-card">
-<div class="icon">📐</div>
-<div class="value">${post.area || "-"}</div>
-<div class="label">м²</div>
-</div>
-
-<div class="stat-card">
-<div class="icon">🏢</div>
-<div class="value">${post.floor || "-"}</div>
-<div class="label">Этаж</div>
-</div>
-
-<div class="stat-card">
-<div class="icon">💰</div>
-<div class="value">$${post.price || "-"}</div>
-<div class="label">Цена</div>
-</div>
-
-</div>
+            const timestamp =
+                Number(post.date);
 
 
-${
-window.Telegram?.WebApp?.initDataUnsafe?.user?.id === 5172653731
-? `
-<div class="admin-buttons">
-<button id="editBtn" class="edit-btn">✏️ Редактировать</button>
-<button id="deleteBtn" class="delete-btn">🗑️ Удалить</button>
-</div>
-`
-: ""
-}
+            if (
+                Number.isFinite(
+                    timestamp
+                )
+            ) {
 
-</div>
+                postDate =
 
+                    new Date(
+                        timestamp * 1000
+                    ).toLocaleDateString(
+                        "ru-RU"
+                    );
 
-</div>
-`;
-const shareBtn = document.getElementById("shareBtn");
-const mapBtn = document.getElementById("mapBtn");
-const agentBtn = document.getElementById("agentBtn");
+            }
 
-if (shareBtn) {
-    shareBtn.onclick = () => sharePost(post);
-}
+            else {
 
-if (mapBtn) {
-    mapBtn.onclick = () => {
-        window.open(
-            `https://yandex.com/maps/?text=${encodeURIComponent(
-                `${post.street || ""}, ${post.district || ""}, Tbilisi`
-            )}`,
-            "_blank"
-        );
-    };
-}
-
-if (agentBtn) {
-    agentBtn.onclick = () => {
-        window.open(
-            "https://t.me/Orangerealestatetbilisi",
-            "_blank"
-        );
-    };
-}
-
-if (agentBtn) {
-    agentBtn.onclick = () => {
-        window.open(
-            "https://t.me/Orangerealestatetbilisi",
-            "_blank"
-        );
-    };
-}
-const editBtn = document.getElementById("editBtn");
-const deleteBtn = document.getElementById("deleteBtn");
-console.log(deleteBtn);
+                const parsed =
+                    new Date(
+                        post.date
+                    );
 
 
-if (deleteBtn) {
-    deleteBtn.onclick = async () => {
+                if (
+                    !isNaN(
+                        parsed.getTime()
+                    )
+                ) {
 
-        if (!confirm("🗑 Удалить объявление?")) return;
+                    postDate =
+                        parsed.toLocaleDateString(
+                            "ru-RU"
+                        );
 
-        const response = await fetch("/api/post/delete", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                id: post.id
-            })
-        });
+                }
 
-        const result = await response.json();
+            }
 
-        if (result.success) {
-            alert("✅ Объявление удалено");
-            window.location.href = "/";
-        } else {
-            alert("❌ Ошибка удаления");
         }
-    };
-}
-console.log(editBtn);
-
-if (editBtn) {
-editBtn.onclick = () => {
-    const ADMIN_IDS = [
-    5172653731, // Tornike
-
-];
-
-    const tg = window.Telegram?.WebApp;
 
 
-    if (tg) {
-    tg.ready();
-    tg.expand();
-}
+        /* =====================================================
+           ADMIN BUTTONS
+        ===================================================== */
 
-console.log(window.Telegram);
-console.log(tg);
-console.log(tg?.initDataUnsafe);
+        const adminButtons =
+            isAdmin()
 
-const userId = tg?.initDataUnsafe?.user?.id;
+                ? `
 
+                    <div
+                        class="admin-buttons"
+                        style="
+                            display:flex;
+                            gap:10px;
+                            margin-top:20px;
+                        "
+                    >
 
-if (!ADMIN_IDS.includes(userId)) {
-    alert("🚫 У вас нет доступа.");
-    return;
-}
-
-    alert(post.id);
-    window.location.href = `edit.html?id=${post.id}`;
-
-};
-}
-} catch (err) {
-
-    document.getElementById("content").innerHTML =
-        "<h2>Ошибка загрузки квартиры</h2>";
-
-    console.error(err);
-
-}
-
-} 
-
-;// ← აქ იხურება loadDetails()
-
-// ==========================
-// SHARE
-// ==========================
+                        <button
+                            id="editBtn"
+                            class="edit-btn"
+                            type="button"
+                        >
+                            ✏️ Редактировать
+                        </button>
 
 
+                        <button
+                            id="deleteBtn"
+                            class="delete-btn"
+                            type="button"
+                        >
+                            🗑️ Удалить
+                        </button>
 
-function sharePost(post){
+                    </div>
 
-    if (!post.telegramLink) {
-        alert("Telegram-пост для этого объявления не найден");
-        return;
+                `
+
+                : "";
+
+
+        /* =====================================================
+           CONTENT
+        ===================================================== */
+
+        document.getElementById(
+            "content"
+        ).innerHTML = `
+
+            <div class="details-container">
+
+
+                <header
+                    class="details-header"
+                >
+                    🍊 Orange Real Estate
+                </header>
+
+
+                <div class="title-block">
+
+
+                    <button
+                        class="back-btn"
+                        onclick="history.back()"
+                    >
+                        ← Назад
+                    </button>
+
+
+                    <h2>
+                        🏠 Сдается
+                        ${post.rooms || "-"}-комнатная
+                        квартира в
+                        ${post.district || "-"}
+                    </h2>
+
+
+                    <div class="price">
+                        $${post.price || "-"}
+                    </div>
+
+
+                    <div
+                        class="publish-date green-date"
+                    >
+                        🕐 ${postDate}
+                    </div>
+
+
+                </div>
+
+
+                <div class="gallery">
+                    ${images}
+                </div>
+
+
+                <div class="stats-grid">
+
+
+                    <div class="stat-card">
+                        <div class="icon">📍</div>
+                        <div class="value">
+                            ${post.district || "-"}
+                        </div>
+                        <div class="label">
+                            Район
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="icon">📌</div>
+                        <div class="value">
+                            ${post.street || "-"}
+                        </div>
+                        <div class="label">
+                            Улица
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="icon">🚪</div>
+                        <div class="value">
+                            ${post.rooms || "-"}
+                        </div>
+                        <div class="label">
+                            Комнаты
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="icon">🛏</div>
+                        <div class="value">
+                            ${post.bedrooms || "-"}
+                        </div>
+                        <div class="label">
+                            Спальни
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="icon">📐</div>
+                        <div class="value">
+                            ${post.area || "-"}
+                        </div>
+                        <div class="label">
+                            м²
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="icon">🏢</div>
+                        <div class="value">
+                            ${post.floor || "-"}
+                        </div>
+                        <div class="label">
+                            Этаж
+                        </div>
+                    </div>
+
+
+                    <div class="stat-card">
+                        <div class="icon">💰</div>
+                        <div class="value">
+                            $${post.price || "-"}
+                        </div>
+                        <div class="label">
+                            Цена
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                ${adminButtons}
+
+
+            </div>
+
+        `;
+
+
+        /* =====================================================
+           SHARE
+        ===================================================== */
+
+        const shareBtn =
+            document.getElementById(
+                "shareBtn"
+            );
+
+
+        if (shareBtn) {
+
+            shareBtn.onclick =
+                () => sharePost(post);
+
+        }
+
+
+        /* =====================================================
+           MAP
+        ===================================================== */
+
+        const mapBtn =
+            document.getElementById(
+                "mapBtn"
+            );
+
+
+        if (mapBtn) {
+
+            mapBtn.onclick =
+                () => {
+
+                    const address =
+
+                        `${post.street || ""}, ` +
+                        `${post.district || ""}, ` +
+                        `Tbilisi`;
+
+
+                    window.open(
+
+                        `https://yandex.com/maps/?text=${
+                            encodeURIComponent(
+                                address
+                            )
+                        }`,
+
+                        "_blank"
+
+                    );
+
+                };
+
+        }
+
+
+        /* =====================================================
+           AGENT
+        ===================================================== */
+
+        const agentBtn =
+            document.getElementById(
+                "agentBtn"
+            );
+
+
+        if (agentBtn) {
+
+            agentBtn.onclick =
+                () => {
+
+                    if (
+                        tg?.openTelegramLink
+                    ) {
+
+                        tg.openTelegramLink(
+                            "https://t.me/Orangerealestatetbilisi"
+                        );
+
+                    }
+
+                    else {
+
+                        window.open(
+                            "https://t.me/Orangerealestatetbilisi",
+                            "_blank"
+                        );
+
+                    }
+
+                };
+
+        }
+
+
+        /* =====================================================
+           EDIT
+        ===================================================== */
+
+        const editBtn =
+            document.getElementById(
+                "editBtn"
+            );
+
+
+        if (editBtn) {
+
+            editBtn.onclick =
+                () => {
+
+                    if (!isAdmin()) {
+
+                        alert(
+                            "🚫 У вас нет доступа."
+                        );
+
+                        return;
+
+                    }
+
+
+                    window.location.href =
+                        `edit.html?id=${post.id}`;
+
+                };
+
+        }
+
+
+        /* =====================================================
+           DELETE
+        ===================================================== */
+
+        const deleteBtn =
+            document.getElementById(
+                "deleteBtn"
+            );
+
+
+        if (deleteBtn) {
+
+            deleteBtn.onclick =
+                async () => {
+
+                    if (!isAdmin()) {
+
+                        alert(
+                            "🚫 У вас нет доступа."
+                        );
+
+                        return;
+
+                    }
+
+
+                    const confirmed =
+                        confirm(
+                            "🗑 Удалить объявление?"
+                        );
+
+
+                    if (!confirmed) {
+
+                        return;
+
+                    }
+
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                "/api/post/delete",
+                                {
+
+                                    method:
+                                        "POST",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json"
+
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+
+                                            id:
+                                                post.id,
+
+                                            userId:
+                                                telegramUserId
+
+                                        })
+
+                                }
+                            );
+
+
+                        const result =
+                            await response.json();
+
+
+                        if (
+                            result.success
+                        ) {
+
+                            alert(
+                                "✅ Объявление удалено"
+                            );
+
+
+                            window.location.href =
+                                "/";
+
+                        }
+
+                        else {
+
+                            alert(
+                                "❌ Ошибка удаления"
+                            );
+
+                        }
+
+                    }
+
+                    catch (err) {
+
+                        console.error(
+                            "Delete error:",
+                            err
+                        );
+
+
+                        alert(
+                            "❌ Ошибка удаления"
+                        );
+
+                    }
+
+                };
+
+        }
+
+
     }
+
+    catch (err) {
+
+        console.error(err);
+
+
+        const content =
+            document.getElementById(
+                "content"
+            );
+
+
+        if (content) {
+
+            content.innerHTML = `
+
+                <h2
+                    style="
+                        text-align:center;
+                        padding:40px;
+                    "
+                >
+                    Ошибка загрузки квартиры
+                </h2>
+
+            `;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   SHARE
+========================================================= */
+
+function sharePost(post) {
+
+    if (
+        !post.telegramLink
+    ) {
+
+        alert(
+            "Telegram-пост для этого объявления не найден"
+        );
+
+        return;
+
+    }
+
 
     const shareUrl =
+
         "https://t.me/share/url?url=" +
-        encodeURIComponent(post.telegramLink);
 
-    if (window.Telegram?.WebApp?.openTelegramLink) {
+        encodeURIComponent(
+            post.telegramLink
+        );
 
-        window.Telegram.WebApp.openTelegramLink(shareUrl);
 
-    } else {
+    if (
+        tg?.openTelegramLink
+    ) {
 
-        window.open(shareUrl, "_blank");
+        tg.openTelegramLink(
+            shareUrl
+        );
 
     }
+
+    else {
+
+        window.open(
+            shareUrl,
+            "_blank"
+        );
+
+    }
+
 }
 
 
-const ADMIN_ID = 5172653731;
-
-const isAdmin =
-    Telegram.WebApp.initDataUnsafe?.user?.id === ADMIN_ID;
-
-
-loadDetails();
+/* =========================================================
+   OPEN IMAGE
+========================================================= */
 
 function openImage(src) {
 
-    currentIndex = currentImages.findIndex(
-        img => "/" + img === src
-    );
+    currentIndex =
 
-    if (currentIndex === -1) {
+        currentImages.findIndex(
+
+            img =>
+                "/" + img === src
+
+        );
+
+
+    if (
+        currentIndex === -1
+    ) {
+
         currentIndex = 0;
+
     }
 
-    document.getElementById("viewer").style.display = "flex";
-    document.getElementById("viewerImage").src = src;
+
+    const viewer =
+        document.getElementById(
+            "viewer"
+        );
+
+
+    const viewerImage =
+        document.getElementById(
+            "viewerImage"
+        );
+
+
+    if (
+        viewer &&
+        viewerImage
+    ) {
+
+        viewer.style.display =
+            "flex";
+
+
+        viewerImage.src =
+            src;
+
+    }
 
 }
+
+
+/* =========================================================
+   CLOSE IMAGE
+========================================================= */
 
 function closeImage() {
 
-    document.getElementById("viewer").style.display = "none";
+    const viewer =
+        document.getElementById(
+            "viewer"
+        );
+
+
+    if (viewer) {
+
+        viewer.style.display =
+            "none";
+
+    }
 
 }
+
+
+/* =========================================================
+   PREVIOUS IMAGE
+========================================================= */
 
 function prevImage() {
 
-    if (currentImages.length <= 1) return;
+    if (
+        currentImages.length <= 1
+    ) {
+
+        return;
+
+    }
+
 
     currentIndex--;
 
-    if (currentIndex < 0) {
-        currentIndex = currentImages.length - 1;
+
+    if (
+        currentIndex < 0
+    ) {
+
+        currentIndex =
+            currentImages.length - 1;
+
     }
 
-    document.getElementById("viewerImage").src =
-        "/" + currentImages[currentIndex];
-    
+
+    updateGallery();
 
 }
+
+
+/* =========================================================
+   NEXT IMAGE
+========================================================= */
 
 function nextImage() {
 
-    if (currentImages.length <= 1) return;
+    if (
+        currentImages.length <= 1
+    ) {
+
+        return;
+
+    }
+
 
     currentIndex++;
 
-    if (currentIndex >= currentImages.length) {
+
+    if (
+        currentIndex >=
+        currentImages.length
+    ) {
+
         currentIndex = 0;
+
     }
 
-    document.getElementById("viewerImage").src =
-        "/" + currentImages[currentIndex];
+
+    updateGallery();
 
 }
-document.addEventListener("keydown", (e) => {
 
-    if (e.key === "Escape") {
-        closeImage();
+
+/* =========================================================
+   UPDATE GALLERY
+========================================================= */
+
+function updateGallery() {
+
+    const mainImage =
+        document.getElementById(
+            "mainImage"
+        );
+
+
+    const photoNumber =
+        document.getElementById(
+            "photoNumber"
+        );
+
+
+    const viewerImage =
+        document.getElementById(
+            "viewerImage"
+        );
+
+
+    if (mainImage) {
+
+        mainImage.src =
+
+            "/" +
+            currentImages[
+                currentIndex
+            ];
+
     }
 
-    if (e.key === "ArrowLeft") {
-        prevImage();
+
+    if (photoNumber) {
+
+        photoNumber.textContent =
+            currentIndex + 1;
+
     }
 
-    if (e.key === "ArrowRight") {
-        nextImage();
+
+    if (viewerImage) {
+
+        viewerImage.src =
+
+            "/" +
+            currentImages[
+                currentIndex
+            ];
+
     }
 
-});
+}
 
-document.addEventListener("click", (e) => {
 
-    const viewer = document.getElementById("viewer");
+/* =========================================================
+   KEYBOARD
+========================================================= */
 
-    if (e.target === viewer) {
-        closeImage();
+document.addEventListener(
+    "keydown",
+    (e) => {
+
+        if (
+            e.key === "Escape"
+        ) {
+
+            closeImage();
+
+        }
+
+
+        if (
+            e.key === "ArrowLeft"
+        ) {
+
+            prevImage();
+
+        }
+
+
+        if (
+            e.key === "ArrowRight"
+        ) {
+
+            nextImage();
+
+        }
+
     }
+);
 
-});
+
+/* =========================================================
+   CLOSE VIEWER
+========================================================= */
+
+document.addEventListener(
+    "click",
+    (e) => {
+
+        const viewer =
+            document.getElementById(
+                "viewer"
+            );
+
+
+        if (
+            viewer &&
+            e.target === viewer
+        ) {
+
+            closeImage();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+loadDetails();

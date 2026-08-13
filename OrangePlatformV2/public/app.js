@@ -1,2164 +1,1310 @@
-console.log("🔥 ORANGE APP.JS LOADED - TEST");
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
-let allPosts = [];
+require("./parser");
+require("./bot");
 
-const telegramWebApp = window.Telegram?.WebApp;
+const app = express();
 
-if (telegramWebApp) {
-    telegramWebApp.ready();
-    telegramWebApp.expand();
-}
+app.use(express.json());
 
-const telegramUserId =
-    telegramWebApp?.initDataUnsafe?.user?.id || null;
+const PORT = 3000;
 
-console.log("🔥 TELEGRAM USER ID:", telegramUserId);
-console.log("🔥 TG INIT DATA:", telegramWebApp?.initData);
-console.log("🔥 TG PLATFORM:", telegramWebApp?.platform);
 
+// =========================================================
+// STATIC FILES
+// =========================================================
 
-/* =========================================================
-   MAP
-========================================================= */
+app.use(
+    express.static(
+        path.join(__dirname, "public")
+    )
+);
 
-let mapInstance = null;
-let mapLayer = null;
-let currentView = "catalog";
+app.use(
+    "/downloads",
+    express.static(
+        path.join(__dirname, "downloads")
+    )
+);
 
 
-/* =========================================================
-   DISTRICT CENTERS
-========================================================= */
+// =========================================================
+// FILES
+// =========================================================
 
-const districtCenters = {
+const POSTS_FILE =
+    path.join(
+        __dirname,
+        "posts.json"
+    );
 
-    saburtalo: [41.7260, 44.7470],
+const FAVORITES_FILE =
+    path.join(
+        __dirname,
+        "favorites.json"
+    );
 
-    vake: [41.7100, 44.7530],
+const STATS_FILE =
+    path.join(
+        __dirname,
+        "stats.json"
+    );
 
-    vera: [41.7085, 44.7830],
 
-    isani: [41.6905, 44.8280],
+// =========================================================
+// STATS
+// =========================================================
 
-    "didi digomi": [41.7850, 44.7300],
-
-    digomi: [41.7850, 44.7300],
-
-    krtsanisi: [41.6785, 44.8240],
-
-    ortachala: [41.6805, 44.8150]
-
-};
-
-
-/* =========================================================
-   MAP MARKER DESIGN
-========================================================= */
-
-(function injectMapStyles() {
-
-    const style = document.createElement("style");
-
-    style.textContent = `
-
-        .orange-map-icon {
-            background: transparent !important;
-            border: 0 !important;
-        }
-
-        .price-marker {
-
-            background: #1f63e9 !important;
-
-            color: #fff !important;
-
-            border: 2px solid #fff !important;
-
-            border-radius: 18px !important;
-
-            box-shadow:
-                0 2px 7px rgba(0,0,0,.25) !important;
-
-            padding: 6px 10px !important;
-
-            font-weight: 800 !important;
-
-            font-size: 13px !important;
-
-            line-height: 1.05 !important;
-
-            white-space: nowrap !important;
-
-            text-align: center !important;
-
-        }
-
-
-        .cluster-marker {
-
-            background: #1f63e9 !important;
-
-            color: #fff !important;
-
-            border: 3px solid #fff !important;
-
-            border-radius: 22px !important;
-
-            box-shadow:
-                0 2px 8px rgba(0,0,0,.25) !important;
-
-            width: 70px !important;
-
-            min-height: 44px !important;
-
-            padding: 5px 8px !important;
-
-            box-sizing: border-box !important;
-
-            display: flex !important;
-
-            align-items: center !important;
-
-            justify-content: center !important;
-
-            text-align: center !important;
-
-            font-weight: 800 !important;
-
-            font-size: 12px !important;
-
-            line-height: 1.05 !important;
-
-        }
-
-    `;
-
-    document.head.appendChild(style);
-
-})();
-
-
-/* =========================================================
-   SHOW CATALOG
-========================================================= */
-
-function showCatalog() {
-
-    currentView = "catalog";
-
-
-    const posts =
-        document.getElementById("posts");
-
-
-    const map =
-        document.getElementById("map");
-
-
-    if (posts) {
-
-        posts.style.display = "";
-
-    }
-
-
-    if (map) {
-
-        map.style.display = "none";
-
-    }
-
-
-    const catalogButton =
-        document.getElementById("catalogViewBtn");
-
-
-    const mapButton =
-        document.getElementById("mapViewBtn");
-
-
-    if (catalogButton) {
-
-        catalogButton.classList.add("active");
-
-    }
-
-
-    if (mapButton) {
-
-        mapButton.classList.remove("active");
-
-    }
-
-
-    renderPosts(getFilteredPosts());
-
-}
-
-
-/* =========================================================
-   SHOW MAP
-========================================================= */
-
-function showMap() {
-
-    currentView = "map";
-
-
-    const posts =
-        document.getElementById("posts");
-
-
-    const map =
-        document.getElementById("map");
-
-
-    if (posts) {
-
-        posts.style.display = "none";
-
-    }
-
-
-    if (map) {
-
-        map.style.display = "block";
-
-    }
-
-
-    const catalogButton =
-        document.getElementById("catalogViewBtn");
-
-
-    const mapButton =
-        document.getElementById("mapViewBtn");
-
-
-    if (catalogButton) {
-
-        catalogButton.classList.remove("active");
-
-    }
-
-
-    if (mapButton) {
-
-        mapButton.classList.add("active");
-
-    }
-
-
-    setTimeout(() => {
-
-        initMap();
-
-        renderMap(getFilteredPosts());
-
-    }, 100);
-
-}
-
-
-/* =========================================================
-   GET FILTERED POSTS
-========================================================= */
-
-function getFilteredPosts() {
-
-    const districtEl =
-        document.getElementById("districtFilter");
-
-
-    const roomsEl =
-        document.getElementById("roomsFilter");
-
-
-    const minPriceEl =
-        document.getElementById("minPrice");
-
-
-    const maxPriceEl =
-        document.getElementById("maxPrice");
-
-
-    if (
-        !districtEl ||
-        !roomsEl ||
-        !minPriceEl ||
-        !maxPriceEl
-    ) {
-
-        return allPosts;
-
-    }
-
-
-    const district =
-        districtEl.value.toLowerCase();
-
-
-    const rooms =
-        roomsEl.value;
-
-
-    const minPrice =
-        Number(minPriceEl.value) || 0;
-
-
-    const maxPrice =
-        Number(maxPriceEl.value) || 999999999;
-
-
-    return allPosts.filter(post => {
-
-
-        const text =
-            (post.text || "").toLowerCase();
-
-
-        const postDistrict =
-            (post.district || "").toLowerCase();
-
-
-        const postRooms =
-            Number(post.rooms) || 0;
-
-
-        const postPrice =
-            Number(post.price) || 0;
-
-
-        if (
-
-            district &&
-
-            !postDistrict.includes(district) &&
-
-            !text.includes(district)
-
-        ) {
-
-            return false;
-
-        }
-
-
-        if (rooms) {
-
-
-            if (rooms === "5") {
-
-                if (postRooms < 5) {
-
-                    return false;
-
-                }
-
-            }
-
-            else {
-
-                if (
-                    postRooms !== Number(rooms)
-                ) {
-
-                    return false;
-
-                }
-
-            }
-
-        }
-
-
-        if (postPrice < minPrice) {
-
-            return false;
-
-        }
-
-
-        if (postPrice > maxPrice) {
-
-            return false;
-
-        }
-
-
-        return true;
-
-    });
-
-}
-
-
-/* =========================================================
-   LOAD POSTS
-========================================================= */
-
-async function loadPosts() {
+function getStats() {
 
     try {
 
+        if (
+            !fs.existsSync(
+                STATS_FILE
+            )
+        ) {
 
-        if (telegramUserId) {
+            return {
 
-            fetch(
-                "/api/stats/app",
-                {
+                users: {},
 
-                    method: "POST",
+                appViews: 0,
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                postViews: {}
 
-                    body: JSON.stringify({
-
-                        userId:
-                            telegramUserId
-
-                    })
-
-                }
-
-            ).catch(err => {
-
-                console.log(
-                    "Stats error:",
-                    err
-                );
-
-            });
+            };
 
         }
 
 
-        const response =
+        return JSON.parse(
 
-            await fetch(
-                "/api/posts?t=" + Date.now(),
-                {
-                    cache: "no-store"
-                }
-            );
+            fs.readFileSync(
+                STATS_FILE,
+                "utf8"
+            )
 
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Failed to load posts"
-            );
-
-        }
-
-
-        allPosts =
-            await response.json();
-
-
-        renderPosts(allPosts);
-
-
-        const loader =
-            document.getElementById(
-                "loader"
-            );
-
-
-        if (loader) {
-
-            setTimeout(() => {
-
-                loader.classList.add(
-                    "loader-hide"
-                );
-
-
-                setTimeout(() => {
-
-                    loader.remove();
-
-                }, 600);
-
-            }, 300);
-
-        }
+        );
 
     }
 
     catch (err) {
 
-        console.error(err);
-
-
-        const posts =
-            document.getElementById(
-                "posts"
-            );
-
-
-        if (posts) {
-
-            posts.innerHTML = `
-
-                <h2
-                    style="
-                        text-align:center;
-                        padding:40px;
-                    "
-                >
-
-                    ❌ Ошибка загрузки объявлений
-
-                </h2>
-
-            `;
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   RENDER POSTS
-========================================================= */
-
-function renderPosts(posts) {
-
-    console.log(
-        "FILTER WORKS"
-    );
-
-    console.log(
-        "Posts received:",
-        posts.length
-    );
-
-
-    const container =
-        document.getElementById(
-            "posts"
-        );
-
-
-    if (!container) {
-
-        return;
-
-    }
-
-
-    container.innerHTML = "";
-
-
-    if (
-        currentView === "map"
-    ) {
-
-        setTimeout(() => {
-
-            renderMap(posts);
-
-        }, 0);
-
-    }
-
-
-    if (!posts.length) {
-
-        container.innerHTML = `
-
-            <h2
-                style="
-                    text-align:center;
-                    padding:40px;
-                "
-            >
-
-                Объявления не найдены
-
-            </h2>
-
-        `;
-
-        return;
-
-    }
-
-
-    posts.forEach(post => {
-
-
-        const postIndex =
-            allPosts.indexOf(post);
-
-
-        const images =
-
-            post.images &&
-            post.images.length
-
-                ? post.images
-
-                : [
-                    "https://via.placeholder.com/600x400?text=No+Photo"
-                ];
-
-
-        const district =
-            post.district || "-";
-
-
-        container.innerHTML += `
-
-            <div class="card">
-
-
-                <div class="card-slider">
-
-
-                    <button
-
-                        class="prev-btn"
-
-                        onclick="
-                            event.stopPropagation();
-                            prevCardImage(${postIndex})
-                        "
-
-                    >
-
-                        ◀
-
-                    </button>
-
-
-                    <img
-
-                        id="
-                            card-image-${postIndex}
-                        "
-
-                        src="${images[0]}"
-
-                        class="card-image"
-
-                        onclick="
-                            openGallery(${postIndex})
-                        "
-
-                    >
-
-
-                    <button
-
-                        class="next-btn"
-
-                        onclick="
-                            event.stopPropagation();
-                            nextCardImage(${postIndex})
-                        "
-
-                    >
-
-                        ▶
-
-                    </button>
-
-
-                </div>
-
-
-                <div class="info">
-
-
-                    <div class="price">
-
-                        $${post.price || "-"}
-
-                    </div>
-
-
-                    <div class="details">
-
-
-                        📍
-                        <b>Район:</b>
-                        ${district}
-
-                        <br><br>
-
-
-                        📌
-                        <b>Адрес:</b>
-                        ${post.street || "-"}
-
-                        <br><br>
-
-
-                        🛏
-                        <b>Комнат:</b>
-                        ${post.rooms || "-"}
-
-                        <br><br>
-
-
-                        📐
-                        <b>Площадь:</b>
-                        ${post.area || "-"} м²
-
-
-                    </div>
-
-
-                    <button
-
-                        class="details-btn"
-
-                        onclick="
-                            location.href=
-                            'details.html?id=${post.id}'
-                        "
-
-                    >
-
-                        Подробнее
-
-                    </button>
-
-
-                </div>
-
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-/* =========================================================
-   FILTER POSTS
-========================================================= */
-
-function filterPosts() {
-
-    console.log(
-        "filterPosts called"
-    );
-
-
-    const districtEl =
-        document.getElementById(
-            "districtFilter"
-        );
-
-
-    const roomsEl =
-        document.getElementById(
-            "roomsFilter"
-        );
-
-
-    const minPriceEl =
-        document.getElementById(
-            "minPrice"
-        );
-
-
-    const maxPriceEl =
-        document.getElementById(
-            "maxPrice"
-        );
-
-
-    if (
-        !districtEl ||
-        !roomsEl ||
-        !minPriceEl ||
-        !maxPriceEl
-    ) {
-
-        return;
-
-    }
-
-
-    const district =
-        districtEl.value.toLowerCase();
-
-
-    const rooms =
-        roomsEl.value;
-
-
-    const minPrice =
-        Number(minPriceEl.value) || 0;
-
-
-    const maxPrice =
-        Number(maxPriceEl.value) || 999999999;
-
-
-    const filtered =
-
-        allPosts.filter(post => {
-
-
-            const text =
-                (post.text || "")
-                    .toLowerCase();
-
-
-            const postDistrict =
-                (post.district || "")
-                    .toLowerCase();
-
-
-            const postRooms =
-                Number(post.rooms) || 0;
-
-
-            const postPrice =
-                Number(post.price) || 0;
-
-
-            if (
-
-                district &&
-
-                !postDistrict.includes(
-                    district
-                ) &&
-
-                !text.includes(
-                    district
-                )
-
-            ) {
-
-                return false;
-
-            }
-
-
-            if (rooms) {
-
-
-                if (
-                    rooms === "5"
-                ) {
-
-                    if (
-                        postRooms < 5
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-                else {
-
-                    if (
-                        postRooms !==
-                        Number(rooms)
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-            }
-
-
-            if (
-                postPrice < minPrice
-            ) {
-
-                return false;
-
-            }
-
-
-            if (
-                postPrice > maxPrice
-            ) {
-
-                return false;
-
-            }
-
-
-            return true;
-
-        });
-
-
-    renderPosts(filtered);
-
-
-    if (
-        currentView === "map"
-    ) {
-
-        setTimeout(() => {
-
-            initMap();
-
-            renderMap(filtered);
-
-        }, 50);
-
-    }
-
-
-    const loader =
-        document.getElementById(
-            "loader"
-        );
-
-
-    if (loader) {
-
-        loader.classList.add(
-            "loader-hide"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   INIT MAP
-========================================================= */
-
-function initMap() {
-
-    if (!window.L) {
-
         console.error(
-            "❌ Leaflet is not loaded"
-        );
-
-        return;
-
-    }
-
-
-    if (!mapInstance) {
-
-
-        mapInstance =
-
-            L.map(
-                "map",
-                {
-                    zoomControl: true
-                }
-            ).setView(
-
-                [
-                    41.7151,
-                    44.8271
-                ],
-
-                12
-
-            );
-
-
-        L.tileLayer(
-
-            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-
-            {
-
-                maxZoom: 19,
-
-                attribution:
-                    "&copy; OpenStreetMap contributors"
-
-            }
-
-        ).addTo(
-            mapInstance
+            "Error reading stats:",
+            err
         );
 
 
-        mapLayer =
-            L.layerGroup()
-                .addTo(mapInstance);
+        return {
 
-    }
+            users: {},
 
+            appViews: 0,
 
-    setTimeout(() => {
-
-        mapInstance.invalidateSize();
-
-    }, 100);
-
-}
-
-
-/* =========================================================
-   GET POST COORDINATES
-========================================================= */
-
-function getPostCoordinates(post) {
-
-    const lat =
-        Number(
-
-            post.latitude ??
-
-            post.lat ??
-
-            post.location?.latitude ??
-
-            post.location?.lat
-
-        );
-
-
-    const lng =
-        Number(
-
-            post.longitude ??
-
-            post.lng ??
-
-            post.lon ??
-
-            post.location?.longitude ??
-
-            post.location?.lng
-
-        );
-
-
-    /*
-       მხოლოდ თბილისთან ახლო
-       რეალურ კოორდინატებს ვიყენებთ.
-    */
-
-    const isTbilisiCoordinate =
-
-        Number.isFinite(lat) &&
-
-        Number.isFinite(lng) &&
-
-        lat >= 41.60 &&
-
-        lat <= 41.84 &&
-
-        lng >= 44.62 &&
-
-        lng <= 44.98;
-
-
-    if (
-        isTbilisiCoordinate
-    ) {
-
-        return [
-            lat,
-            lng
-        ];
-
-    }
-
-
-    /*
-       თუ რეალური კოორდინატა
-       არ გვაქვს, ვიყენებთ რაიონს.
-    */
-
-    const district =
-        (post.district || "")
-            .toLowerCase();
-
-
-    for (
-        const key of
-        Object.keys(
-            districtCenters
-        )
-    ) {
-
-
-        if (
-            district.includes(key)
-        ) {
-
-            return districtCenters[
-                key
-            ];
-
-        }
-
-    }
-
-
-    /*
-       district-ში ვერ ვიპოვეთ —
-       ვეძებთ განცხადების ტექსტში.
-    */
-
-    const text =
-        (post.text || "")
-            .toLowerCase();
-
-
-    for (
-        const key of
-        Object.keys(
-            districtCenters
-        )
-    ) {
-
-
-        if (
-            text.includes(key)
-        ) {
-
-            return districtCenters[
-                key
-            ];
-
-        }
-
-    }
-
-
-    /*
-       საბოლოო fallback —
-       თბილისის ცენტრი.
-    */
-
-    return [
-        41.7151,
-        44.8271
-    ];
-
-}
-
-
-/* =========================================================
-   CREATE PRICE MARKER
-========================================================= */
-
-function createPriceMarker(
-
-    lat,
-
-    lng,
-
-    text,
-
-    className =
-        "price-marker"
-
-) {
-
-
-    const isCluster =
-        className ===
-        "cluster-marker";
-
-
-    return L.marker(
-
-        [
-            lat,
-            lng
-        ],
-
-        {
-
-            icon:
-
-                L.divIcon({
-
-                    className:
-                        "orange-map-icon",
-
-
-                    html: `
-
-                        <div
-                            class="${className}"
-                        >
-
-                            ${text}
-
-                        </div>
-
-                    `,
-
-
-                    iconSize:
-
-                        isCluster
-
-                            ? [
-                                70,
-                                44
-                            ]
-
-                            : [
-                                100,
-                                34
-                            ],
-
-
-                    iconAnchor:
-
-                        isCluster
-
-                            ? [
-                                35,
-                                22
-                            ]
-
-                            : [
-                                50,
-                                17
-                            ]
-
-                })
-
-        }
-
-    );
-
-}
-
-
-/* =========================================================
-   RENDER MAP
-========================================================= */
-
-function renderMap(posts) {
-
-    if (
-        !mapInstance ||
-        !mapLayer
-    ) {
-
-        return;
-
-    }
-
-
-    mapLayer.clearLayers();
-
-
-    const tbilisiCenter = [
-
-        41.7151,
-
-        44.8271
-
-    ];
-
-
-    if (!posts.length) {
-
-        mapInstance.setView(
-
-            tbilisiCenter,
-
-            12
-
-        );
-
-        return;
-
-    }
-
-
-    const groups =
-        new Map();
-
-
-    /*
-       ახლო ბინებს ვაჯგუფებთ.
-    */
-
-    posts.forEach(post => {
-
-
-        const [
-            lat,
-            lng
-        ] =
-            getPostCoordinates(
-                post
-            );
-
-
-        /*
-           დაახლოებით 100-200 მეტრის
-           დაჯგუფება.
-        */
-
-        const key =
-
-            `${lat.toFixed(3)},${lng.toFixed(3)}`;
-
-
-        if (
-            !groups.has(key)
-        ) {
-
-            groups.set(
-
-                key,
-
-                {
-
-                    lat,
-
-                    lng,
-
-                    posts: []
-
-                }
-
-            );
-
-        }
-
-
-        groups
-            .get(key)
-            .posts
-            .push(post);
-
-    });
-
-
-    const bounds = [];
-
-
-    groups.forEach(
-        group => {
-
-
-            const groupPosts =
-                group.posts;
-
-
-            bounds.push([
-
-                group.lat,
-
-                group.lng
-
-            ]);
-
-
-            /*
-               ერთი ბინა.
-            */
-
-            if (
-                groupPosts.length === 1
-            ) {
-
-
-                const post =
-                    groupPosts[0];
-
-
-                const price =
-                    Number(
-                        post.price
-                    ) || 0;
-
-
-                const marker =
-
-                    createPriceMarker(
-
-                        group.lat,
-
-                        group.lng,
-
-                        price
-
-                            ? `$${price}`
-
-                            : "Цена"
-
-                    );
-
-
-                marker.bindPopup(`
-
-                    <div
-                        class="map-popup"
-                    >
-
-                        <div
-                            class="map-price"
-                        >
-
-                            ${
-                                price
-
-                                    ? `$${price}`
-
-                                    : "Цена не указана"
-                            }
-
-                        </div>
-
-
-                        <div
-                            class="map-title"
-                        >
-
-                            📍
-                            ${post.district || "-"}
-
-                            <br>
-
-                            🛏
-                            ${post.rooms || "-"}
-                            комн.
-
-                            ·
-
-                            ${post.area || "-"}
-                            м²
-
-                        </div>
-
-
-                        <button
-
-                            onclick="
-                                location.href=
-                                'details.html?id=${post.id}'
-                            "
-
-                        >
-
-                            Подробнее
-
-                        </button>
-
-
-                    </div>
-
-                `);
-
-
-                marker.addTo(
-                    mapLayer
-                );
-
-
-                return;
-
-            }
-
-
-            /*
-               რამდენიმე ბინა
-               ერთ ადგილას.
-            */
-
-            const prices =
-
-                groupPosts
-
-                    .map(
-                        p =>
-                            Number(
-                                p.price
-                            )
-                    )
-
-                    .filter(
-                        p =>
-
-                            Number.isFinite(
-                                p
-                            ) &&
-
-                            p > 0
-
-                    );
-
-
-            const minPrice =
-
-                prices.length
-
-                    ? Math.min(
-                        ...prices
-                    )
-
-                    : 0;
-
-
-            const markerText =
-
-                minPrice
-
-                    ? `
-
-                        От ${minPrice}
-
-                        <br>
-
-                        <span
-                            style="
-                                font-size:11px
-                            "
-                        >
-
-                            (${groupPosts.length})
-
-                        </span>
-
-                      `
-
-                    :
-
-                        `${groupPosts.length}`;
-
-
-            const marker =
-
-                createPriceMarker(
-
-                    group.lat,
-
-                    group.lng,
-
-                    markerText,
-
-                    "cluster-marker"
-
-                );
-
-
-            marker.on(
-                "click",
-                () => {
-
-
-                    const list =
-
-                        groupPosts
-
-                            .slice(
-                                0,
-                                30
-                            )
-
-                            .map(
-                                post => `
-
-                                <div
-
-                                    style="
-                                        padding:7px 0;
-                                        border-bottom:
-                                            1px solid #eee;
-                                    "
-
-                                >
-
-                                    <b>
-
-                                        $${post.price || "-"}
-
-                                    </b>
-
-                                    ·
-
-                                    ${post.rooms || "-"}
-                                    комн.
-
-
-                                    <br>
-
-
-                                    <button
-
-                                        style="
-                                            margin-top:4px;
-                                            width:100%;
-                                            border:0;
-                                            border-radius:7px;
-                                            padding:6px;
-                                            background:#1f63e9;
-                                            color:#fff;
-                                        "
-
-                                        onclick="
-                                            location.href=
-                                            'details.html?id=${post.id}'
-                                        "
-
-                                    >
-
-                                        Подробнее
-
-                                    </button>
-
-
-                                </div>
-
-                            `
-                            )
-
-                            .join("");
-
-
-                    marker
-
-                        .bindPopup(`
-
-                            <div
-                                class="map-popup"
-                            >
-
-                                <div
-                                    class="map-price"
-                                >
-
-                                    От
-                                    $${minPrice || "-"}
-
-                                    (${groupPosts.length})
-
-                                </div>
-
-
-                                ${list}
-
-
-                            </div>
-
-                        `)
-
-                        .openPopup();
-
-                }
-
-            );
-
-
-            marker.addTo(
-                mapLayer
-            );
-
-        }
-
-    );
-
-
-    /*
-       მხოლოდ თბილისის კოორდინატები
-       მონაწილეობს Zoom-ში.
-    */
-
-    const tbilisiBounds =
-
-        bounds.filter(
-            ([lat, lng]) =>
-
-                lat >= 41.60 &&
-
-                lat <= 41.84 &&
-
-                lng >= 44.62 &&
-
-                lng <= 44.98
-
-        );
-
-
-    if (
-        tbilisiBounds.length === 1
-    ) {
-
-
-        mapInstance.setView(
-
-            tbilisiBounds[0],
-
-            14
-
-        );
-
-    }
-
-
-    else if (
-        tbilisiBounds.length > 1
-    ) {
-
-
-        mapInstance.fitBounds(
-
-            L.latLngBounds(
-                tbilisiBounds
-            ),
-
-            {
-
-                padding: [
-                    40,
-                    40
-                ],
-
-                maxZoom: 13
-
-            }
-
-        );
-
-    }
-
-
-    else {
-
-
-        mapInstance.setView(
-
-            tbilisiCenter,
-
-            12
-
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   GALLERY
-========================================================= */
-
-function openGallery(index) {
-
-
-    const post =
-        allPosts[index];
-
-
-    if (
-        !post.images ||
-        post.images.length === 0
-    ) {
-
-        return;
-
-    }
-
-
-    let current = 0;
-
-
-    const viewer =
-        document.createElement(
-            "div"
-        );
-
-
-    viewer.id =
-        "viewer";
-
-
-    viewer.innerHTML = `
-
-        <div
-            class="viewer"
-        >
-
-
-            <button
-                id="closeViewer"
-            >
-
-                ✕
-
-            </button>
-
-
-            <button
-                id="prevPhoto"
-            >
-
-                ◀
-
-            </button>
-
-
-            <img
-
-                id="galleryImage"
-
-                src="/${post.images[0]}"
-
-            >
-
-
-            <button
-                id="nextPhoto"
-            >
-
-                ▶
-
-            </button>
-
-
-            <div
-                id="counter"
-            >
-
-                1 /
-                ${post.images.length}
-
-            </div>
-
-
-        </div>
-
-    `;
-
-
-    document.body.appendChild(
-        viewer
-    );
-
-
-    const image =
-        document.getElementById(
-            "galleryImage"
-        );
-
-
-    const counter =
-        document.getElementById(
-            "counter"
-        );
-
-
-    document.getElementById(
-        "nextPhoto"
-    ).onclick = () => {
-
-
-        current++;
-
-
-        if (
-            current >=
-            post.images.length
-        ) {
-
-            current = 0;
-
-        }
-
-
-        image.src =
-            "/" +
-            post.images[current];
-
-
-        counter.innerHTML =
-
-            `${current + 1} / ${post.images.length}`;
-
-    };
-
-
-    document.getElementById(
-        "prevPhoto"
-    ).onclick = () => {
-
-
-        current--;
-
-
-        if (
-            current < 0
-        ) {
-
-            current =
-                post.images.length - 1;
-
-        }
-
-
-        image.src =
-            "/" +
-            post.images[current];
-
-
-        counter.innerHTML =
-
-            `${current + 1} / ${post.images.length}`;
-
-    };
-
-
-    document.getElementById(
-        "closeViewer"
-    ).onclick = () => {
-
-        viewer.remove();
-
-    };
-
-
-    viewer.onclick =
-        (e) => {
-
-
-            if (
-                e.target ===
-                viewer
-            ) {
-
-                viewer.remove();
-
-            }
+            postViews: {}
 
         };
 
+    }
+
 }
 
 
-/* =========================================================
-   CARD IMAGE SLIDER
-========================================================= */
+function saveStats(stats) {
 
-const currentCardImage = {};
+    fs.writeFileSync(
 
+        STATS_FILE,
 
-function nextCardImage(index) {
+        JSON.stringify(
+            stats,
+            null,
+            2
+        ),
 
+        "utf8"
 
-    const post =
-        allPosts[index];
+    );
 
-
-    if (
-        !post.images ||
-        post.images.length < 2
-    ) {
-
-        return;
-
-    }
+}
 
 
-    currentCardImage[index] =
+// =========================================================
+// FAVORITES
+// =========================================================
 
-        (
+function getFavorites() {
 
-            (
-                currentCardImage[index]
-                || 0
+    try {
+
+        if (
+            !fs.existsSync(
+                FAVORITES_FILE
             )
+        ) {
 
-            + 1
-
-        )
-
-        %
-
-        post.images.length;
-
-
-    const image =
-        document.getElementById(
-
-            `card-image-${index}`
-
-        );
-
-
-    if (image) {
-
-        image.src =
-
-            "/" +
-
-            post.images[
-                currentCardImage[index]
-            ];
-
-    }
-
-}
-
-
-function prevCardImage(index) {
-
-
-    const post =
-        allPosts[index];
-
-
-    if (
-        !post.images ||
-        post.images.length < 2
-    ) {
-
-        return;
-
-    }
-
-
-    currentCardImage[index] =
-
-        (
-
-            (
-                currentCardImage[index]
-                || 0
-            )
-
-            - 1
-
-            + post.images.length
-
-        )
-
-        %
-
-        post.images.length;
-
-
-    const image =
-        document.getElementById(
-
-            `card-image-${index}`
-
-        );
-
-
-    if (image) {
-
-        image.src =
-
-            "/" +
-
-            post.images[
-                currentCardImage[index]
-            ];
-
-    }
-
-}
-
-
-/* =========================================================
-   FIRST LOAD
-========================================================= */
-
-loadPosts();
-
-
-/* =========================================================
-   AUTO REFRESH
-========================================================= */
-
-setInterval(
-    async () => {
-
-
-        try {
-
-
-            const res =
-
-                await fetch(
-
-                    "/api/posts?t=" +
-                    Date.now(),
-
-                    {
-                        cache:
-                            "no-store"
-                    }
-
-                );
-
-
-            const posts =
-                await res.json();
-
-
-            if (
-                posts.length !==
-                allPosts.length
-            ) {
-
-
-                allPosts =
-                    posts;
-
-
-                const filtered =
-                    getFilteredPosts();
-
-
-                renderPosts(
-                    filtered
-                );
-
-
-                if (
-                    currentView ===
-                    "map"
-                ) {
-
-                    renderMap(
-                        filtered
-                    );
-
-                }
-
-            }
+            return {};
 
         }
 
-        catch (e) {
 
-            console.log(
-                "Auto refresh error:",
-                e
+        return JSON.parse(
+
+            fs.readFileSync(
+                FAVORITES_FILE,
+                "utf8"
+            )
+
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            "Error reading favorites:",
+            err
+        );
+
+
+        return {};
+
+    }
+
+}
+
+
+function saveFavorites(data) {
+
+    fs.writeFileSync(
+
+        FAVORITES_FILE,
+
+        JSON.stringify(
+            data,
+            null,
+            2
+        ),
+
+        "utf8"
+
+    );
+
+}
+
+
+// =========================================================
+// POSTS
+// =========================================================
+
+function savePosts(posts) {
+
+    fs.writeFileSync(
+
+        POSTS_FILE,
+
+        JSON.stringify(
+            posts,
+            null,
+            2
+        ),
+
+        "utf8"
+
+    );
+
+}
+
+
+// =========================================================
+// READ POSTS
+// =========================================================
+
+function getPosts() {
+
+    try {
+
+        if (
+            !fs.existsSync(
+                POSTS_FILE
+            )
+        ) {
+
+            return [];
+
+        }
+
+
+        const data =
+
+            fs.readFileSync(
+                POSTS_FILE,
+                "utf8"
+            );
+
+
+        return JSON.parse(
+            data
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            "Error reading posts.json:",
+            err
+        );
+
+
+        return [];
+
+    }
+
+}
+
+
+// =========================================================
+// 30 DAY POST FILTER
+// =========================================================
+
+const POST_MAX_AGE_DAYS = 30;
+
+
+function parsePostDate(value) {
+
+    if (!value) {
+
+        return null;
+
+    }
+
+
+    // Date object
+    if (
+        value instanceof Date
+    ) {
+
+        return isNaN(
+            value.getTime()
+        )
+
+            ? null
+
+            : value;
+
+    }
+
+
+    // Unix timestamp
+    if (
+        typeof value === "number"
+    ) {
+
+        const ms =
+
+            value < 100000000000
+
+                ? value * 1000
+
+                : value;
+
+
+        const date =
+            new Date(ms);
+
+
+        return isNaN(
+            date.getTime()
+        )
+
+            ? null
+
+            : date;
+
+    }
+
+
+    const raw =
+        String(value).trim();
+
+
+    if (!raw) {
+
+        return null;
+
+    }
+
+
+    // ISO / normal JS date
+
+    let date =
+        new Date(raw);
+
+
+    if (
+        !isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return date;
+
+    }
+
+
+    // DD.MM.YYYY
+    // DD.MM.YYYY HH:mm
+
+    const match =
+
+        raw.match(
+
+            /^(\d{1,2})[./-](\d{1,2})[./-](\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/
+
+        );
+
+
+    if (match) {
+
+        const day =
+            Number(
+                match[1]
+            );
+
+        const month =
+            Number(
+                match[2]
+            ) - 1;
+
+        const year =
+            Number(
+                match[3]
+            );
+
+        const hour =
+            Number(
+                match[4] || 0
+            );
+
+        const minute =
+            Number(
+                match[5] || 0
+            );
+
+
+        date = new Date(
+
+            year,
+
+            month,
+
+            day,
+
+            hour,
+
+            minute
+
+        );
+
+
+        if (
+
+            date.getFullYear()
+                === year &&
+
+            date.getMonth()
+                === month &&
+
+            date.getDate()
+                === day
+
+        ) {
+
+            return date;
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+// =========================================================
+// ONLY POSTS FROM LAST 30 DAYS
+// =========================================================
+
+function getVisiblePosts() {
+
+    const posts =
+        getPosts();
+
+
+    const now =
+        Date.now();
+
+
+    const maxAgeMs =
+
+        POST_MAX_AGE_DAYS *
+
+        24 *
+
+        60 *
+
+        60 *
+
+        1000;
+
+
+    return posts.filter(
+        post => {
+
+
+            const rawDate =
+
+                post.date ??
+
+                post.createdAt ??
+
+                post.created_at ??
+
+                post.publishedAt ??
+
+                post.published_at;
+
+
+            const postDate =
+
+                parsePostDate(
+                    rawDate
+                );
+
+
+            /*
+             * თუ თარიღი საერთოდ არ აქვს
+             * ან უცნობ ფორმატშია,
+             * განცხადებას არ ვშლით.
+             */
+
+            if (!postDate) {
+
+                return true;
+
+            }
+
+
+            const ageMs =
+
+                now -
+
+                postDate.getTime();
+
+
+            /*
+             * მომავლის თარიღიც დაშვებულია.
+             */
+
+            return (
+                ageMs <=
+                maxAgeMs
             );
 
         }
 
-    },
+    );
 
-    30000
+}
 
+
+// =========================================================
+// DIRECT ACCESS TO posts.json
+// =========================================================
+
+app.get(
+    "/posts.json",
+    (req, res) => {
+
+        res.sendFile(
+            POSTS_FILE
+        );
+
+    }
+);
+
+
+// =========================================================
+// API POSTS
+// ONLY LAST 30 DAYS
+// =========================================================
+
+app.get(
+    "/api/posts",
+    (req, res) => {
+
+
+        res.setHeader(
+            "Cache-Control",
+            "no-store, no-cache, must-revalidate, proxy-revalidate"
+        );
+
+
+        res.setHeader(
+            "Pragma",
+            "no-cache"
+        );
+
+
+        res.setHeader(
+            "Expires",
+            "0"
+        );
+
+
+        res.json(
+            getVisiblePosts()
+        );
+
+    }
+);
+
+
+// =========================================================
+// FAVORITES
+// =========================================================
+
+app.get(
+    "/api/favorites/:userId",
+    (req, res) => {
+
+
+        const favorites =
+            getFavorites();
+
+
+        const userId =
+            String(
+                req.params.userId
+            );
+
+
+        res.json(
+
+            favorites[userId]
+                || []
+
+        );
+
+    }
+);
+
+
+app.post(
+    "/api/favorites",
+    (req, res) => {
+
+
+        const favorites =
+            getFavorites();
+
+
+        const userId =
+            String(
+                req.body.userId
+            );
+
+
+        const postId =
+            String(
+                req.body.postId
+            );
+
+
+        if (
+            !favorites[userId]
+        ) {
+
+            favorites[userId] = [];
+
+        }
+
+
+        if (
+            !favorites[userId]
+                .includes(postId)
+        ) {
+
+            favorites[userId]
+                .push(postId);
+
+        }
+
+
+        fs.writeFileSync(
+
+            FAVORITES_FILE,
+
+            JSON.stringify(
+                favorites,
+                null,
+                2
+            ),
+
+            "utf8"
+
+        );
+
+
+        res.json({
+
+            success: true,
+
+            favorites:
+                favorites[userId]
+
+        });
+
+    }
+);
+
+
+app.delete(
+    "/api/favorites/:userId/:postId",
+    (req, res) => {
+
+
+        const favorites =
+            getFavorites();
+
+
+        const userId =
+            String(
+                req.params.userId
+            );
+
+
+        const postId =
+            String(
+                req.params.postId
+            );
+
+
+        if (
+            favorites[userId]
+        ) {
+
+            favorites[userId] =
+
+                favorites[userId].filter(
+
+                    id =>
+                        String(id)
+                        !== postId
+
+                );
+
+        }
+
+
+        fs.writeFileSync(
+
+            FAVORITES_FILE,
+
+            JSON.stringify(
+                favorites,
+                null,
+                2
+            ),
+
+            "utf8"
+
+        );
+
+
+        res.json({
+
+            success: true,
+
+            favorites:
+                favorites[userId]
+                || []
+
+        });
+
+    }
+);
+
+
+// =========================================================
+// ONE POST
+// ALSO HIDDEN AFTER 30 DAYS
+// =========================================================
+
+app.get(
+    "/api/post/:id",
+    (req, res) => {
+
+
+        const posts =
+            getVisiblePosts();
+
+
+        const post =
+            posts.find(
+
+                p =>
+                    String(p.id)
+                    ===
+                    String(
+                        req.params.id
+                    )
+
+            );
+
+
+        if (!post) {
+
+            return res
+                .status(404)
+                .json({
+
+                    error:
+                        "Apartment not found"
+
+                });
+
+        }
+
+
+        res.json(
+            post
+        );
+
+    }
+);
+
+
+// =========================================================
+// STATISTICS
+// =========================================================
+
+app.post(
+    "/api/stats/app",
+    (req, res) => {
+
+        try {
+
+            const {
+                userId
+            } = req.body;
+
+
+            if (!userId) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success: false,
+
+                        error:
+                            "userId required"
+
+                    });
+
+            }
+
+
+            const stats =
+                getStats();
+
+
+            stats.appViews++;
+
+
+            const id =
+                String(
+                    userId
+                );
+
+
+            if (
+                !stats.users[id]
+            ) {
+
+                stats.users[id] = {
+
+                    views: 0,
+
+                    firstSeen:
+                        new Date()
+                            .toISOString(),
+
+                    lastSeen:
+                        new Date()
+                            .toISOString()
+
+                };
+
+            }
+
+
+            stats.users[id]
+                .views++;
+
+
+            stats.users[id]
+                .lastSeen =
+
+                new Date()
+                    .toISOString();
+
+
+            saveStats(
+                stats
+            );
+
+
+            res.json({
+
+                success: true
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(
+                "Stats app error:",
+                err
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success: false
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// POST VIEW STATISTICS
+// =========================================================
+
+app.post(
+    "/api/stats/post",
+    (req, res) => {
+
+        try {
+
+            const {
+                userId,
+                postId
+            } = req.body;
+
+
+            if (
+                !userId ||
+                !postId
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success: false,
+
+                        error:
+                            "userId and postId required"
+
+                    });
+
+            }
+
+
+            const stats =
+                getStats();
+
+
+            const id =
+                String(
+                    postId
+                );
+
+
+            if (
+                !stats.postViews[id]
+            ) {
+
+                stats.postViews[id] = 0;
+
+            }
+
+
+            stats.postViews[id]++;
+
+
+            saveStats(
+                stats
+            );
+
+
+            res.json({
+
+                success: true
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(
+                "Stats post error:",
+                err
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success: false
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// ADMIN STATISTICS
+// =========================================================
+
+app.get(
+    "/api/stats",
+    (req, res) => {
+
+        try {
+
+            const adminId =
+                "5172653731";
+
+
+            const userId =
+                String(
+                    req.query.userId
+                    || ""
+                );
+
+
+            if (
+                userId !== adminId
+            ) {
+
+                return res
+                    .status(403)
+                    .json({
+
+                        success: false,
+
+                        error:
+                            "Access denied"
+
+                    });
+
+            }
+
+
+            const stats =
+                getStats();
+
+
+            const users =
+                Object.keys(
+                    stats.users
+                    || {}
+                );
+
+
+            const totalUsers =
+                users.length;
+
+
+            const totalAppViews =
+                stats.appViews
+                || 0;
+
+
+            const postViews =
+                stats.postViews
+                || {};
+
+
+            const totalPostViews =
+
+                Object.values(
+                    postViews
+                )
+
+                .reduce(
+
+                    (
+                        sum,
+                        value
+                    ) =>
+
+                        sum +
+                        Number(
+                            value
+                            || 0
+                        ),
+
+                    0
+
+                );
+
+
+            res.json({
+
+                totalUsers,
+
+                totalAppViews,
+
+                totalPostViews,
+
+                postViews
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(
+                "Stats API error:",
+                err
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success: false
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// UPDATE POST
+// =========================================================
+
+app.post(
+    "/api/post/update",
+    (req, res) => {
+
+        try {
+
+            const posts =
+                getPosts();
+
+
+            const updated =
+                req.body;
+
+
+            const index =
+                posts.findIndex(
+
+                    p =>
+                        String(p.id)
+                        ===
+                        String(
+                            updated.id
+                        )
+
+                );
+
+
+            if (
+                index === -1
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        success: false,
+
+                        error:
+                            "Apartment not found"
+
+                    });
+
+            }
+
+
+            posts[index] = {
+
+                ...posts[index],
+
+                district:
+                    updated.district,
+
+                street:
+                    updated.street,
+
+                rooms:
+                    updated.rooms,
+
+                bedrooms:
+                    updated.bedrooms,
+
+                area:
+                    updated.area,
+
+                floor:
+                    updated.floor,
+
+                price:
+                    updated.price,
+
+                text:
+                    updated.text
+
+            };
+
+
+            savePosts(
+                posts
+            );
+
+
+            res.json({
+
+                success: true
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(
+                err
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success: false
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// DELETE POST
+// =========================================================
+
+app.post(
+    "/api/post/delete",
+    (req, res) => {
+
+        try {
+
+            const posts =
+                getPosts();
+
+
+            const filtered =
+                posts.filter(
+
+                    p =>
+
+                        String(p.id)
+                        !==
+                        String(
+                            req.body.id
+                        )
+
+                );
+
+
+            savePosts(
+                filtered
+            );
+
+
+            res.json({
+
+                success: true
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(
+                err
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success: false
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// START SERVER
+// =========================================================
+
+app.listen(
+    PORT,
+    () => {
+
+        console.log(
+            `✅ Server running: http://localhost:${PORT}`
+        );
+
+    }
 );
