@@ -20,6 +20,7 @@ bot.on("polling_error", console.error);
 bot.on("error", console.error);
 
 const WEBAPP = "https://orangeplatform.onrender.com/";
+const API_URL = "https://orangeplatform.onrender.com";
 console.log("Bot started successfully");
 bot.onText(/\/start/, (msg) => {
     bot.sendMessage(
@@ -59,7 +60,7 @@ bot.onText(/\/start/, (msg) => {
         }
     );
 });
-bot.on("callback_query", (query) => {
+bot.on("callback_query", async (query) => {
     const chatId = query.message.chat.id;
 
     if (query.data === "new_posts") {
@@ -70,10 +71,64 @@ bot.on("callback_query", (query) => {
     }
 
     if (query.data === "favorites") {
-        bot.sendMessage(
-            chatId,
-            "❤️ Ваше избранное пока пусто."
+
+    try {
+
+        const userId = String(query.from.id);
+
+        const response = await fetch(
+            `${API_URL}/api/favorites/${userId}?t=${Date.now()}`
         );
+
+        if (!response.ok) {
+            throw new Error("Failed to load favorites");
+        }
+
+        const favorites = await response.json();
+
+        if (
+            !Array.isArray(favorites) ||
+            favorites.length === 0
+        ) {
+
+            await bot.sendMessage(
+                chatId,
+                "❤️ Ваше избранное пока пусто."
+            );
+
+            return;
+        }
+
+        let message =
+            "❤️ <b>Ваше избранное:</b>\n\n";
+
+        favorites.forEach((postId, index) => {
+
+            message +=
+                `${index + 1}. 🏠 Объявление #${postId}\n`;
+
+        });
+
+        await bot.sendMessage(
+            chatId,
+            message,
+            {
+                parse_mode: "HTML"
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Favorites bot error:",
+            error
+        );
+
+        await bot.sendMessage(
+            chatId,
+            "❌ Не удалось загрузить избранное."
+        );
+    }
     }
 
     if (query.data === "contact") {
