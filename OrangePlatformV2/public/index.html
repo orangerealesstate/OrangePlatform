@@ -1,122 +1,397 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>🍊 Orange Real Estate</title>
 
     <link rel="stylesheet" href="style.css">
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Leaflet -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <style>
+
+        /* =========================
+           КАРТА / КАТАЛОГ
+        ========================= */
+
+        .view-switcher {
+            display: flex;
+            gap: 8px;
+            margin: 10px 12px 14px;
+        }
+
+        .view-btn {
+            flex: 1;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 10px;
+            font-size: 15px;
+            font-weight: 700;
+            background: #f1f1f1;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .view-btn.active {
+            background: #ff7a00;
+            color: white;
+        }
+
+        #map {
+            display: none;
+            width: 100%;
+            height: calc(100vh - 185px);
+            min-height: 480px;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        /* ფასის მარკერი */
+
+        .price-marker {
+            background: white;
+            border: 2px solid #ff7a00;
+            border-radius: 18px;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,.18);
+
+            padding: 6px 9px;
+
+            font-weight: 800;
+            color: #222;
+
+            white-space: nowrap;
+
+            font-size: 13px;
+        }
+
+        /* ბევრი ბინა ერთ ადგილზე */
+
+        .cluster-marker {
+            background: #ff7a00;
+            color: white;
+
+            border: 3px solid white;
+
+            border-radius: 50%;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,.25);
+
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            font-weight: 800;
+            font-size: 12px;
+
+            line-height: 1.05;
+        }
+
+        /* Popup */
+
+        .map-popup {
+            min-width: 190px;
+        }
+
+        .map-popup .map-price {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .map-popup .map-title {
+            font-size: 13px;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .map-popup button {
+            width: 100%;
+
+            border: none;
+            border-radius: 8px;
+
+            padding: 8px;
+
+            background: #ff7a00;
+            color: white;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+    </style>
+
 </head>
 
+
 <body>
-  <div id="loader" class="loader-screen">
 
-    <div class="loader-logo">🍊</div>
+    <!-- =========================
+         LOADER
+    ========================= -->
 
-    <div class="loader-title">Orange Real Estate</div>
+    <div id="loader" class="loader-screen">
 
-    <div class="loader-subtitle">Loading apartments...</div>
+        <div class="loader-logo">
+            🍊
+        </div>
 
-    <div class="loader-dots">
-        <span></span>
-        <span></span>
-        <span></span>
+        <div class="loader-title">
+            Orange Real Estate
+        </div>
+
+        <div class="loader-subtitle">
+            Loading apartments...
+        </div>
+
+        <div class="loader-dots">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </div>
+
     </div>
 
-</div>  
 
-<header>
+    <!-- =========================
+         HEADER
+    ========================= -->
 
-    <div class="logo">
-        🍊 Orange Real Estate
+    <header>
+
+        <div class="logo">
+            🍊 Orange Real Estate
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         FILTERS
+    ========================= -->
+
+    <section class="filters">
+
+        <!-- Район -->
+
+        <select
+            id="districtFilter"
+            onchange="filterPosts()">
+
+            <option value="">
+                Все районы
+            </option>
+
+            <option value="saburtalo">
+                Saburtalo
+            </option>
+
+            <option value="vake">
+                Vake
+            </option>
+
+            <option value="vera">
+                Vera
+            </option>
+
+            <option value="isani">
+                Isani
+            </option>
+
+            <option value="digomi">
+                Didi Digomi
+            </option>
+
+            <option value="krtsanisi">
+                Krtsanisi
+            </option>
+
+            <option value="ortachala">
+                Ortachala
+            </option>
+
+        </select>
+
+
+        <!-- Комнаты -->
+
+        <select
+            id="roomsFilter"
+            onchange="filterPosts()">
+
+            <option value="">
+                Комнаты
+            </option>
+
+            <option value="1">
+                1
+            </option>
+
+            <option value="2">
+                2
+            </option>
+
+            <option value="3">
+                3
+            </option>
+
+            <option value="4">
+                4
+            </option>
+
+            <option value="5">
+                5+
+            </option>
+
+        </select>
+
+
+        <!-- Цена от -->
+
+        <input
+            id="minPrice"
+            type="number"
+            placeholder="Цена от"
+            onkeyup="filterPosts()"
+            onkeydown="if(event.key==='Enter') this.blur()"
+        >
+
+
+        <!-- Цена до -->
+
+        <input
+            id="maxPrice"
+            type="number"
+            placeholder="Цена до"
+            onkeyup="filterPosts()"
+            onkeydown="if(event.key==='Enter') this.blur()"
+        >
+
+    </section>
+
+
+    <!-- =========================
+         КАТАЛОГ / КАРТА
+    ========================= -->
+
+    <div class="view-switcher">
+
+        <button
+            id="catalogViewBtn"
+            class="view-btn active"
+            onclick="showCatalog()">
+
+            🏠 Каталог
+
+        </button>
+
+
+        <button
+            id="mapViewBtn"
+            class="view-btn"
+            onclick="showMap()">
+
+            🗺️ Карта
+
+        </button>
+
     </div>
 
-</header>
 
-<section class="filters">
+    <!-- =========================
+         MAP
+    ========================= -->
 
-    <select
-        id="districtFilter"
-        onchange="filterPosts()">
-
-        <option value="">Все районы</option>
-        <option value="saburtalo">Saburtalo</option>
-        <option value="vake">Vake</option>
-        <option value="vera">Vera</option>
-        <option value="isani">Isani</option>
-        <option value="digomi">Didi Digomi</option>
-        <option value="krtsanisi">Krtsanisi</option>
-        <option value="ortachala">Ortachala</option>
-
-    </select>
+    <div id="map"></div>
 
 
+    <!-- =========================
+         POSTS
+    ========================= -->
 
-    <select
-        id="roomsFilter"
-        onchange="filterPosts()">
+    <div
+        id="posts"
+        class="grid">
 
-        <option value="">Комнаты</option>
+        Загрузка...
 
-        <option value="1">1</option>
+    </div>
 
-        <option value="2">2</option>
 
-        <option value="3">3</option>
+    <!-- =========================
+         STATS
+    ========================= -->
 
-        <option value="4">4</option>
+    <button
+        id="statsBtn"
+        style="display:none;"
+        onclick="window.location.href='stats.html'">
 
-        <option value="5">5+</option>
+        📊 Статистика
 
-    </select>
+    </button>
 
-    <<input
-    id="minPrice"
-    type="number"
-    placeholder="Цена от"
-    onkeyup="filterPosts()"
-    onkeydown="if(event.key==='Enter') this.blur()"
->
 
-    <input
-    id="maxPrice"
-    type="number"
-    placeholder="Цена до"
-    onkeyup="filterPosts()"
-    onkeydown="if(event.key==='Enter') this.blur()"
->
+    <!-- =========================
+         TELEGRAM
+    ========================= -->
 
-</section>
+    <script>
 
-<div id="posts" class="grid">
+        const tg = window.Telegram?.WebApp;
 
-    Загрузка...
+        if (tg) {
 
-</div>
-<button
-    id="statsBtn"
-    style="display:none;"
-    onclick="window.location.href='stats.html'">
-    📊 Статистика
-</button>
+            tg.ready();
 
-<script>
-    const tg = window.Telegram?.WebApp;
+            const userId =
+                tg.initDataUnsafe?.user?.id;
 
-    if (tg) {
-        tg.ready();
+            if (String(userId) === "5172653731") {
 
-        const userId =
-            tg.initDataUnsafe?.user?.id;
+                document
+                    .getElementById("statsBtn")
+                    .style.display = "block";
 
-        if (String(userId) === "5172653731") {
-            document.getElementById("statsBtn").style.display = "block";
+            }
+
         }
-    }
-</script>
-<script src="app.js"></script>
+
+    </script>
+
+
+    <!-- Leaflet -->
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+
+    <!-- ჩვენი app.js -->
+
+    <script src="app.js"></script>
+
 
 </body>
+
 </html>
