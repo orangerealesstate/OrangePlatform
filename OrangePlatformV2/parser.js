@@ -153,27 +153,65 @@ function normalizeDistrict(value) {
 /* =========================================================
    GEOCODE
 ========================================================= */
-
+const geocodeCache = new Map();
 async function geocodeAddress(address) {
 
-    if (!address || address === "-") {
+    if (
+        !address ||
+        address === "-" ||
+        address === "undefined" ||
+        address === "null"
+    ) {
         return {
             lat: null,
             lng: null
         };
     }
 
+    const cleanAddress =
+        String(address).trim();
+
+    if (
+        !cleanAddress ||
+        cleanAddress.length < 3
+    ) {
+        return {
+            lat: null,
+            lng: null
+        };
+    }
+
+    // ერთი და იგივე მისამართის ხელმეორედ ძებნის თავიდან აცილება
+    if (
+        geocodeCache.has(
+            cleanAddress
+        )
+    ) {
+
+        return geocodeCache.get(
+            cleanAddress
+        );
+
+    }
+
     const url =
         "https://nominatim.openstreetmap.org/search";
 
-    for (let attempt = 1; attempt <= 4; attempt++) {
+    for (
+        let attempt = 1;
+        attempt <= 4;
+        attempt++
+    ) {
 
         try {
 
-            // თითო მოთხოვნამდე ველოდებით
+            // Nominatim-ს არ გადავტვირთავთ
             await new Promise(
                 resolve =>
-                    setTimeout(resolve, 2500)
+                    setTimeout(
+                        resolve,
+                        2500
+                    )
             );
 
             const { data } =
@@ -181,34 +219,77 @@ async function geocodeAddress(address) {
                     url,
                     {
                         params: {
-                            q: address,
-                            format: "json",
-                            limit: 1
+
+                            q:
+                                cleanAddress,
+
+                            format:
+                                "json",
+
+                            limit:
+                                1,
+
+                            countrycodes:
+                                "ge"
+
                         },
 
                         headers: {
+
                             "User-Agent":
                                 "Orange Real Estate Tbilisi"
+
                         }
+
                     }
                 );
 
-            if (!data.length) {
 
-                return {
-                    lat: null,
-                    lng: null
-                };
+            if (
+                !data ||
+                !data.length
+            ) {
+
+                const empty =
+                    {
+                        lat: null,
+                        lng: null
+                    };
+
+                geocodeCache.set(
+                    cleanAddress,
+                    empty
+                );
+
+                return empty;
 
             }
 
-            return {
-                lat:
-                    Number(data[0].lat),
 
-                lng:
-                    Number(data[0].lon)
-            };
+            const result =
+                {
+
+                    lat:
+                        Number(
+                            data[0].lat
+                        ),
+
+                    lng:
+                        Number(
+                            data[0].lon
+                        )
+
+                };
+
+
+            geocodeCache.set(
+                cleanAddress,
+                result
+            );
+
+
+            return result;
+
 
         }
 
@@ -217,21 +298,26 @@ async function geocodeAddress(address) {
             const status =
                 err.response?.status;
 
+
             console.log(
                 `Geocode attempt ${attempt}/4:`,
-                status || err.message
+                status ||
+                err.message
             );
 
-            // თუ Nominatim გვაბლოკავს,
-            // უფრო დიდხანს დაველოდოთ
-            if (status === 429) {
+
+            if (
+                status === 429
+            ) {
 
                 const wait =
                     10000 * attempt;
 
+
                 console.log(
                     `429 - waiting ${wait / 1000}s...`
                 );
+
 
                 await new Promise(
                     resolve =>
@@ -241,20 +327,27 @@ async function geocodeAddress(address) {
                         )
                 );
 
+
                 continue;
+
             }
+
 
             return {
                 lat: null,
                 lng: null
             };
+
         }
+
     }
+
 
     return {
         lat: null,
         lng: null
     };
+
 }
 
 
