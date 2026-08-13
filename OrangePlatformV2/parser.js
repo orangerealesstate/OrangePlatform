@@ -156,110 +156,105 @@ function normalizeDistrict(value) {
 
 async function geocodeAddress(address) {
 
-    if (
-        !address ||
-        address === "-"
-    ) {
-
+    if (!address || address === "-") {
         return {
             lat: null,
             lng: null
         };
-
     }
 
+    const url =
+        "https://nominatim.openstreetmap.org/search";
 
-    try {
+    for (let attempt = 1; attempt <= 4; attempt++) {
 
-        const url =
-            "https://nominatim.openstreetmap.org/search";
+        try {
 
-
-        const { data } =
-            await axios.get(
-
-                url,
-
-                {
-
-                    params: {
-
-                        q: address,
-
-                        format: "json",
-
-                        limit: 1
-
-                    },
-
-                    headers: {
-
-                        "User-Agent":
-                            "Orange Real Estate"
-
-                    }
-
-                }
-
+            // თითო მოთხოვნამდე ველოდებით
+            await new Promise(
+                resolve =>
+                    setTimeout(resolve, 2500)
             );
 
+            const { data } =
+                await axios.get(
+                    url,
+                    {
+                        params: {
+                            q: address,
+                            format: "json",
+                            limit: 1
+                        },
 
-        if (!data.length) {
+                        headers: {
+                            "User-Agent":
+                                "Orange Real Estate Tbilisi"
+                        }
+                    }
+                );
+
+            if (!data.length) {
+
+                return {
+                    lat: null,
+                    lng: null
+                };
+
+            }
 
             return {
+                lat:
+                    Number(data[0].lat),
 
-                lat: null,
-
-                lng: null
-
+                lng:
+                    Number(data[0].lon)
             };
 
         }
 
+        catch (err) {
 
-        await new Promise(
-            resolve =>
-                setTimeout(
-                    resolve,
-                    1200
-                )
-        );
+            const status =
+                err.response?.status;
 
+            console.log(
+                `Geocode attempt ${attempt}/4:`,
+                status || err.message
+            );
 
-        return {
+            // თუ Nominatim გვაბლოკავს,
+            // უფრო დიდხანს დაველოდოთ
+            if (status === 429) {
 
-            lat:
-                Number(
-                    data[0].lat
-                ),
+                const wait =
+                    10000 * attempt;
 
-            lng:
-                Number(
-                    data[0].lon
-                )
+                console.log(
+                    `429 - waiting ${wait / 1000}s...`
+                );
 
-        };
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            wait
+                        )
+                );
 
+                continue;
+            }
+
+            return {
+                lat: null,
+                lng: null
+            };
+        }
     }
 
-    catch (err) {
-
-        console.log(
-            "Geocode error:",
-            err.message
-        );
-
-
-        return {
-
-            lat: null,
-
-            lng: null
-
-        };
-
-    }
-
+    return {
+        lat: null,
+        lng: null
+    };
 }
 
 
