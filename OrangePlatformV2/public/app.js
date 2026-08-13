@@ -5,25 +5,37 @@ console.log("🍊 ORANGE APP.JS + MAP + CATALOG + GALLERY LOADED");
    TELEGRAM
 ========================================================= */
 
-const telegramWebApp =
-    window.Telegram?.WebApp;
+/* =========================================================
+   TELEGRAM
+========================================================= */
 
+const telegramWebApp = window.Telegram?.WebApp || null;
 
 if (telegramWebApp) {
 
     telegramWebApp.ready();
-
     telegramWebApp.expand();
+
+    console.log("🍊 Telegram WebApp detected");
+    console.log("INIT DATA:", telegramWebApp.initData);
+    console.log(
+        "USER DATA:",
+        telegramWebApp.initDataUnsafe?.user
+    );
+
+} else {
+
+    console.log("⚠️ Telegram WebApp NOT detected");
 
 }
 
-
 const telegramUserId =
-    telegramWebApp?.initDataUnsafe?.user?.id || null;
-
+    telegramWebApp?.initDataUnsafe?.user?.id
+    ? String(telegramWebApp.initDataUnsafe.user.id)
+    : null;
 
 console.log(
-    "Telegram user:",
+    "Telegram user ID:",
     telegramUserId
 );
 
