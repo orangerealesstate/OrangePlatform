@@ -40,6 +40,10 @@ let mapInstance = null;
 
 let mapLayer = null;
 
+let favoritePostIds = new Set();
+
+let favoritesOnly = false;
+
 const currentCardImage = {};
 
 
@@ -169,6 +173,7 @@ async function loadPosts() {
             allPosts.length
         );
 
+await loadFavorites();
 
         renderPosts(
             getFilteredPosts()
@@ -439,7 +444,156 @@ function normalizeDistrict(value) {
     return text;
 }
 
+/* =========================================================
+   FAVORITES
+========================================================= */
 
+async function loadFavorites() {
+
+    if (!telegramUserId) {
+
+        console.log(
+            "No Telegram user ID"
+        );
+
+        favoritePostIds =
+            new Set();
+
+        return;
+
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/favorites/${telegramUserId}?t=${Date.now()}`,
+                {
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load favorites"
+            );
+
+        }
+
+        const favorites =
+            await response.json();
+
+        favoritePostIds =
+            new Set(
+                favorites.map(
+                    id => String(id)
+                )
+            );
+
+        console.log(
+            "❤️ Favorites loaded:",
+            favoritePostIds.size
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Favorites error:",
+            error
+        );
+
+        favoritePostIds =
+            new Set();
+
+    }
+
+}
+async function toggleFavorite(postId) {
+
+    if (!telegramUserId) {
+        alert("Telegram user not found");
+        return;
+    }
+
+    postId = String(postId);
+
+    const isFavorite =
+        favoritePostIds.has(postId);
+
+    try {
+
+        let response;
+
+        if (isFavorite) {
+
+            response = await fetch(
+                `/api/favorites/${telegramUserId}/${postId}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+        } else {
+
+            response = await fetch(
+                "/api/favorites",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        userId: telegramUserId,
+                        postId: postId
+                    })
+                }
+            );
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                "Favorite request failed"
+            );
+        }
+
+        if (isFavorite) {
+
+            favoritePostIds.delete(postId);
+
+        } else {
+
+            favoritePostIds.add(postId);
+
+        }
+
+        const button =
+            document.querySelector(
+                `.favorite-btn[data-post-id="${postId}"]`
+            );
+
+        if (button) {
+
+            button.textContent =
+                favoritePostIds.has(postId)
+                    ? "❤️"
+                    : "🤍";
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Favorite error:",
+            error
+        );
+
+    }
+}
 
 function getFilteredPosts() {
 
@@ -750,7 +904,34 @@ function renderPosts(posts) {
                     "
                 >
 
-
+<button
+    type="button"
+    class="favorite-btn"
+    data-post-id="${post.id}"
+    onclick="toggleFavorite('${post.id}')"
+    style="
+        position:absolute;
+        top:10px;
+        right:10px;
+        z-index:20;
+        width:42px;
+        height:42px;
+        border:0;
+        border-radius:50%;
+        background:white;
+        box-shadow:0 2px 8px rgba(0,0,0,.25);
+        font-size:24px;
+        cursor:pointer;
+    "
+>
+    ${
+        favoritePostIds.has(
+            String(post.id)
+        )
+            ? "❤️"
+            : "🤍"
+    }
+</button>
                     <button
                         type="button"
                         class="prev-btn"
