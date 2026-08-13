@@ -2125,7 +2125,18 @@ const key = addressKey;
 
                                         <br>
 
-
+${post.images?.[0] ? `
+<img
+    src="${post.images[0]}"
+    style="
+        width:100%;
+        height:150px;
+        object-fit:cover;
+        border-radius:10px;
+        margin-bottom:8px;
+    "
+>
+` : ""}
                                         <button
                                             type="button"
                                             style="
