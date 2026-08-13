@@ -2095,6 +2095,7 @@ const key = addressKey;
             marker.on(
                 "click",
                 () => {
+                    console.log("MARKER CLICKED");
 console.log("MAP POST:", groupPosts[0]);
                     const list =
 
