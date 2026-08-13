@@ -49,38 +49,49 @@ const currentCardImage = {};
 
 const districtCenters = {
 
-    saburtalo:
-        [41.7260, 44.7470],
+    saburtalo: [41.7260, 44.7470],
 
-    vake:
-        [41.7100, 44.7530],
+    vake: [41.7100, 44.7530],
 
-    vera:
-        [41.7085, 44.7830],
+    vera: [41.7085, 44.7830],
 
-    isani:
-        [41.6905, 44.8280],
+    mtatsminda: [41.7000, 44.7900],
 
-    "didi digomi":
-        [41.7850, 44.7300],
+    sololaki: [41.6955, 44.8010],
 
-    digomi:
-        [41.7850, 44.7300],
+    chugureti: [41.7150, 44.8050],
 
-    krtsanisi:
-        [41.6785, 44.8240],
+    didube: [41.7250, 44.7800],
 
-    ortachala:
-        [41.6805, 44.8150],
+    nadzaladevi: [41.7350, 44.7950],
 
-    mtatsminda:
-        [41.7000, 44.7900],
+    gldani: [41.7950, 44.8200],
 
-    didube:
-        [41.7250, 44.7800],
+    "didi digomi": [41.7850, 44.7300],
 
-    gldani:
-        [41.7950, 44.8200]
+    digomi: [41.7750, 44.7350],
+
+    temka: [41.8000, 44.7900],
+
+    isani: [41.6905, 44.8280],
+
+    samgori: [41.6850, 44.8700],
+
+    varketili: [41.6900, 44.8800],
+
+    vazisubani: [41.6950, 44.8750],
+
+    krtsanisi: [41.6785, 44.8240],
+
+    ortachala: [41.6805, 44.8150],
+
+    ponichala: [41.6500, 44.8400],
+
+    avlabari: [41.6950, 44.8200],
+
+    navtlughi: [41.6850, 44.8500],
+
+    "tbilisi sea": [41.7600, 44.9000]
 
 };
 
@@ -269,139 +280,257 @@ function hideLoader() {
    GET FILTERED POSTS
 ========================================================= */
 
-function getFilteredPosts() {
+function normalizeDistrict(value) {
 
-    const districtEl =
-        document.getElementById(
-            "districtFilter"
-        );
+    const text = String(value || "")
+        .toLowerCase()
+        .trim();
+
+    const aliases = {
+
+        "saburtalo": [
+            "saburtalo",
+            "сабуртало",
+            "საბურთალო"
+        ],
+
+        "vake": [
+            "vake",
+            "ваки",
+            "ვაკე"
+        ],
+
+        "vera": [
+            "vera",
+            "вера",
+            "ვერა"
+        ],
+
+        "mtatsminda": [
+            "mtatsminda",
+            "мтацминда",
+            "მთაწმინდა"
+        ],
+
+        "sololaki": [
+            "sololaki",
+            "сололаки",
+            "სოლოლაკი"
+        ],
+
+        "chugureti": [
+            "chugureti",
+            "чугурети",
+            "ჩუღურეთი"
+        ],
+
+        "didube": [
+            "didube",
+            "дидубе",
+            "დიდუბე"
+        ],
+
+        "nadzaladevi": [
+            "nadzaladevi",
+            "надзаладеви",
+            "ნაძალადევი"
+        ],
+
+        "gldani": [
+            "gldani",
+            "глдани",
+            "გლდანი"
+        ],
+
+        "didi digomi": [
+            "didi digomi",
+            "დიდი დიღომი",
+            "დიდი დიღმის",
+            "большой дигоми"
+        ],
+
+        "digomi": [
+            "digomi",
+            "дидигоми",
+            "дიღომი",
+            "დიღომი"
+        ],
+
+        "temka": [
+            "temka",
+            "темка",
+            "თემქა"
+        ],
+
+        "isani": [
+            "isani",
+            "исани",
+            "ისანი"
+        ],
+
+        "samgori": [
+            "samgori",
+            "самгори",
+            "სამგორი"
+        ],
+
+        "varketili": [
+            "varketili",
+            "варкетили",
+            "ვარკეთილი"
+        ],
+
+        "vazisubani": [
+            "vazisubani",
+            "вазисубани",
+            "ვაზისუბანი"
+        ],
+
+        "krtsanisi": [
+            "krtsanisi",
+            "крцаниси",
+            "კრწანისი"
+        ],
+
+        "ortachala": [
+            "ortachala",
+            "орточала",
+            "ორთაჭალა"
+        ],
+
+        "ponichala": [
+            "ponichala",
+            "поничала",
+            "ფონიჭალა"
+        ],
+
+        "avlabari": [
+            "avlabari",
+            "авлабари",
+            "ავლაბარი"
+        ],
+
+        "navtlughi": [
+            "navtlughi",
+            "нафтлуги",
+            "ნავთლუღი"
+        ],
+
+        "tbilisi sea": [
+            "tbilisi sea",
+            "тбилисское море",
+            "თბილისის ზღვა"
+        ]
+
+    };
 
 
-    const roomsEl =
-        document.getElementById(
-            "roomsFilter"
-        );
+    for (const [district, names] of Object.entries(aliases)) {
 
+        if (names.some(name => text.includes(name))) {
 
-    const minPriceEl =
-        document.getElementById(
-            "minPrice"
-        );
+            return district;
 
-
-    const maxPriceEl =
-        document.getElementById(
-            "maxPrice"
-        );
-
-
-    if (
-        !districtEl ||
-        !roomsEl ||
-        !minPriceEl ||
-        !maxPriceEl
-    ) {
-
-        return allPosts;
+        }
 
     }
 
 
-    const district =
-        districtEl.value
-            .toLowerCase()
-            .trim();
+    return text;
+}
 
 
-    const rooms =
-        roomsEl.value;
+
+function getFilteredPosts() {
+
+    const districtEl =
+        document.getElementById("districtFilter");
+
+    const roomsEl =
+        document.getElementById("roomsFilter");
+
+    const minPriceEl =
+        document.getElementById("minPrice");
+
+    const maxPriceEl =
+        document.getElementById("maxPrice");
+
+
+    const selectedDistrict =
+        normalizeDistrict(
+            districtEl?.value || ""
+        );
+
+
+    const selectedRooms =
+        roomsEl?.value || "";
 
 
     const minPrice =
-        Number(
-            minPriceEl.value
-        ) || 0;
+        Number(minPriceEl?.value) || 0;
 
 
     const maxPrice =
-        Number(
-            maxPriceEl.value
-        ) || 999999999;
+        Number(maxPriceEl?.value) || 999999999;
 
 
-    return allPosts.filter(
-        post => {
+    return allPosts.filter(post => {
 
-            const text =
-                (
-                    post.text ||
-                    ""
-                ).toLowerCase();
+        /* =========================
+           DISTRICT
+        ========================= */
 
+        if (selectedDistrict) {
 
             const postDistrict =
-                (
-                    post.district ||
-                    ""
-                ).toLowerCase();
+                normalizeDistrict(
+                    post.district
+                );
 
 
-            const postRooms =
-                Number(
-                    post.rooms
-                ) || 0;
+            const postText =
+                normalizeDistrict(
+                    post.text
+                );
 
-
-            const postPrice =
-                Number(
-                    post.price
-                ) || 0;
-
-
-            /* DISTRICT */
 
             if (
-
-                district &&
-
-                !postDistrict.includes(
-                    district
-                ) &&
-
-                !text.includes(
-                    district
-                )
-
+                postDistrict !== selectedDistrict &&
+                postText !== selectedDistrict
             ) {
 
                 return false;
 
             }
 
+        }
 
-            /* ROOMS */
 
-            if (rooms) {
+        /* =========================
+           ROOMS
+        ========================= */
 
-                if (
-                    rooms === "5"
-                ) {
+        if (selectedRooms) {
 
-                    if (
-                        postRooms < 5
-                    ) {
+            const postRooms =
+                Number(post.rooms) || 0;
 
-                        return false;
 
-                    }
+            if (
+                selectedRooms === "5"
+            ) {
+
+                if (postRooms < 5) {
+
+                    return false;
 
                 }
 
-                else if (
+            } else {
 
+                if (
                     postRooms !==
-                    Number(rooms)
-
+                    Number(selectedRooms)
                 ) {
 
                     return false;
@@ -410,33 +539,38 @@ function getFilteredPosts() {
 
             }
 
-
-            /* PRICE */
-
-            if (
-                postPrice <
-                minPrice
-            ) {
-
-                return false;
-
-            }
+        }
 
 
-            if (
-                postPrice >
-                maxPrice
-            ) {
+        /* =========================
+           PRICE
+        ========================= */
 
-                return false;
-
-            }
+        const postPrice =
+            Number(post.price) || 0;
 
 
-            return true;
+        if (
+            postPrice < minPrice
+        ) {
+
+            return false;
 
         }
-    );
+
+
+        if (
+            postPrice > maxPrice
+        ) {
+
+            return false;
+
+        }
+
+
+        return true;
+
+    });
 
 }
 
