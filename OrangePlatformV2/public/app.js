@@ -623,40 +623,24 @@ function getFilteredPosts() {
 
 
     const selectedDistrict =
-        String(
+        normalizeDistrict(
             districtEl?.value || ""
-        )
-        .trim()
-        .toLowerCase();
+        );
 
 
     const selectedRooms =
-        String(
-            roomsEl?.value || ""
-        )
-        .trim();
+        roomsEl?.value || "";
 
 
     const minPrice =
-        minPriceEl?.value
-            ? Number(
-                String(minPriceEl.value)
-                    .replace(/[^\d]/g, "")
-              )
-            : 0;
+        Number(minPriceEl?.value) || 0;
 
 
     const maxPrice =
-        maxPriceEl?.value
-            ? Number(
-                String(maxPriceEl.value)
-                    .replace(/[^\d]/g, "")
-              )
-            : Infinity;
+        Number(maxPriceEl?.value) || 999999999;
 
 
     return allPosts.filter(post => {
-
 
         /* =========================
            DISTRICT
@@ -664,45 +648,21 @@ function getFilteredPosts() {
 
         if (selectedDistrict) {
 
-            const district =
-                String(
-                    post.district || ""
-                )
-                .replace(/^#/, "")
-                .trim()
-                .toLowerCase();
-
-
-            const text =
-                String(
-                    post.text || ""
-                )
-                .toLowerCase();
-
-
-            const districtFromText =
-                text.match(
-                    /район\s*:\s*#?([^\n\r]+)/i
+            const postDistrict =
+                normalizeDistrict(
+                    post.district
                 );
 
 
-            const textDistrict =
-                districtFromText
-                    ? districtFromText[1]
-                        .replace(/^#/, "")
-                        .trim()
-                        .toLowerCase()
-                    : "";
-
-
-            const postDistrict =
-                district ||
-                textDistrict;
+            const postText =
+                normalizeDistrict(
+                    post.text
+                );
 
 
             if (
-                postDistrict !==
-                selectedDistrict
+                postDistrict !== selectedDistrict &&
+                postText !== selectedDistrict
             ) {
 
                 return false;
@@ -718,45 +678,15 @@ function getFilteredPosts() {
 
         if (selectedRooms) {
 
-            let postRooms =
-                Number(
-                    post.rooms
-                ) || 0;
-
-
-            if (!postRooms) {
-
-                const text =
-                    String(
-                        post.text || ""
-                    );
-
-
-                const roomMatch =
-                    text.match(
-                        /(\d+)\s*(?:комн|комнат|комнаты|room|rooms)/i
-                    );
-
-
-                if (roomMatch) {
-
-                    postRooms =
-                        Number(
-                            roomMatch[1]
-                        );
-
-                }
-
-            }
+            const postRooms =
+                Number(post.rooms) || 0;
 
 
             if (
                 selectedRooms === "5"
             ) {
 
-                if (
-                    postRooms < 5
-                ) {
+                if (postRooms < 5) {
 
                     return false;
 
@@ -782,55 +712,11 @@ function getFilteredPosts() {
            PRICE
         ========================= */
 
-        let postPrice =
-            Number(
-                String(
-                    post.price || ""
-                )
-                .replace(/[^\d]/g, "")
-            );
-
-
-        if (!postPrice) {
-
-            const text =
-                String(
-                    post.text || ""
-                );
-
-
-            /*
-               ვეძებთ ფასს:
-               $800
-               $ 800
-               800 USD
-            */
-
-            const priceMatch =
-                text.match(
-                    /\$\s*(\d[\d\s,]*)|(\d[\d\s,]*)\s*(?:USD|usd)/i
-                );
-
-
-            if (priceMatch) {
-
-                postPrice =
-                    Number(
-                        (
-                            priceMatch[1] ||
-                            priceMatch[2] ||
-                            ""
-                        )
-                        .replace(/[^\d]/g, "")
-                    );
-
-            }
-
-        }
+        const postPrice =
+            Number(post.price) || 0;
 
 
         if (
-            minPrice > 0 &&
             postPrice < minPrice
         ) {
 
@@ -840,7 +726,6 @@ function getFilteredPosts() {
 
 
         if (
-            maxPrice !== Infinity &&
             postPrice > maxPrice
         ) {
 
@@ -854,6 +739,8 @@ function getFilteredPosts() {
     });
 
 }
+
+
 /* =========================================================
    FILTER POSTS
 ========================================================= */
@@ -885,66 +772,6 @@ function filterPosts() {
     hideLoader();
 
 }
-// =========================
-// FILTER EVENTS
-// =========================
-
-function setupFilterEvents() {
-
-    const districtFilter =
-        document.getElementById("districtFilter");
-
-    const roomsFilter =
-        document.getElementById("roomsFilter");
-
-    const minPrice =
-        document.getElementById("minPrice");
-
-    const maxPrice =
-        document.getElementById("maxPrice");
-
-
-    if (districtFilter) {
-
-        districtFilter.addEventListener(
-            "change",
-            filterPosts
-        );
-
-    }
-
-
-    if (roomsFilter) {
-
-        roomsFilter.addEventListener(
-            "change",
-            filterPosts
-        );
-
-    }
-
-
-    if (minPrice) {
-
-        minPrice.addEventListener(
-            "input",
-            filterPosts
-        );
-
-    }
-
-
-    if (maxPrice) {
-
-        maxPrice.addEventListener(
-            "input",
-            filterPosts
-        );
-
-    }
-
-}
-
 
 
 
@@ -2427,104 +2254,19 @@ mapLayerNormal.addTo(
                 .addTo(
                     mapInstance
                 );
-                /* =========================
-   MAP / SATELLITE BUTTON
-========================= */
-
-let satelliteMode = false;
-
-const mapTypeButton =
-    L.control({
-        position: "topright"
-    });
-
-
-mapTypeButton.onAdd = function () {
-
-    const button =
-        L.DomUtil.create(
-            "button",
-            "map-type-button"
+                L.control.layers(
+            {
+                "🗺️ Карта": mapLayerNormal,
+                "🛰️ Спутник": mapLayerSatellite
+            },
+            null,
+            {
+                position: "topright",
+                collapsed: false
+            }
+        ).addTo(
+            mapInstance
         );
-
-
-    button.innerHTML = "🗺️";
-
-
-    button.title =
-        "Переключить карту";
-
-
-    button.style.cssText = `
-        width:46px;
-        height:46px;
-
-        border:0;
-        border-radius:50%;
-
-        background:white;
-
-        box-shadow:
-            0 2px 10px rgba(0,0,0,.25);
-
-        font-size:23px;
-
-        cursor:pointer;
-
-        display:flex;
-        align-items:center;
-        justify-content:center;
-    `;
-
-
-    L.DomEvent.disableClickPropagation(
-        button
-    );
-
-
-    button.onclick = function () {
-
-        if (satelliteMode) {
-
-            mapLayerSatellite.removeFrom(
-                mapInstance
-            );
-
-            mapLayerNormal.addTo(
-                mapInstance
-            );
-
-            button.innerHTML = "🗺️";
-
-            satelliteMode = false;
-
-        } else {
-
-            mapLayerNormal.removeFrom(
-                mapInstance
-            );
-
-            mapLayerSatellite.addTo(
-                mapInstance
-            );
-
-            button.innerHTML = "🛰️";
-
-            satelliteMode = true;
-
-        }
-
-    };
-
-
-    return button;
-
-};
-
-
-mapTypeButton.addTo(
-    mapInstance
-);
 
     }
 
@@ -3343,7 +3085,6 @@ document.addEventListener(
     () => {
 
         setupViewButtons();
-        setupFilterEvents();
 
         loadPosts();
 
