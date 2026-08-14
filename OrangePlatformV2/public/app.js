@@ -2320,7 +2320,7 @@ const gallery = images.length
             ${images.map((img, index) => `
                 <img
                     src="${img.startsWith("http") ? img : "/" + img}"
-                    onclick="openMapGallery(${JSON.stringify(images)}, ${index})"
+                    onclick='openMapGallery(${JSON.stringify(images)}, ${index})'
                     style="
                         width:230px;
                         min-width:230px;
