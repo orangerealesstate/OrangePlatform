@@ -772,6 +772,65 @@ function filterPosts() {
     hideLoader();
 
 }
+/* =========================================================
+   FILTER CONTROLS
+========================================================= */
+
+function setupFilters() {
+
+    const districtFilter =
+        document.getElementById("districtFilter");
+
+    const roomsFilter =
+        document.getElementById("roomsFilter");
+
+    const minPrice =
+        document.getElementById("minPrice");
+
+    const maxPrice =
+        document.getElementById("maxPrice");
+
+
+    if (districtFilter) {
+
+        districtFilter.addEventListener(
+            "change",
+            filterPosts
+        );
+
+    }
+
+
+    if (roomsFilter) {
+
+        roomsFilter.addEventListener(
+            "change",
+            filterPosts
+        );
+
+    }
+
+
+    if (minPrice) {
+
+        minPrice.addEventListener(
+            "change",
+            filterPosts
+        );
+
+    }
+
+
+    if (maxPrice) {
+
+        maxPrice.addEventListener(
+            "change",
+            filterPosts
+        );
+
+    }
+
+}
 
 
 /* =========================================================
