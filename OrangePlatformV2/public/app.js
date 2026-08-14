@@ -1746,7 +1746,6 @@ function openMapGallery(images, startIndex = 0) {
 /* =========================================================
    CATALOG VIEW
 ========================================================= */
-
 function showCatalog() {
 
     currentView =
@@ -1758,21 +1757,21 @@ function showCatalog() {
     );
 
 
-    // რუკის "Каталог" ღილაკის წაშლა
+    // რუკის კონტროლების წაშლა
 
-    const mapCatalogButton =
+    const mapControls =
         document.getElementById(
-            "mapCatalogButton"
+            "mapControls"
         );
 
-    if (mapCatalogButton) {
+    if (mapControls) {
 
-        mapCatalogButton.remove();
+        mapControls.remove();
 
     }
 
 
-    // ფილტრების დაბრუნება
+    // ფილტრების დაბრუნება ჩვეულებრივ ადგილზე
 
     const filters =
         document.querySelector(
@@ -1782,12 +1781,51 @@ function showCatalog() {
     if (filters) {
 
         filters.style.display =
-            "flex";
+            "";
+
+        filters.style.position =
+            "";
+
+        filters.style.top =
+            "";
+
+        filters.style.right =
+            "";
+
+        filters.style.zIndex =
+            "";
+
+        filters.style.width =
+            "";
+
+        filters.style.maxWidth =
+            "";
+
+        filters.style.padding =
+            "";
+
+        filters.style.margin =
+            "";
+
+        filters.style.background =
+            "";
+
+        filters.style.borderRadius =
+            "";
+
+        filters.style.boxShadow =
+            "";
+
+        filters.style.flexDirection =
+            "";
+
+        filters.style.gap =
+            "";
 
     }
 
 
-    // Каталог / Карта ღილაკების დაბრუნება
+    // Catalog / Map ღილაკების დაბრუნება
 
     const viewSwitcher =
         document.querySelector(
@@ -1802,8 +1840,6 @@ function showCatalog() {
     }
 
 
-    // განცხადებების დაბრუნება
-
     const posts =
         document.getElementById(
             "posts"
@@ -1817,8 +1853,6 @@ function showCatalog() {
     }
 
 
-    // რუკის დამალვა
-
     const map =
         document.getElementById(
             "map"
@@ -1831,8 +1865,6 @@ function showCatalog() {
 
     }
 
-
-    // აქტიური ღილაკები
 
     document
         .getElementById(
@@ -1852,8 +1884,6 @@ function showCatalog() {
         );
 
 
-    // გაფილტრული განცხადებების ჩვენება
-
     renderPosts(
         getFilteredPosts()
     );
@@ -1864,26 +1894,39 @@ function showCatalog() {
 /* =========================================================
    MAP VIEW
 ========================================================= */
-
 function showMap() {
 
-    currentView = "map";
+    currentView =
+        "map";
 
-    document.body.classList.add("map-mode");
+
+    document.body.classList.add(
+        "map-mode"
+    );
 
 
     const posts =
-        document.getElementById("posts");
+        document.getElementById(
+            "posts"
+        );
 
     const map =
-        document.getElementById("map");
+        document.getElementById(
+            "map"
+        );
 
     const filters =
-        document.querySelector(".filters");
+        document.querySelector(
+            ".filters"
+        );
 
     const viewSwitcher =
-        document.querySelector(".view-switcher");
+        document.querySelector(
+            ".view-switcher"
+        );
 
+
+    // კატალოგი დავმალოთ
 
     if (posts) {
 
@@ -1893,6 +1936,8 @@ function showMap() {
     }
 
 
+    // რუკა გამოჩნდეს
+
     if (map) {
 
         map.style.display =
@@ -1901,22 +1946,61 @@ function showMap() {
     }
 
 
-    // ფილტრი რუკაზეც დარჩეს
-
-    if (filters) {
-
-        filters.style.display =
-            "flex";
-
-    }
-
-
-    // ზედა Каталог / Карта ღილაკები რუკაზე დავმალოთ
+    // ზედა ძველი კატალოგი / რუკა ღილაკები დავმალოთ
 
     if (viewSwitcher) {
 
         viewSwitcher.style.display =
             "none";
+
+    }
+
+
+    // ჩვეულებრივი ფილტრები თავიდან დამალული
+
+    if (filters) {
+
+        filters.style.display =
+            "none";
+
+        filters.style.position =
+            "absolute";
+
+        filters.style.top =
+            "58px";
+
+        filters.style.right =
+            "12px";
+
+        filters.style.zIndex =
+            "1001";
+
+        filters.style.width =
+            "280px";
+
+        filters.style.maxWidth =
+            "calc(100vw - 24px)";
+
+        filters.style.padding =
+            "14px";
+
+        filters.style.margin =
+            "0";
+
+        filters.style.background =
+            "white";
+
+        filters.style.borderRadius =
+            "16px";
+
+        filters.style.boxShadow =
+            "0 5px 20px rgba(0,0,0,.25)";
+
+        filters.style.flexDirection =
+            "column";
+
+        filters.style.gap =
+            "10px";
 
     }
 
@@ -1931,19 +2015,20 @@ function showMap() {
 
 
     document
-    .getElementById(
-        "mapViewBtn"
-    )
-    ?.classList.add(
-        "active"
-    );
+        .getElementById(
+            "mapViewBtn"
+        )
+        ?.classList.add(
+            "active"
+        );
 
 
-addMapCatalogButton();
+    // ახალი ლამაზი ღილაკები
+
+    addMapControls();
 
 
-setTimeout(
-    () => {
+    setTimeout(() => {
 
         initMap();
 
@@ -1951,65 +2036,142 @@ setTimeout(
             getFilteredPosts()
         );
 
-    },
-    100
-);
+    }, 100);
+
+
 
 }
-function addMapCatalogButton() {
+function addMapControls() {
 
+    const map =
+        document.getElementById("map");
+
+    if (!map) return;
+
+
+    // უკვე არსებობს?
     if (
         document.getElementById(
-            "mapCatalogButton"
+            "mapControls"
         )
     ) {
-
         return;
-
     }
 
 
-    const button =
-        document.createElement(
-            "button"
-        );
+    // მთავარი კონტეინერი
+
+    const controls =
+        document.createElement("div");
+
+    controls.id =
+        "mapControls";
+
+    controls.style.cssText = `
+        position:absolute;
+        top:12px;
+        right:12px;
+        z-index:1000;
+        display:flex;
+        gap:8px;
+        align-items:flex-start;
+    `;
 
 
-    button.id =
+    // კატალოგის ღილაკი
+
+    const catalogButton =
+        document.createElement("button");
+
+    catalogButton.id =
         "mapCatalogButton";
 
-
-    button.innerHTML =
+    catalogButton.innerHTML =
         "🏠 Каталог";
 
-
-    button.style.cssText = `
-        position:fixed;
-        top:10px;
-        left:10px;
-        z-index:9999;
+    catalogButton.style.cssText = `
         border:0;
-        border-radius:10px;
-        padding:10px 14px;
+        border-radius:12px;
+        padding:11px 15px;
         background:white;
         color:#222;
         font-size:14px;
         font-weight:700;
-        box-shadow:0 2px 8px rgba(0,0,0,.25);
+        box-shadow:0 3px 12px rgba(0,0,0,.25);
         cursor:pointer;
+        white-space:nowrap;
     `;
 
 
-    button.onclick =
-        () => {
+    catalogButton.onclick = () => {
 
-            showCatalog();
+        showCatalog();
 
-        };
+    };
 
 
-    document.body.appendChild(
-        button
+    // ფილტრების ღილაკი
+
+    const filterButton =
+        document.createElement("button");
+
+    filterButton.id =
+        "mapFilterButton";
+
+    filterButton.innerHTML =
+        "⚱ Фильтры";
+
+    filterButton.style.cssText = `
+        border:0;
+        border-radius:12px;
+        padding:11px 15px;
+        background:white;
+        color:#222;
+        font-size:14px;
+        font-weight:700;
+        box-shadow:0 3px 12px rgba(0,0,0,.25);
+        cursor:pointer;
+        white-space:nowrap;
+    `;
+
+
+    filterButton.onclick = () => {
+
+        const filters =
+            document.querySelector(".filters");
+
+        if (!filters) return;
+
+
+        if (
+            filters.style.display ===
+            "flex"
+        ) {
+
+            filters.style.display =
+                "none";
+
+        } else {
+
+            filters.style.display =
+                "flex";
+
+        }
+
+    };
+
+
+    controls.appendChild(
+        catalogButton
+    );
+
+    controls.appendChild(
+        filterButton
+    );
+
+
+    map.appendChild(
+        controls
     );
 
 }
