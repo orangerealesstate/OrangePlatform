@@ -2170,23 +2170,29 @@ const gallery = images.length
     ? `
         <div
             style="
-                display:grid;
-                grid-template-columns:repeat(2, 1fr);
-                gap:6px;
+                display:flex;
+                overflow-x:auto;
+                gap:8px;
                 width:100%;
                 margin-bottom:10px;
+                scroll-snap-type:x mandatory;
+                -webkit-overflow-scrolling:touch;
             "
         >
 
-            ${images.slice(0, 4).map((img) => `
+            ${images.map((img, index) => `
                 <img
                     src="${img.startsWith("http") ? img : "/" + img}"
+                    onclick="openMapGallery(${JSON.stringify(images)}, ${index})"
                     style="
-                        width:100%;
-                        height:120px;
+                        width:230px;
+                        min-width:230px;
+                        height:170px;
                         object-fit:cover;
                         border-radius:8px;
                         display:block;
+                        cursor:pointer;
+                        scroll-snap-align:start;
                     "
                 >
             `).join("")}
