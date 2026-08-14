@@ -2170,48 +2170,30 @@ const gallery = images.length
     ? `
         <div
             style="
-                display:flex;
-                overflow-x:auto;
-                gap:8px;
+                display:grid;
+                grid-template-columns:repeat(2, 1fr);
+                gap:6px;
                 width:100%;
-                margin-bottom:8px;
+                margin-bottom:10px;
             "
         >
 
-            ${images.map((img, index) => `
+            ${images.slice(0, 4).map((img) => `
                 <img
-                    src="${
-                        img.startsWith("http")
-                            ? img
-                            : "/" + img
-                    }"
-                    onclick='openMapGallery(${JSON.stringify(images)}, ${index})'
+                    src="${img.startsWith("http") ? img : "/" + img}"
                     style="
-                        width:230px;
-                        min-width:230px;
-                        height:170px;
+                        width:100%;
+                        height:120px;
                         object-fit:cover;
-                        border-radius:10px;
-                        cursor:pointer;
+                        border-radius:8px;
+                        display:block;
                     "
                 >
             `).join("")}
 
         </div>
-
-        <div
-            style="
-                text-align:center;
-                font-size:12px;
-                color:#777;
-                margin-bottom:8px;
-            "
-        >
-            ← გადაასრიალე ფოტოები →
-        </div>
     `
     : "";
-
 marker.bindPopup(`
 
     <div
