@@ -1679,16 +1679,6 @@ function showMap() {
         "map";
 
     document.body.classList.add("map-mode");
-    const backButton = document.createElement("button");
-
-backButton.id = "mapBackButton";
-backButton.innerHTML = "← კატალოგი";
-
-backButton.onclick = function () {
-    showCatalog();
-};
-
-document.body.appendChild(backButton);
 
 
     const posts =
@@ -1802,51 +1792,19 @@ function initMap() {
             );
 
 
-        const streetLayer =
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-            maxZoom: 19,
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
 
-            attribution:
-                "&copy; OpenStreetMap contributors"
-        }
-    );
+                maxZoom: 19,
 
-const satelliteLayer =
-    L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        {
-            maxZoom: 19,
+                attribution:
+                    "&copy; OpenStreetMap contributors"
 
-            attribution:
-                "Tiles © Esri"
-        }
-    );
-
-streetLayer.addTo(
-    mapInstance
-);
-
-L.control.layers(
-    {
-        "🗺️ Карта":
-            streetLayer,
-
-        "🛰️ Спутник":
-            satelliteLayer
-    },
-    null,
-    {
-        position:
-            "topright",
-
-        collapsed:
-            false
-    }
-).addTo(
-    mapInstance
-);
+            }
+        ).addTo(
+            mapInstance
+        );
 
 
         mapLayer =
@@ -2355,8 +2313,8 @@ marker.on("click", () => {
 
                     ${images.map((img, index) => `
                         <img
-                            src="${img}"
-                            onclick='openMapGallery(${JSON.stringify(images)}, ${index})'
+                            src="${img.startsWith("http") ? img : "/" + img}"
+                            onclick="openGallery('${post.id}')"
                             style="
                                 width:230px;
                                 min-width:230px;
