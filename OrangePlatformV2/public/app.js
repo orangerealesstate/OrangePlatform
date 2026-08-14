@@ -1603,6 +1603,143 @@ function openGallery(
         };
 
 }
+function openMapGallery(images, startIndex = 0) {
+
+    let currentIndex = startIndex;
+
+    const viewer = document.createElement("div");
+
+    viewer.style.cssText = `
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,0.92);
+        z-index:99999;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    `;
+
+    const image = document.createElement("img");
+
+    image.style.cssText = `
+        max-width:90vw;
+        max-height:85vh;
+        object-fit:contain;
+        border-radius:8px;
+    `;
+
+    function showImage() {
+
+        const img = images[currentIndex];
+
+        image.src =
+            img.startsWith("http")
+                ? img
+                : "/" + img;
+    }
+
+    // ❌ დახურვა
+    const close = document.createElement("button");
+
+    close.innerHTML = "✕";
+
+    close.style.cssText = `
+        position:absolute;
+        top:20px;
+        right:25px;
+        width:45px;
+        height:45px;
+        border:0;
+        border-radius:50%;
+        background:white;
+        color:black;
+        font-size:25px;
+        font-weight:bold;
+        cursor:pointer;
+    `;
+
+    close.onclick = () => {
+        viewer.remove();
+    };
+
+
+    // ◀ წინა ფოტო
+    const prev = document.createElement("button");
+
+    prev.innerHTML = "‹";
+
+    prev.style.cssText = `
+        position:absolute;
+        left:20px;
+        top:50%;
+        transform:translateY(-50%);
+        width:50px;
+        height:60px;
+        border:0;
+        border-radius:10px;
+        background:rgba(255,255,255,0.85);
+        font-size:40px;
+        cursor:pointer;
+    `;
+
+    prev.onclick = () => {
+
+        currentIndex =
+            (currentIndex - 1 + images.length)
+            % images.length;
+
+        showImage();
+    };
+
+
+    // ▶ შემდეგი ფოტო
+    const next = document.createElement("button");
+
+    next.innerHTML = "›";
+
+    next.style.cssText = `
+        position:absolute;
+        right:20px;
+        top:50%;
+        transform:translateY(-50%);
+        width:50px;
+        height:60px;
+        border:0;
+        border-radius:10px;
+        background:rgba(255,255,255,0.85);
+        font-size:40px;
+        cursor:pointer;
+    `;
+
+    next.onclick = () => {
+
+        currentIndex =
+            (currentIndex + 1)
+            % images.length;
+
+        showImage();
+    };
+
+
+    // ფონზე დაჭერითაც დაიხუროს
+    viewer.onclick = event => {
+
+        if (event.target === viewer) {
+            viewer.remove();
+        }
+
+    };
+
+
+    viewer.appendChild(image);
+    viewer.appendChild(close);
+    viewer.appendChild(prev);
+    viewer.appendChild(next);
+
+    document.body.appendChild(viewer);
+
+    showImage();
+}
 
 
 /* =========================================================
