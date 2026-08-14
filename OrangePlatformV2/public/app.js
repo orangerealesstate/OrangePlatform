@@ -2070,7 +2070,7 @@ function addMapControls() {
     controls.style.cssText = `
         position:absolute;
         top:12px;
-        right:12px;
+        right:65px;
         z-index:1000;
         display:flex;
         gap:8px;
