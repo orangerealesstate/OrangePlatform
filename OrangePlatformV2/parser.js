@@ -858,22 +858,45 @@ async function start() {
         };
 
 
-        /*
-           Geocoding currently disabled,
-           same as your previous parser.
-        */
-
         if (!coords.lat || !coords.lng) {
 
-            coords =
-                await geocodeAddress(
+    const addresses = [
 
-                    post.street +
-                    ", Tbilisi, Georgia"
+        `${post.street}, ${post.district}, Tbilisi, Georgia`,
 
-                );
+        `${post.street}, Tbilisi, Georgia`
+
+    ];
+
+    for (const address of addresses) {
+
+        console.log(
+            "📍 Geocoding:",
+            address
+        );
+
+        const result =
+            await geocodeAddress(address);
+
+        if (
+            result.lat &&
+            result.lng
+        ) {
+
+            coords = result;
+
+            console.log(
+                "✅ Coordinates found:",
+                result
+            );
+
+            break;
 
         }
+
+    }
+
+}
 
 
         post.lat =
