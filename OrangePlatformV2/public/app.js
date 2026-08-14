@@ -623,20 +623,25 @@ function getFilteredPosts() {
 
 
     const selectedDistrict =
-        normalizeDistrict(
+        String(
             districtEl?.value || ""
-        );
+        )
+        .trim()
+        .toLowerCase();
 
 
     const selectedRooms =
-        roomsEl?.value || "";
+        String(
+            roomsEl?.value || ""
+        )
+        .trim();
 
 
     const minPrice =
         minPriceEl?.value
             ? Number(
                 String(minPriceEl.value)
-                    .replace(/[^\d.]/g, "")
+                    .replace(/[^\d]/g, "")
               )
             : 0;
 
@@ -645,7 +650,7 @@ function getFilteredPosts() {
         maxPriceEl?.value
             ? Number(
                 String(maxPriceEl.value)
-                    .replace(/[^\d.]/g, "")
+                    .replace(/[^\d]/g, "")
               )
             : Infinity;
 
@@ -659,39 +664,40 @@ function getFilteredPosts() {
 
         if (selectedDistrict) {
 
-            let postDistrict =
-                normalizeDistrict(
+            const district =
+                String(
                     post.district || ""
+                )
+                .replace(/^#/, "")
+                .trim()
+                .toLowerCase();
+
+
+            const text =
+                String(
+                    post.text || ""
+                )
+                .toLowerCase();
+
+
+            const districtFromText =
+                text.match(
+                    /район\s*:\s*#?([^\n\r]+)/i
                 );
 
 
-            /*
-               თუ district ცარიელია,
-               ვეძებთ ტექსტში
-            */
-
-            if (!postDistrict) {
-
-                const text =
-                    String(post.text || "");
+            const textDistrict =
+                districtFromText
+                    ? districtFromText[1]
+                        .replace(/^#/, "")
+                        .trim()
+                        .toLowerCase()
+                    : "";
 
 
-                const match =
-                    text.match(
-                        /Район\s*:\s*#?([^\n\r]+)/i
-                    );
-
-
-                if (match) {
-
-                    postDistrict =
-                        normalizeDistrict(
-                            match[1]
-                        );
-
-                }
-
-            }
+            const postDistrict =
+                district ||
+                textDistrict;
 
 
             if (
@@ -713,22 +719,17 @@ function getFilteredPosts() {
         if (selectedRooms) {
 
             let postRooms =
-                Number(post.rooms) || 0;
+                Number(
+                    post.rooms
+                ) || 0;
 
-
-            /*
-               თუ rooms ცარიელია,
-               ვეძებთ ტექსტში:
-               1 комн.
-               2 комнаты
-               3 комн.
-               და ა.შ.
-            */
 
             if (!postRooms) {
 
                 const text =
-                    String(post.text || "");
+                    String(
+                        post.text || ""
+                    );
 
 
                 const roomMatch =
@@ -782,30 +783,32 @@ function getFilteredPosts() {
         ========================= */
 
         let postPrice =
-            Number(post.price) || 0;
+            Number(
+                String(
+                    post.price || ""
+                )
+                .replace(/[^\d]/g, "")
+            );
 
-
-        /*
-           თუ price რიცხვი არ არის,
-           მაგალითად "$1200",
-           "$ 1200",
-           "1200 USD",
-           ვასუფთავებთ
-        */
 
         if (!postPrice) {
 
-            const priceText =
+            const text =
                 String(
-                    post.price ||
-                    post.text ||
-                    ""
+                    post.text || ""
                 );
 
 
+            /*
+               ვეძებთ ფასს:
+               $800
+               $ 800
+               800 USD
+            */
+
             const priceMatch =
-                priceText.match(
-                    /(?:\$|USD)?\s*(\d[\d\s,]*)/i
+                text.match(
+                    /\$\s*(\d[\d\s,]*)|(\d[\d\s,]*)\s*(?:USD|usd)/i
                 );
 
 
@@ -813,8 +816,12 @@ function getFilteredPosts() {
 
                 postPrice =
                     Number(
-                        priceMatch[1]
-                            .replace(/[^\d]/g, "")
+                        (
+                            priceMatch[1] ||
+                            priceMatch[2] ||
+                            ""
+                        )
+                        .replace(/[^\d]/g, "")
                     );
 
             }
@@ -847,7 +854,6 @@ function getFilteredPosts() {
     });
 
 }
-
 /* =========================================================
    FILTER POSTS
 ========================================================= */
