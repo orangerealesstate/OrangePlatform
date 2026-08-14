@@ -772,65 +772,7 @@ function filterPosts() {
     hideLoader();
 
 }
-/* =========================================================
-   FILTER CONTROLS
-========================================================= */
 
-function setupFilters() {
-
-    const districtFilter =
-        document.getElementById("districtFilter");
-
-    const roomsFilter =
-        document.getElementById("roomsFilter");
-
-    const minPrice =
-        document.getElementById("minPrice");
-
-    const maxPrice =
-        document.getElementById("maxPrice");
-
-
-    if (districtFilter) {
-
-        districtFilter.addEventListener(
-            "change",
-            filterPosts
-        );
-
-    }
-
-
-    if (roomsFilter) {
-
-        roomsFilter.addEventListener(
-            "change",
-            filterPosts
-        );
-
-    }
-
-
-    if (minPrice) {
-
-        minPrice.addEventListener(
-            "change",
-            filterPosts
-        );
-
-    }
-
-
-    if (maxPrice) {
-
-        maxPrice.addEventListener(
-            "change",
-            filterPosts
-        );
-
-    }
-
-}
 
 
 /* =========================================================
@@ -1809,20 +1751,63 @@ function showCatalog() {
 
     currentView =
         "catalog";
-        document.body.classList.remove("map-mode");
 
+
+    document.body.classList.remove(
+        "map-mode"
+    );
+
+
+    // რუკის "Каталог" ღილაკის წაშლა
+
+    const mapCatalogButton =
+        document.getElementById(
+            "mapCatalogButton"
+        );
+
+    if (mapCatalogButton) {
+
+        mapCatalogButton.remove();
+
+    }
+
+
+    // ფილტრების დაბრუნება
+
+    const filters =
+        document.querySelector(
+            ".filters"
+        );
+
+    if (filters) {
+
+        filters.style.display =
+            "flex";
+
+    }
+
+
+    // Каталог / Карта ღილაკების დაბრუნება
+
+    const viewSwitcher =
+        document.querySelector(
+            ".view-switcher"
+        );
+
+    if (viewSwitcher) {
+
+        viewSwitcher.style.display =
+            "flex";
+
+    }
+
+
+    // განცხადებების დაბრუნება
 
     const posts =
         document.getElementById(
             "posts"
         );
-
-
-    const map =
-        document.getElementById(
-            "map"
-        );
-
 
     if (posts) {
 
@@ -1832,6 +1817,13 @@ function showCatalog() {
     }
 
 
+    // რუკის დამალვა
+
+    const map =
+        document.getElementById(
+            "map"
+        );
+
     if (map) {
 
         map.style.display =
@@ -1839,6 +1831,8 @@ function showCatalog() {
 
     }
 
+
+    // აქტიური ღილაკები
 
     document
         .getElementById(
@@ -1858,6 +1852,8 @@ function showCatalog() {
         );
 
 
+    // გაფილტრული განცხადებების ჩვენება
+
     renderPosts(
         getFilteredPosts()
     );
@@ -1871,22 +1867,22 @@ function showCatalog() {
 
 function showMap() {
 
-    currentView =
-        "map";
+    currentView = "map";
 
     document.body.classList.add("map-mode");
 
 
     const posts =
-        document.getElementById(
-            "posts"
-        );
-
+        document.getElementById("posts");
 
     const map =
-        document.getElementById(
-            "map"
-        );
+        document.getElementById("map");
+
+    const filters =
+        document.querySelector(".filters");
+
+    const viewSwitcher =
+        document.querySelector(".view-switcher");
 
 
     if (posts) {
@@ -1905,6 +1901,26 @@ function showMap() {
     }
 
 
+    // ფილტრი რუკაზეც დარჩეს
+
+    if (filters) {
+
+        filters.style.display =
+            "flex";
+
+    }
+
+
+    // ზედა Каталог / Карта ღილაკები რუკაზე დავმალოთ
+
+    if (viewSwitcher) {
+
+        viewSwitcher.style.display =
+            "none";
+
+    }
+
+
     document
         .getElementById(
             "catalogViewBtn"
@@ -1915,25 +1931,85 @@ function showMap() {
 
 
     document
-        .getElementById(
-            "mapViewBtn"
+    .getElementById(
+        "mapViewBtn"
+    )
+    ?.classList.add(
+        "active"
+    );
+
+
+addMapCatalogButton();
+
+
+setTimeout(
+    () => {
+
+        initMap();
+
+        renderMap(
+            getFilteredPosts()
+        );
+
+    },
+    100
+);
+
+}
+function addMapCatalogButton() {
+
+    if (
+        document.getElementById(
+            "mapCatalogButton"
         )
-        ?.classList.add(
-            "active"
+    ) {
+
+        return;
+
+    }
+
+
+    const button =
+        document.createElement(
+            "button"
         );
 
 
-    setTimeout(
+    button.id =
+        "mapCatalogButton";
+
+
+    button.innerHTML =
+        "🏠 Каталог";
+
+
+    button.style.cssText = `
+        position:fixed;
+        top:10px;
+        left:10px;
+        z-index:9999;
+        border:0;
+        border-radius:10px;
+        padding:10px 14px;
+        background:white;
+        color:#222;
+        font-size:14px;
+        font-weight:700;
+        box-shadow:0 2px 8px rgba(0,0,0,.25);
+        cursor:pointer;
+    `;
+
+
+    button.onclick =
         () => {
 
-            initMap();
+            showCatalog();
 
-            renderMap(
-                getFilteredPosts()
-            );
+        };
 
-        },
-        100
+
+    document.body.appendChild(
+        button
     );
 
 }
