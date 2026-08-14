@@ -885,6 +885,66 @@ function filterPosts() {
     hideLoader();
 
 }
+// =========================
+// FILTER EVENTS
+// =========================
+
+function setupFilterEvents() {
+
+    const districtFilter =
+        document.getElementById("districtFilter");
+
+    const roomsFilter =
+        document.getElementById("roomsFilter");
+
+    const minPrice =
+        document.getElementById("minPrice");
+
+    const maxPrice =
+        document.getElementById("maxPrice");
+
+
+    if (districtFilter) {
+
+        districtFilter.addEventListener(
+            "change",
+            filterPosts
+        );
+
+    }
+
+
+    if (roomsFilter) {
+
+        roomsFilter.addEventListener(
+            "change",
+            filterPosts
+        );
+
+    }
+
+
+    if (minPrice) {
+
+        minPrice.addEventListener(
+            "input",
+            filterPosts
+        );
+
+    }
+
+
+    if (maxPrice) {
+
+        maxPrice.addEventListener(
+            "input",
+            filterPosts
+        );
+
+    }
+
+}
+setupFilterEvents();
 
 
 
