@@ -1792,19 +1792,29 @@ function initMap() {
             );
 
 
-        L.tileLayer(
-            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            {
+        const mapLayerNormal =
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution:
+                "&copy; OpenStreetMap contributors"
+        }
+    );
 
-                maxZoom: 19,
+const mapLayerSatellite =
+    L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+            maxZoom: 19,
+            attribution:
+                "Tiles &copy; Esri"
+        }
+    );
 
-                attribution:
-                    "&copy; OpenStreetMap contributors"
-
-            }
-        ).addTo(
-            mapInstance
-        );
+mapLayerNormal.addTo(
+    mapInstance
+);
 
 
         mapLayer =
@@ -1812,6 +1822,19 @@ function initMap() {
                 .addTo(
                     mapInstance
                 );
+                L.control.layers(
+            {
+                "🗺️ Карта": mapLayerNormal,
+                "🛰️ Спутник": mapLayerSatellite
+            },
+            null,
+            {
+                position: "topright",
+                collapsed: false
+            }
+        ).addTo(
+            mapInstance
+        );
 
     }
 
@@ -2139,80 +2162,122 @@ marker.on("click", () => {
     console.log("MAP POST:", post);
 });
 
-                marker.bindPopup(`
+                const images = Array.isArray(post.images)
+    ? post.images.filter(Boolean)
+    : [];
 
-                    <div
-                        class="map-popup"
-                        style="
-                            min-width:180px;
-                        "
-                    >
+const gallery = images.length
+    ? `
+        <div
+            style="
+                display:flex;
+                overflow-x:auto;
+                gap:8px;
+                width:100%;
+                margin-bottom:8px;
+            "
+        >
 
-                        <div
-                            style="
-                                font-size:20px;
-                                font-weight:bold;
-                                margin-bottom:6px;
-                            "
-                        >
-                            ${
-                                price
-                                    ? `$${price}`
-                                    : "Цена"
-                            }
-                        </div>
+            ${images.map((img, index) => `
+                <img
+                    src="${
+                        img.startsWith("http")
+                            ? img
+                            : "/" + img
+                    }"
+                    onclick='openMapGallery(${JSON.stringify(images)}, ${index})'
+                    style="
+                        width:230px;
+                        min-width:230px;
+                        height:170px;
+                        object-fit:cover;
+                        border-radius:10px;
+                        cursor:pointer;
+                    "
+                >
+            `).join("")}
 
+        </div>
 
-                        <div>
+        <div
+            style="
+                text-align:center;
+                font-size:12px;
+                color:#777;
+                margin-bottom:8px;
+            "
+        >
+            ← გადაასრიალე ფოტოები →
+        </div>
+    `
+    : "";
 
-                            📍
-                            ${post.district || "-"}
+marker.bindPopup(`
 
-                            <br>
+    <div
+        class="map-popup"
+        style="
+            width:240px;
+        "
+    >
 
-                            🛏
-                            ${post.rooms || "-"}
-                            комн.
+        <div
+            style="
+                font-size:22px;
+                font-weight:bold;
+                margin-bottom:8px;
+            "
+        >
+            ${
+                price
+                    ? `$${price}`
+                    : "Цена"
+            }
+        </div>
 
-                            <br>
+        ${gallery}
 
-                            📐
-                            ${post.area || "-"}
-                            м²
+        <div style="font-size:14px;">
 
-                        </div>
+            📍 ${post.district || "-"}
+            <br>
 
+            🛏 ${post.rooms || "-"} комн.
+            <br>
 
-                        <button
-                            type="button"
-                            style="
-                                margin-top:10px;
-                                width:100%;
-                                border:0;
-                                border-radius:8px;
-                                padding:9px;
-                                background:#1f63e9;
-                                color:white;
-                                font-weight:bold;
-                            "
-                            onclick="
-                                location.href='details.html?id=${post.id}'
-                            "
-                        >
-                            Подробнее
-                        </button>
+            📐 ${post.area || "-"} м²
 
-                    </div>
+        </div>
 
-                `);
+        <button
+            type="button"
+            onclick="
+                location.href='details.html?id=${post.id}'
+            "
+            style="
+                margin-top:10px;
+                width:100%;
+                border:0;
+                border-radius:8px;
+                padding:9px;
+                background:#1f63e9;
+                color:white;
+                font-weight:bold;
+                cursor:pointer;
+            "
+        >
+            Подробнее
+        </button>
 
+    </div>
 
-                marker.addTo(
-                    mapLayer
-                );
+`);
 
+marker.addTo(
+    mapLayer
+);
 
-                return;
+return;
 
             }
 
