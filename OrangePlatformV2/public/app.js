@@ -2361,19 +2361,104 @@ mapLayerNormal.addTo(
                 .addTo(
                     mapInstance
                 );
-                L.control.layers(
-            {
-                "🗺️ Карта": mapLayerNormal,
-                "🛰️ Спутник": mapLayerSatellite
-            },
-            null,
-            {
-                position: "topright",
-                collapsed: false
-            }
-        ).addTo(
-            mapInstance
+                /* =========================
+   MAP / SATELLITE BUTTON
+========================= */
+
+let satelliteMode = false;
+
+const mapTypeButton =
+    L.control({
+        position: "topright"
+    });
+
+
+mapTypeButton.onAdd = function () {
+
+    const button =
+        L.DomUtil.create(
+            "button",
+            "map-type-button"
         );
+
+
+    button.innerHTML = "🗺️";
+
+
+    button.title =
+        "Переключить карту";
+
+
+    button.style.cssText = `
+        width:46px;
+        height:46px;
+
+        border:0;
+        border-radius:50%;
+
+        background:white;
+
+        box-shadow:
+            0 2px 10px rgba(0,0,0,.25);
+
+        font-size:23px;
+
+        cursor:pointer;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    `;
+
+
+    L.DomEvent.disableClickPropagation(
+        button
+    );
+
+
+    button.onclick = function () {
+
+        if (satelliteMode) {
+
+            mapLayerSatellite.removeFrom(
+                mapInstance
+            );
+
+            mapLayerNormal.addTo(
+                mapInstance
+            );
+
+            button.innerHTML = "🗺️";
+
+            satelliteMode = false;
+
+        } else {
+
+            mapLayerNormal.removeFrom(
+                mapInstance
+            );
+
+            mapLayerSatellite.addTo(
+                mapInstance
+            );
+
+            button.innerHTML = "🛰️";
+
+            satelliteMode = true;
+
+        }
+
+    };
+
+
+    return button;
+
+};
+
+
+mapTypeButton.addTo(
+    mapInstance
+);
 
     }
 
