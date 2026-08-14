@@ -576,18 +576,51 @@ async function start() {
     );
 
 
-    const messages =
-        await client.getMessages(
-            channel,
-            {
-                limit: 500
-            }
-        );
+    const now = new Date();
+
+const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+);
+
+const startOfTomorrow = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + 1
+);
+
+const messages =
+    await client.getMessages(
+        channel,
+        {
+            limit: 500,
+            offsetDate: Math.floor(
+                startOfTomorrow.getTime() / 1000
+            )
+        }
+    );
+
+const todayMessages = messages.filter(msg => {
+    const messageDate = new Date(
+        msg.date * 1000
+    );
+
+    return (
+        messageDate >= startOfToday &&
+        messageDate < startOfTomorrow
+    );
+});
+
+console.log(
+    "Today's messages:",
+    todayMessages.length
+);
 
 
     console.log(
         "Messages count:",
-        messages.length
+       todayMessages.length
     );
 
 
@@ -627,7 +660,7 @@ async function start() {
 
     for (
         const msg of
-        messages.reverse()
+        todayMessages.reverse()
     ) {
 
 
