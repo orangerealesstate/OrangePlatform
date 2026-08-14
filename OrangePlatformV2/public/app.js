@@ -2068,14 +2068,15 @@ function addMapControls() {
         "mapControls";
 
     controls.style.cssText = `
-        position:absolute;
-        top:12px;
-        right:180px;
-        z-index:1000;
-        display:flex;
-        gap:8px;
-        align-items:flex-start;
-    `;
+    position:absolute;
+    left:12px;
+    bottom:12px;
+    z-index:1000;
+    display:flex;
+    flex-direction:row;
+    gap:8px;
+    align-items:center;
+`;
 
 
     // კატალოგის ღილაკი
@@ -2090,17 +2091,17 @@ function addMapControls() {
         "🏠 Каталог";
 
     catalogButton.style.cssText = `
-        border:0;
-        border-radius:12px;
-        padding:11px 15px;
-        background:white;
-        color:#222;
-        font-size:14px;
-        font-weight:700;
-        box-shadow:0 3px 12px rgba(0,0,0,.25);
-        cursor:pointer;
-        white-space:nowrap;
-    `;
+    border:0;
+    border-radius:12px;
+    padding:11px 15px;
+    background:#ff7a00;
+    color:white;
+    font-size:14px;
+    font-weight:700;
+    box-shadow:0 3px 12px rgba(0,0,0,.25);
+    cursor:pointer;
+    white-space:nowrap;
+`;
 
 
     catalogButton.onclick = () => {
@@ -2125,8 +2126,8 @@ function addMapControls() {
         border:0;
         border-radius:12px;
         padding:11px 15px;
-        background:white;
-        color:#222;
+        background:#22a447;
+        color:white;
         font-size:14px;
         font-weight:700;
         box-shadow:0 3px 12px rgba(0,0,0,.25);
@@ -2137,28 +2138,25 @@ function addMapControls() {
 
     filterButton.onclick = () => {
 
-        const filters =
-            document.querySelector(".filters");
+    const filters =
+        document.querySelector(".filters");
 
-        if (!filters) return;
+    if (!filters) return;
 
+    const isHidden =
+        getComputedStyle(filters).display === "none";
 
-        if (
-            filters.style.display ===
-            "flex"
-        ) {
+    if (isHidden) {
 
-            filters.style.display =
-                "none";
+        filters.style.display = "flex";
 
-        } else {
+    } else {
 
-            filters.style.display =
-                "flex";
+        filters.style.display = "none";
 
-        }
+    }
 
-    };
+};
 
 
     controls.appendChild(
