@@ -1033,3 +1033,56 @@ body{
     color: #22a447;
     font-weight: 600;
 }
+/* =========================================
+   COMFORTABLE MOBILE MAP
+========================================= */
+
+#map {
+    width: 100%;
+    height: 65vh;
+    min-height: 500px;
+}
+
+/* Map mode */
+body.map-mode {
+    overflow: hidden;
+}
+
+body.map-mode #map {
+    position: fixed;
+    inset: 0;
+
+    width: 100vw !important;
+    height: 100vh !important;
+
+    min-height: 100vh !important;
+
+    z-index: 5000;
+
+    border-radius: 0;
+}
+
+/* Hide catalog content while map is open */
+body.map-mode #posts {
+    display: none !important;
+}
+
+/* Hide filters while map is open */
+body.map-mode .filters {
+    display: none !important;
+}
+
+/* Leaflet controls above map */
+body.map-mode .leaflet-control {
+    z-index: 6000;
+}
+
+/* Better mobile layer switcher */
+.leaflet-control-layers {
+    font-size: 15px;
+    border-radius: 12px;
+}
+
+.leaflet-control-layers label {
+    padding: 5px 3px;
+}

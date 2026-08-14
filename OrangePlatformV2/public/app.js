@@ -1613,6 +1613,7 @@ function showCatalog() {
 
     currentView =
         "catalog";
+        document.body.classList.remove("map-mode");
 
 
     const posts =
@@ -1676,6 +1677,8 @@ function showMap() {
 
     currentView =
         "map";
+
+    document.body.classList.add("map-mode");
 
 
     const posts =
@@ -1785,23 +1788,55 @@ function initMap() {
                 }
             ).setView(
                 [41.7151, 44.8271],
-                12
+                13
             );
 
 
-        L.tileLayer(
-            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            {
+        const streetLayer =
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
 
-                maxZoom: 19,
+            attribution:
+                "&copy; OpenStreetMap contributors"
+        }
+    );
 
-                attribution:
-                    "&copy; OpenStreetMap contributors"
+const satelliteLayer =
+    L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+            maxZoom: 19,
 
-            }
-        ).addTo(
-            mapInstance
-        );
+            attribution:
+                "Tiles © Esri"
+        }
+    );
+
+streetLayer.addTo(
+    mapInstance
+);
+
+L.control.layers(
+    {
+        "🗺️ Карта":
+            streetLayer,
+
+        "🛰️ Спутник":
+            satelliteLayer
+    },
+    null,
+    {
+        position:
+            "topright",
+
+        collapsed:
+            false
+    }
+).addTo(
+    mapInstance
+);
 
 
         mapLayer =
