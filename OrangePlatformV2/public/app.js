@@ -633,14 +633,25 @@ function getFilteredPosts() {
 
 
     const minPrice =
-        Number(minPriceEl?.value) || 0;
+        minPriceEl?.value
+            ? Number(
+                String(minPriceEl.value)
+                    .replace(/[^\d.]/g, "")
+              )
+            : 0;
 
 
     const maxPrice =
-        Number(maxPriceEl?.value) || 999999999;
+        maxPriceEl?.value
+            ? Number(
+                String(maxPriceEl.value)
+                    .replace(/[^\d.]/g, "")
+              )
+            : Infinity;
 
 
     return allPosts.filter(post => {
+
 
         /* =========================
            DISTRICT
@@ -648,21 +659,44 @@ function getFilteredPosts() {
 
         if (selectedDistrict) {
 
-            const postDistrict =
+            let postDistrict =
                 normalizeDistrict(
-                    post.district
+                    post.district || ""
                 );
 
 
-            const postText =
-                normalizeDistrict(
-                    post.text
-                );
+            /*
+               თუ district ცარიელია,
+               ვეძებთ ტექსტში
+            */
+
+            if (!postDistrict) {
+
+                const text =
+                    String(post.text || "");
+
+
+                const match =
+                    text.match(
+                        /Район\s*:\s*#?([^\n\r]+)/i
+                    );
+
+
+                if (match) {
+
+                    postDistrict =
+                        normalizeDistrict(
+                            match[1]
+                        );
+
+                }
+
+            }
 
 
             if (
-                postDistrict !== selectedDistrict &&
-                postText !== selectedDistrict
+                postDistrict !==
+                selectedDistrict
             ) {
 
                 return false;
@@ -678,15 +712,50 @@ function getFilteredPosts() {
 
         if (selectedRooms) {
 
-            const postRooms =
+            let postRooms =
                 Number(post.rooms) || 0;
+
+
+            /*
+               თუ rooms ცარიელია,
+               ვეძებთ ტექსტში:
+               1 комн.
+               2 комнаты
+               3 комн.
+               და ა.შ.
+            */
+
+            if (!postRooms) {
+
+                const text =
+                    String(post.text || "");
+
+
+                const roomMatch =
+                    text.match(
+                        /(\d+)\s*(?:комн|комнат|комнаты|room|rooms)/i
+                    );
+
+
+                if (roomMatch) {
+
+                    postRooms =
+                        Number(
+                            roomMatch[1]
+                        );
+
+                }
+
+            }
 
 
             if (
                 selectedRooms === "5"
             ) {
 
-                if (postRooms < 5) {
+                if (
+                    postRooms < 5
+                ) {
 
                     return false;
 
@@ -712,11 +781,49 @@ function getFilteredPosts() {
            PRICE
         ========================= */
 
-        const postPrice =
+        let postPrice =
             Number(post.price) || 0;
 
 
+        /*
+           თუ price რიცხვი არ არის,
+           მაგალითად "$1200",
+           "$ 1200",
+           "1200 USD",
+           ვასუფთავებთ
+        */
+
+        if (!postPrice) {
+
+            const priceText =
+                String(
+                    post.price ||
+                    post.text ||
+                    ""
+                );
+
+
+            const priceMatch =
+                priceText.match(
+                    /(?:\$|USD)?\s*(\d[\d\s,]*)/i
+                );
+
+
+            if (priceMatch) {
+
+                postPrice =
+                    Number(
+                        priceMatch[1]
+                            .replace(/[^\d]/g, "")
+                    );
+
+            }
+
+        }
+
+
         if (
+            minPrice > 0 &&
             postPrice < minPrice
         ) {
 
@@ -726,6 +833,7 @@ function getFilteredPosts() {
 
 
         if (
+            maxPrice !== Infinity &&
             postPrice > maxPrice
         ) {
 
@@ -739,7 +847,6 @@ function getFilteredPosts() {
     });
 
 }
-
 
 /* =========================================================
    FILTER POSTS
