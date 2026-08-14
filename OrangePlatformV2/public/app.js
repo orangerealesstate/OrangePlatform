@@ -3084,7 +3084,7 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        setupViewButtons();
+    
 
         loadPosts();
 
