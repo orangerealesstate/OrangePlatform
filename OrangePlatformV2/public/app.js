@@ -944,7 +944,7 @@ function setupFilterEvents() {
     }
 
 }
-setupFilterEvents();
+
 
 
 
@@ -3343,6 +3343,7 @@ document.addEventListener(
     () => {
 
         setupViewButtons();
+        setupFilterEvents();
 
         loadPosts();
 
