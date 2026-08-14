@@ -1679,6 +1679,16 @@ function showMap() {
         "map";
 
     document.body.classList.add("map-mode");
+    const backButton = document.createElement("button");
+
+backButton.id = "mapBackButton";
+backButton.innerHTML = "← კატალოგი";
+
+backButton.onclick = function () {
+    showCatalog();
+};
+
+document.body.appendChild(backButton);
 
 
     const posts =
