@@ -1838,57 +1838,7 @@ if (filters) {
 
     // ფილტრების დაბრუნება ჩვეულებრივ ადგილზე
 
-  const filters =
-    document.querySelector(
-        ".search-panel"
-    );
-
-    if (filters) {
-
-        filters.style.display =
-            "";
-
-        filters.style.position =
-            "";
-
-        filters.style.top =
-            "";
-
-        filters.style.right =
-            "";
-
-        filters.style.zIndex =
-            "";
-
-        filters.style.width =
-            "";
-
-        filters.style.maxWidth =
-            "";
-
-        filters.style.padding =
-            "";
-
-        filters.style.margin =
-            "";
-
-        filters.style.background =
-            "";
-
-        filters.style.borderRadius =
-            "";
-
-        filters.style.boxShadow =
-            "";
-
-        filters.style.flexDirection =
-            "";
-
-        filters.style.gap =
-            "";
-
-    }
-
+ 
 
     // Catalog / Map ღილაკების დაბრუნება
 
