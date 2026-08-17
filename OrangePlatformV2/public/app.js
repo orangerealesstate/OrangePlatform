@@ -2206,7 +2206,7 @@ function addMapControls() {
     event.stopPropagation();
 
     const filters =
-        document.querySelector(".filters");
+       document.querySelector(".search-panel")
 
     if (!filters) {
         console.error("❌ .filters ვერ მოიძებნა");
