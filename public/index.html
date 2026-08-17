@@ -2,12 +2,20 @@
 <html lang="ru">
 
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>Orange Real Estate</title>
 
-<link rel="stylesheet" href="style.css">
+<link
+    rel="stylesheet"
+    href="style.css"
+>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -16,61 +24,386 @@
 <body>
 
 <header>
-<h1>🍊 Orange Real Estate</h1>
+
+    <h1>
+        🍊 Orange Real Estate
+    </h1>
+
 </header>
 
-<div class="search-panel">
 
-<input
-type="text"
-id="search"
-placeholder="🔍 Поиск..."
-onkeyup="filterPosts()"
->
+<!-- =========================
+     VIEW SWITCHER
+========================= -->
 
-<select id="districtFilter" onchange="filterPosts()">
-<option value="">🏙 Все районы</option>
-<option>Сабуртало</option>
-<option>Ваке</option>
-<option>Вера</option>
-<option>Мтацминда</option>
-<option>Исани</option>
-<option>Ортачала</option>
-<option>Диди Дигоми</option>
-<option>Авлабари</option>
-<option>Чугурети</option>
-</select>
+<div class="view-switcher">
 
-<select id="roomsFilter" onchange="filterPosts()">
-<option value="">🛏 Комнаты</option>
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-<option value="5">5+</option>
-</select>
+    <button
+        type="button"
+        onclick="showCatalog()"
+        id="catalogBtn"
+    >
+        🏠 Каталог
+    </button>
 
-<input
-type="number"
-id="minPrice"
-placeholder="От $"
-onkeyup="filterPosts()"
->
 
-<input
-type="number"
-id="maxPrice"
-placeholder="До $"
-onkeyup="filterPosts()"
->
+    <button
+        type="button"
+        onclick="openFilters()"
+        id="filterBtn"
+    >
+        🔎 Фильтр
+    </button>
+
+
+    <button
+        type="button"
+        onclick="showMap()"
+        id="mapBtn"
+    >
+        🗺️ Карта
+    </button>
 
 </div>
 
-<div id="posts" class="grid">
-Загрузка...
+
+
+<!-- =========================
+     FILTER WINDOW
+========================= -->
+
+<div
+    id="filterOverlay"
+    class="filter-overlay"
+>
+
+    <div
+        class="filter-window"
+    >
+
+        <div class="filter-header">
+
+            <h2>
+                🔎 Фильтр
+            </h2>
+
+            <button
+                type="button"
+                class="filter-close"
+                onclick="closeFilters()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="search-panel">
+
+
+            <!-- SEARCH -->
+
+            <input
+                type="text"
+                id="search"
+                placeholder="🔍 Поиск..."
+                onkeyup="filterPosts()"
+            >
+
+
+            <!-- DISTRICT -->
+
+            <select
+                id="districtFilter"
+                onchange="filterPosts()"
+            >
+
+                <option value="">
+                    🏙 Все районы
+                </option>
+
+                <option>
+                    Сабуртало
+                </option>
+
+                <option>
+                    Ваке
+                </option>
+
+                <option>
+                    Вера
+                </option>
+
+                <option>
+                    Мтацминда
+                </option>
+
+                <option>
+                    Исани
+                </option>
+
+                <option>
+                    Ортачала
+                </option>
+
+                <option>
+                    Диди Дигоми
+                </option>
+
+                <option>
+                    Авлабари
+                </option>
+
+                <option>
+                    Чугурети
+                </option>
+
+            </select>
+
+
+            <!-- ROOMS -->
+
+            <select
+                id="roomsFilter"
+                onchange="filterPosts()"
+            >
+
+                <option value="">
+                    🛏 Комнаты
+                </option>
+
+                <option value="1">
+                    1
+                </option>
+
+                <option value="2">
+                    2
+                </option>
+
+                <option value="3">
+                    3
+                </option>
+
+                <option value="4">
+                    4
+                </option>
+
+                <option value="5">
+                    5+
+                </option>
+
+            </select>
+
+
+            <!-- MIN PRICE -->
+
+            <input
+                type="number"
+                id="minPrice"
+                placeholder="Цена от $"
+                onkeyup="filterPosts()"
+            >
+
+
+            <!-- MAX PRICE -->
+
+            <input
+                type="number"
+                id="maxPrice"
+                placeholder="Цена до $"
+                onkeyup="filterPosts()"
+            >
+
+
+            <!-- FILTER ACTIONS -->
+
+            <div class="filter-actions">
+
+                <button
+                    type="button"
+                    onclick="clearFilters()"
+                >
+                    🗑 Очистить
+                </button>
+
+                <button
+                    type="button"
+                    onclick="closeFilters()"
+                >
+                    ✓ Готово
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
 </div>
 
-<script src="app.js?v=20260811"></script>
+
+
+<!-- =========================
+     POSTS
+========================= -->
+
+<div
+    id="posts"
+    class="grid"
+>
+
+    Загрузка...
+
+</div>
+
+
+
+<script src="app.js?v=20260817"></script>
+
+
+<script>
+
+/* =========================
+   OPEN FILTERS
+========================= */
+
+function openFilters() {
+
+    const overlay =
+        document.getElementById(
+            "filterOverlay"
+        );
+
+    if (!overlay) return;
+
+    overlay.style.display =
+        "flex";
+
+}
+
+
+/* =========================
+   CLOSE FILTERS
+========================= */
+
+function closeFilters() {
+
+    const overlay =
+        document.getElementById(
+            "filterOverlay"
+        );
+
+    if (!overlay) return;
+
+    overlay.style.display =
+        "none";
+
+}
+
+
+/* =========================
+   CLEAR FILTERS
+========================= */
+
+function clearFilters() {
+
+    const search =
+        document.getElementById(
+            "search"
+        );
+
+    const district =
+        document.getElementById(
+            "districtFilter"
+        );
+
+    const rooms =
+        document.getElementById(
+            "roomsFilter"
+        );
+
+    const minPrice =
+        document.getElementById(
+            "minPrice"
+        );
+
+    const maxPrice =
+        document.getElementById(
+            "maxPrice"
+        );
+
+
+    if (search)
+        search.value = "";
+
+
+    if (district)
+        district.value = "";
+
+
+    if (rooms)
+        rooms.value = "";
+
+
+    if (minPrice)
+        minPrice.value = "";
+
+
+    if (maxPrice)
+        maxPrice.value = "";
+
+
+    if (
+        typeof filterPosts ===
+        "function"
+    ) {
+
+        filterPosts();
+
+    }
+
+}
+
+
+/* =========================
+   CLOSE BY CLICKING OUTSIDE
+========================= */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const overlay =
+            document.getElementById(
+                "filterOverlay"
+            );
+
+        const windowBox =
+            document.querySelector(
+                ".filter-window"
+            );
+
+        if (!overlay || !windowBox)
+            return;
+
+
+        if (
+            overlay.style.display ===
+                "flex" &&
+            event.target === overlay
+        ) {
+
+            closeFilters();
+
+        }
+
+    }
+);
+
+</script>
+
 
 </body>
+
 </html>
