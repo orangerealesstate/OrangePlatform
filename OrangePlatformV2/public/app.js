@@ -2200,23 +2200,34 @@ function addMapControls() {
     `;
 
 
-    filterButton.onclick = () => {
+    filterButton.onclick = (event) => {
+
+    event.preventDefault();
+    event.stopPropagation();
 
     const filters =
-        document.querySelector(".search-panel");
+        document.querySelector(".filters");
 
-    if (!filters) return;
+    if (!filters) {
+        console.error("❌ .filters ვერ მოიძებნა");
+        return;
+    }
 
-    const isHidden =
+    const hidden =
+        filters.style.display === "none" ||
         getComputedStyle(filters).display === "none";
 
-    if (isHidden) {
+    if (hidden) {
 
         filters.style.display = "flex";
+
+        console.log("🟢 ფილტრები გაიხსნა");
 
     } else {
 
         filters.style.display = "none";
+
+        console.log("🔴 ფილტრები დაიხურა");
 
     }
 

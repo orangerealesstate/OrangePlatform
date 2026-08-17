@@ -154,6 +154,7 @@ function normalizeDistrict(value) {
    GEOCODE
 ========================================================= */
 const geocodeCache = new Map();
+
 async function geocodeAddress(address) {
 
     if (
@@ -168,8 +169,10 @@ async function geocodeAddress(address) {
         };
     }
 
-    const cleanAddress =
-        String(address).trim();
+    let cleanAddress =
+        String(address)
+            .trim()
+            .replace(/\s+/g, " ");
 
     if (
         !cleanAddress ||
@@ -181,37 +184,72 @@ async function geocodeAddress(address) {
         };
     }
 
-    // ერთი და იგივე მისამართის ხელმეორედ ძებნის თავიდან აცილება
     if (
-        geocodeCache.has(
-            cleanAddress
-        )
+        geocodeCache.has(cleanAddress)
     ) {
-
         return geocodeCache.get(
             cleanAddress
         );
+    }
 
+    const queries = [
+        cleanAddress +
+        ", Tbilisi, Georgia"
+    ];
+
+    const normalized =
+        cleanAddress
+            .replace(
+                /^ул\.?\s*/i,
+                "улица "
+            )
+            .replace(
+                /^пр\.?\s*/i,
+                "проспект "
+            )
+            .replace(
+                /^пер\.?\s*/i,
+                "переулок "
+            )
+            .replace(
+                /^наб\.?\s*/i,
+                "набережная "
+            );
+
+    if (
+        normalized !== cleanAddress
+    ) {
+        queries.push(
+            normalized +
+            ", Tbilisi, Georgia"
+        );
     }
 
     const url =
         "https://nominatim.openstreetmap.org/search";
 
     for (
-        let attempt = 1;
-        attempt <= 4;
-        attempt++
+        let qIndex = 0;
+        qIndex < queries.length;
+        qIndex++
     ) {
+
+        const query =
+            queries[qIndex];
 
         try {
 
-            // Nominatim-ს არ გადავტვირთავთ
             await new Promise(
                 resolve =>
                     setTimeout(
                         resolve,
-                        2500
+                        1200
                     )
+            );
+
+            console.log(
+                "📍 Geocoding:",
+                query
             );
 
             const { data } =
@@ -220,104 +258,190 @@ async function geocodeAddress(address) {
                     {
                         params: {
 
-                            q:
-                                cleanAddress,
+                            q: query,
 
                             format:
                                 "json",
 
                             limit:
-                                1,
+                                5,
 
                             countrycodes:
-                                "ge"
+                                "ge",
 
+                            addressdetails:
+                                1,
+
+                            viewbox:
+                                "44.65,41.82,44.95,41.60",
+
+                            bounded:
+                                1
                         },
 
                         headers: {
 
                             "User-Agent":
                                 "Orange Real Estate Tbilisi"
+                        },
 
-                        }
-
+                        timeout:
+                            10000
                     }
                 );
-
 
             if (
                 !data ||
                 !data.length
             ) {
 
-                const empty =
-                    {
-                        lat: null,
-                        lng: null
-                    };
-
-                geocodeCache.set(
-                    cleanAddress,
-                    empty
+                console.log(
+                    "❌ Not found:",
+                    query
                 );
 
-                return empty;
-
+                continue;
             }
 
+            let selected = null;
 
-            const result =
-                {
+            for (
+                const item of data
+            ) {
 
-                    lat:
-                        Number(
-                            data[0].lat
-                        ),
+                const lat =
+                    Number(item.lat);
 
-                    lng:
-                        Number(
-                            data[0].lon
-                        )
+                const lng =
+                    Number(item.lon);
 
-                };
+                if (
+                    !Number.isFinite(lat) ||
+                    !Number.isFinite(lng)
+                ) {
+                    continue;
+                }
+
+                if (
+                    lat >= 41.60 &&
+                    lat <= 41.82 &&
+                    lng >= 44.65 &&
+                    lng <= 44.95
+                ) {
+
+                    selected =
+                        item;
+
+                    break;
+                }
+            }
+
+            if (!selected) {
+
+                console.log(
+                    "⚠️ Result outside Tbilisi:",
+                    query
+                );
+
+                continue;
+            }
+
+            const result = {
+
+    lat:
+        Number(
+            selected.lat
+        ),
+
+    lng:
+        Number(
+            selected.lon
+        )
+};
 
 
-            geocodeCache.set(
-                cleanAddress,
-                result
-            );
+// მიღებული ქუჩის შემოწმება
+const returnedAddress =
+    String(
+        selected.display_name || ""
+    ).toLowerCase();
 
+const requestedAddress =
+    cleanAddress.toLowerCase();
+
+const streetWords =
+    requestedAddress
+        .replace(
+            /^улица\s+/i,
+            ""
+        )
+        .replace(
+            /^ул\.?\s+/i,
+            ""
+        )
+        .replace(
+            /^проспект\s+/i,
+            ""
+        )
+        .replace(
+            /^пр\.?\s+/i,
+            ""
+        )
+        .split(",")[0]
+        .trim();
+
+if (
+    streetWords &&
+    !returnedAddress.includes(
+        streetWords
+    )
+) {
+
+    console.log(
+        "⚠️ Street mismatch:",
+        cleanAddress,
+        "=>",
+        selected.display_name
+    );
+
+    continue;
+}
+
+
+console.log(
+    "✅ Coordinates found:",
+    result
+);
+
+geocodeCache.set(
+    cleanAddress,
+    result
+);
 
             return result;
 
-
-        }
-
-        catch (err) {
+        } catch (err) {
 
             const status =
                 err.response?.status;
 
-
             console.log(
-                `Geocode attempt ${attempt}/4:`,
+                `Geocode error ${qIndex + 1}/${queries.length}:`,
                 status ||
                 err.message
             );
-
 
             if (
                 status === 429
             ) {
 
                 const wait =
-                    10000 * attempt;
-
+                    10000 *
+                    (qIndex + 1);
 
                 console.log(
-                    `429 - waiting ${wait / 1000}s...`
+                    `⏳ 429 - waiting ${wait / 1000}s...`
                 );
-
 
                 await new Promise(
                     resolve =>
@@ -326,30 +450,28 @@ async function geocodeAddress(address) {
                             wait
                         )
                 );
-
-
-                continue;
-
             }
-
-
-            return {
-                lat: null,
-                lng: null
-            };
-
         }
-
     }
 
+    const empty = {
 
-    return {
         lat: null,
         lng: null
     };
 
-}
+    geocodeCache.set(
+        cleanAddress,
+        empty
+    );
 
+    console.log(
+        "❌ Coordinates not found:",
+        cleanAddress
+    );
+
+    return empty;
+}
 
 /* =========================================================
    DOWNLOAD PHOTO
