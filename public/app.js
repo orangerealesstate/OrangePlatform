@@ -11,9 +11,18 @@ async function loadPosts() {
             throw new Error("Failed to load posts");
         }
 
-        allPosts = await response.json();
+        const posts = await response.json();
 
-        renderPosts(allPosts);
+allPosts = Array.from(
+    new Map(
+        posts.map(post => [
+            String(post.id),
+            post
+        ])
+    ).values()
+);
+
+renderPosts(allPosts);
 
     } catch (err) {
 
@@ -268,3 +277,63 @@ function renderPosts(posts) {
     };
 
 }loadPosts();
+// AUTO REFRESH — ყოველ 30 წამში
+setInterval(async () => {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/posts?t=" + Date.now(),
+                {
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) return;
+
+        const posts =
+            await response.json();
+
+        // ერთი ID = ერთი განცხადება
+        const uniquePosts =
+            Array.from(
+                new Map(
+                    posts.map(post => [
+                        String(post.id),
+                        post
+                    ])
+                ).values()
+            );
+
+        const oldData =
+            JSON.stringify(allPosts);
+
+        const newData =
+            JSON.stringify(uniquePosts);
+
+        if (oldData !== newData) {
+
+            allPosts =
+                uniquePosts;
+
+            renderPosts(
+                allPosts
+            );
+
+            console.log(
+                "🔄 New posts loaded:",
+                allPosts.length
+            );
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Auto refresh error:",
+            error
+        );
+
+    }
+
+}, 30000);
