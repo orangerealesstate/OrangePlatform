@@ -606,8 +606,10 @@ async function toggleFavorite(postId) {
 
     }
 }
-
 function getFilteredPosts() {
+
+    const searchEl =
+        document.getElementById("search");
 
     const districtEl =
         document.getElementById("districtFilter");
@@ -622,6 +624,12 @@ function getFilteredPosts() {
         document.getElementById("maxPrice");
 
 
+    const search =
+        (searchEl?.value || "")
+            .toLowerCase()
+            .trim();
+
+
     const selectedDistrict =
         normalizeDistrict(
             districtEl?.value || ""
@@ -633,36 +641,43 @@ function getFilteredPosts() {
 
 
     const minPrice =
-        Number(minPriceEl?.value) || 0;
+        Number(
+            minPriceEl?.value
+        ) || 0;
 
 
     const maxPrice =
-        Number(maxPriceEl?.value) || 999999999;
+        Number(
+            maxPriceEl?.value
+        ) || 999999999;
 
 
     return allPosts.filter(post => {
 
+
         /* =========================
-           DISTRICT
+           🔍 SEARCH
         ========================= */
 
-        if (selectedDistrict) {
+        if (search) {
 
-            const postDistrict =
-                normalizeDistrict(
-                    post.district
-                );
+            const searchableText = [
 
+                post.text,
+                post.district,
+                post.street,
+                post.rooms,
+                post.area,
+                post.price
 
-            const postText =
-                normalizeDistrict(
-                    post.text
-                );
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
 
 
             if (
-                postDistrict !== selectedDistrict &&
-                postText !== selectedDistrict
+                !searchableText.includes(search)
             ) {
 
                 return false;
@@ -673,20 +688,48 @@ function getFilteredPosts() {
 
 
         /* =========================
-           ROOMS
+           🏙 DISTRICT
+        ========================= */
+
+        if (selectedDistrict) {
+
+            const postDistrict =
+                normalizeDistrict(
+                    post.district
+                );
+
+
+            if (
+                postDistrict !==
+                selectedDistrict
+            ) {
+
+                return false;
+
+            }
+
+        }
+
+
+        /* =========================
+           🛏 ROOMS
         ========================= */
 
         if (selectedRooms) {
 
             const postRooms =
-                Number(post.rooms) || 0;
+                Number(
+                    post.rooms
+                ) || 0;
 
 
             if (
                 selectedRooms === "5"
             ) {
 
-                if (postRooms < 5) {
+                if (
+                    postRooms < 5
+                ) {
 
                     return false;
 
@@ -709,11 +752,13 @@ function getFilteredPosts() {
 
 
         /* =========================
-           PRICE
+           💰 PRICE
         ========================= */
 
         const postPrice =
-            Number(post.price) || 0;
+            Number(
+                post.price
+            ) || 0;
 
 
         if (
@@ -1773,10 +1818,10 @@ function showCatalog() {
 
     // ფილტრების დაბრუნება ჩვეულებრივ ადგილზე
 
-    const filters =
-        document.querySelector(
-            ".filters"
-        );
+  const filters =
+    document.querySelector(
+        ".search-panel"
+    );
 
     if (filters) {
 
