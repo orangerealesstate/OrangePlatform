@@ -39,25 +39,20 @@
 <div class="view-switcher">
 
     <button
-        type="button"
-        onclick="showCatalog()"
-        id="catalogBtn"
-    >
+        class="view-btn active"
+        onclick="showCatalog()">
         🏠 Каталог
     </button>
-<button
-    type="button"
-    onclick="openFilters()"
-    id="filterBtn"
->
-    🔎 Фильтр
-</button>
 
     <button
-        type="button"
-        onclick="showMap()"
-        id="mapBtn"
-    >
+        class="view-btn"
+        onclick="openFilters()">
+        🔎 Фильтр
+    </button>
+
+    <button
+        class="view-btn"
+        onclick="showMap()">
         🗺️ Карта
     </button>
 
