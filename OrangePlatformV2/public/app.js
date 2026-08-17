@@ -1796,8 +1796,10 @@ function showCatalog() {
 
     currentView =
         "catalog";
-        const filters =
-    document.querySelector(".search-panel");
+       const filters =
+    document.querySelector(
+        ".search-panel"
+    );
 
 if (filters) {
     filters.style.display = "flex";
@@ -1932,7 +1934,7 @@ function showMap() {
 
     const filters =
     document.querySelector(
-        ".search-panel"
+        ".filters"
     );
 
     const viewSwitcher =
