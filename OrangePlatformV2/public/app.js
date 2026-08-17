@@ -1931,9 +1931,9 @@ function showMap() {
         );
 
     const filters =
-        document.querySelector(
-            ".filters"
-        );
+    document.querySelector(
+        ".search-panel"
+    );
 
     const viewSwitcher =
         document.querySelector(
@@ -1976,7 +1976,7 @@ function showMap() {
     if (filters) {
 
         filters.style.display =
-            "none";
+    "flex";
 
         filters.style.position =
             "absolute";
