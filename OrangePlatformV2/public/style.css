@@ -1366,4 +1366,18 @@ body:not(.map-mode) #mapBackButton {
         border-radius: 14px;
     }
 
+}.view-switcher {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 720px;
+    margin: 6px auto;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+.view-switcher button {
+    flex: 1;
 }
