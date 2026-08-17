@@ -2184,7 +2184,7 @@ function addMapControls() {
     filterButton.onclick = () => {
 
     const filters =
-        document.querySelector(".filters");
+        document.querySelector(".search-panel");
 
     if (!filters) return;
 
