@@ -1124,9 +1124,13 @@ body:not(.map-mode) #mapBackButton {
 
 .view-switcher {
     display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
     width: 100%;
-    gap: 8px;
-    padding: 8px 12px;
+    max-width: 420px;
+    margin: 6px auto;
+    padding: 0;
     box-sizing: border-box;
 }
 
@@ -1134,7 +1138,7 @@ body:not(.map-mode) #mapBackButton {
     flex: 1;
     border: none;
     border-radius: 10px;
-    padding: 10px 8px;
+    padding: 9px 6px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
