@@ -1791,7 +1791,12 @@ function openMapGallery(images, startIndex = 0) {
 /* =========================================================
    CATALOG VIEW
 ========================================================= */
-const filters =
+
+function showCatalog() {
+
+    currentView =
+        "catalog";
+        const filters =
     document.querySelector(".search-panel");
 
 if (filters) {
@@ -1810,10 +1815,6 @@ if (filters) {
     filters.style.flexDirection = "";
     filters.style.gap = "";
 }
-function showCatalog() {
-
-    currentView =
-        "catalog";
 
 
     document.body.classList.remove(
