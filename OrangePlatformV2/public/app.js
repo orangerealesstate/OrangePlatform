@@ -2307,132 +2307,108 @@ mapLayerNormal.addTo(
 /* =========================================================
    POST COORDINATES
 ========================================================= */
+function getPostCoordinates(post) {
 
-function getPostCoordinates(
-    post
-) {
+    if (!post) {
+        return null;
+    }
 
-    const lat =
-        Number(
-            post.latitude ??
-            post.lat ??
-            post.location?.latitude ??
-            post.location?.lat
-        );
+    const lat = Number(
+        post.latitude ??
+        post.lat ??
+        post.location?.latitude ??
+        post.location?.lat
+    );
 
-
-    const lng =
-        Number(
-            post.longitude ??
-            post.lng ??
-            post.lon ??
-            post.location?.longitude ??
-            post.location?.lng
-        );
-
+    const lng = Number(
+        post.longitude ??
+        post.lng ??
+        post.lon ??
+        post.location?.longitude ??
+        post.location?.lng
+    );
 
     const valid =
         Number.isFinite(lat) &&
         Number.isFinite(lng) &&
-
         lat >= 41.60 &&
         lat <= 41.84 &&
-
         lng >= 44.62 &&
         lng <= 44.98;
 
-
     if (valid) {
-
         return [
             lat,
             lng
         ];
-
     }
 
-
-    const district =
-        (
-            post.district ||
-            ""
-        ).toLowerCase();
-
-
-    for (
-        const key of
-        Object.keys(
-            districtCenters
-        )
-    ) {
-
-        if (
-            district.includes(
-                key
-            )
-        ) {
-
-            return districtCenters[
-                key
-            ];
-
-        }
-
-    }
-
-
-    const text =
-        (
-            post.text ||
-            ""
-        ).toLowerCase();
-
-
-    for (
-        const key of
-        Object.keys(
-            districtCenters
-        )
-    ) {
-
-        if (
-            text.includes(
-                key
-            )
-        ) {
-
-            return districtCenters[
-                key
-            ];
-
-        }
-
-    }
-
-
-    return [
-        41.7151,
-        44.8271
-    ];
-
+    return null;
 }
 
 
+    /*
+       2. თუ ზუსტი კოორდინატა არ აქვს,
+       → ვიყენებთ რაიონის ცენტრს.
+
+       ეს საჭიროა იმისთვის, რომ ბინა
+       რუკიდან საერთოდ არ გაქრეს.
+    */
+
+    const district =
+        String(
+            post.district || ""
+        )
+        .toLowerCase()
+        .trim();
+
+
+    if (
+        district &&
+        typeof districtCenters !== "undefined"
+    ) {
+
+        const center =
+            districtCenters[district];
+
+        if (
+            Array.isArray(center) &&
+            center.length >= 2
+        ) {
+
+            console.log(
+                "📍 DISTRICT FALLBACK:",
+                district,
+                center
+            );
+
+            return [
+                Number(center[0]),
+                Number(center[1])
+            ];
+        }
+    }
+
+
+    /*
+       3. თუ ვერც კოორდინატა და ვერც რაიონი ვერ ვიპოვეთ
+    */
+
+    return null;
 /* =========================================================
    PRICE MARKER
+   🔵 ლურჯი წრე + 🏠 სახლი + ფასი
 ========================================================= */
 
 function createPriceMarker(
     lat,
     lng,
     text,
-    className =
-        "price-marker"
+    className = "price-marker"
 ) {
 
     const isCluster =
-        className ===
-        "cluster-marker";
+        className === "cluster-marker";
 
 
     return L.marker(
@@ -2443,31 +2419,118 @@ function createPriceMarker(
         {
 
             icon:
-
                 L.divIcon({
 
                     className:
                         "orange-map-icon",
 
                     html: `
-
                         <div
                             class="${className}"
+                            style="
+                                display:flex;
+                                align-items:center;
+                                gap:8px;
+                                white-space:nowrap;
+                            "
                         >
-                            ${text}
-                        </div>
 
+                            <!-- 🔵 HOUSE -->
+
+                            <div
+                                style="
+                                    width:46px;
+                                    height:46px;
+                                    min-width:46px;
+                                    border-radius:50%;
+                                    background:#1677ff;
+                                    border:3px solid white;
+
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;
+
+                                    box-shadow:
+                                        0 3px 10px
+                                        rgba(0,0,0,.25);
+                                "
+                            >
+
+                                <svg
+                                    width="25"
+                                    height="25"
+                                    viewBox="0 0 24 24"
+                                    fill="white"
+                                >
+
+                                    <path
+                                        d="
+                                            M12 3
+                                            L3 10
+                                            V21
+                                            H9
+                                            V15
+                                            H15
+                                            V21
+                                            H21
+                                            V10
+                                            Z
+                                        "
+                                    />
+
+                                </svg>
+
+                            </div>
+
+
+                            <!-- 💰 PRICE -->
+
+                            <div
+                                style="
+                                    background:#fff;
+                                    color:#111;
+
+                                    padding:
+                                        9px 15px;
+
+                                    border-radius:
+                                        18px;
+
+                                    font-size:
+                                        17px;
+
+                                    font-weight:
+                                        700;
+
+                                    line-height:
+                                        1;
+
+                                    box-shadow:
+                                        0 3px 12px
+                                        rgba(0,0,0,.18);
+
+                                    border:
+                                        1px solid #eee;
+                                "
+                            >
+                                ${text}
+                            </div>
+
+                        </div>
                     `,
 
                     iconSize:
                         isCluster
-                            ? [90, 50]
-                            : [100, 40],
+                            ? [170, 52]
+                            : [170, 52],
 
                     iconAnchor:
                         isCluster
-                            ? [45, 25]
-                            : [50, 20]
+                            ? [23, 26]
+                            : [23, 26],
+
+                    popupAnchor:
+                        [0, -30]
 
                 })
 
@@ -2475,7 +2538,6 @@ function createPriceMarker(
     );
 
 }
-
 
 /* =========================================================
    RENDER MAP
