@@ -1741,3 +1741,64 @@ body:not(.map-mode) #mapBackButton {
     }
 
 }
+/* =========================
+   PREMIUM PROMO ANIMATION
+========================= */
+
+.promo-text {
+    position: relative;
+
+    width: 100%;
+    max-width: 650px;
+
+    height: 34px;
+
+    margin: 4px auto 12px;
+
+    overflow: hidden;
+
+    text-align: center;
+}
+
+.promo-line {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    top: 0;
+
+    opacity: 0;
+
+    transform: translateY(25px) scale(.98);
+
+    color: #777;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    line-height: 34px;
+
+    transition:
+        opacity .7s ease,
+        transform .7s cubic-bezier(.22,1,.36,1);
+}
+
+.promo-line.active {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+}
+
+@media (max-width: 600px) {
+
+    .promo-text {
+        height: 30px;
+        margin: 3px auto 9px;
+    }
+
+    .promo-line {
+        font-size: 13px;
+        line-height: 30px;
+    }
+
+}
