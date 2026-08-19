@@ -316,7 +316,29 @@
         </div>
 
     </header>
+<!-- =========================
+     ANIMATED PROMO TEXT
+========================= -->
 
+<div class="promo-text">
+
+    <div class="promo-line active">
+        ✨ Найдите свою идеальную квартиру в Тбилиси
+    </div>
+
+    <div class="promo-line">
+        📍 Квартиры в лучших районах Тбилиси
+    </div>
+
+    <div class="promo-line">
+        💰 Лучшие предложения в одном месте
+    </div>
+
+    <div class="promo-line">
+        🍊 Orange Real Estate — недвижимость в Тбилиси
+    </div>
+
+</div>
 
     <!-- =========================
          OLD FILTERS
@@ -802,6 +824,35 @@ document.addEventListener(
 
     }
 );
+
+</script>
+<script>
+
+/* =========================
+   PROMO TEXT ANIMATION
+========================= */
+
+(function () {
+
+    const lines =
+        document.querySelectorAll(".promo-line");
+
+    if (!lines.length) return;
+
+    let current = 0;
+
+    setInterval(function () {
+
+        lines[current].classList.remove("active");
+
+        current =
+            (current + 1) % lines.length;
+
+        lines[current].classList.add("active");
+
+    }, 3500);
+
+})();
 
 </script>
 </body>
