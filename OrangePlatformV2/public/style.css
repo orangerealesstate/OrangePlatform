@@ -1526,3 +1526,116 @@ body:not(.map-mode) #mapBackButton {
     color: #333;
 
 }
+/* FILTER OVERLAY FIX */
+
+.filter-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(0,0,0,.35);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.filter-window {
+    position: relative;
+    z-index: 100000;
+    width: 100%;
+    max-width: 360px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 18px;
+    box-sizing: border-box;
+}
+/* =========================
+   HIDE OLD FILTER BAR
+========================= */
+
+.filters {
+    display: none !important;
+}
+/* =========================
+   MAIN VIEW BUTTONS
+========================= */
+
+.view-switcher {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    width: 100%;
+    max-width: 500px;
+
+    margin: 10px auto 18px;
+    padding: 0 12px;
+
+    box-sizing: border-box;
+}
+
+.view-switcher .view-btn {
+    flex: 1;
+    min-width: 0;
+
+    border: none;
+    border-radius: 12px;
+
+    padding: 12px 8px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+
+/* 🏠 КАТАЛОГ */
+
+#catalogViewBtn {
+    background: #f5b400;
+}
+
+
+/* 🔎 ФИЛЬТР */
+
+#filterViewBtn {
+    background: #22a447;
+}
+
+
+/* 🗺️ КАРТА */
+
+#mapViewBtn {
+    background: #4285f4;
+}
+
+
+/* დაჭერის ეფექტი */
+
+.view-switcher .view-btn:active {
+    transform: scale(.97);
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .view-switcher {
+        max-width: 100%;
+        padding: 0 10px;
+        gap: 6px;
+    }
+
+    .view-switcher .view-btn {
+        padding: 11px 5px;
+        font-size: 13px;
+    }
+
+}
