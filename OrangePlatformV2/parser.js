@@ -1,64 +1,231 @@
 const { TelegramClient } = require("telegram");
 const { StringSession } = require("telegram/sessions");
+
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 
 require("dotenv").config();
 
-const apiId = Number(process.env.API_ID);
-const apiHash = process.env.API_HASH;
-const channel = process.env.CHANNEL;
 
-const stringSession = new StringSession(
-    process.env.STRING_SESSION || ""
-);
+/* =========================================================
+   CONFIG
+========================================================= */
 
-const client = new TelegramClient(
-    stringSession,
-    apiId,
-    apiHash,
-    {
-        connectionRetries: 5,
-    }
-);
+const apiId =
+    Number(process.env.API_ID);
+
+const apiHash =
+    process.env.API_HASH;
+
+const channel =
+    process.env.CHANNEL;
+
+const stringSession =
+    new StringSession(
+        process.env.STRING_SESSION || ""
+    );
+
+
+const client =
+    new TelegramClient(
+        stringSession,
+        apiId,
+        apiHash,
+        {
+            connectionRetries: 5
+        }
+    );
+
+
+/* =========================================================
+   FILES
+========================================================= */
 
 const POSTS_FILE =
-    path.join(__dirname, "posts.json");
+    path.join(
+        __dirname,
+        "posts.json"
+    );
 
 const DOWNLOADS =
-    path.join(__dirname, "downloads");
+    path.join(
+        __dirname,
+        "downloads"
+    );
 
 
 if (!fs.existsSync(DOWNLOADS)) {
 
-    fs.mkdirSync(DOWNLOADS);
+    fs.mkdirSync(
+        DOWNLOADS,
+        {
+            recursive: true
+        }
+    );
 
 }
 
 
 /* =========================================================
-   GET VALUE
+   PARSER SETTINGS
 ========================================================= */
 
-function getValue(text, patterns) {
+/*
+   რამდენი ბოლო Telegram პოსტი შევამოწმოთ.
 
-    if (!text) return "";
+   200 საკმარისია ახალი განცხადებების
+   მუდმივი სინქრონიზაციისთვის.
 
-    for (const pattern of patterns) {
+   ძველი განცხადებები posts.json-ში
+   არ იშლება.
+*/
+
+const SYNC_MESSAGES_LIMIT =
+    Number(
+        process.env.SYNC_MESSAGES_LIMIT || 200
+    );
+
+
+/*
+   ძველი განცხადებების კოორდინატების
+   აღდგენა.
+
+   თუ true არის, parser შეამოწმებს
+   ძველ ბინებსაც, რომლებსაც lat/lng
+   არ აქვთ.
+*/
+
+const BACKFILL_MISSING_COORDS =
+    process.env.BACKFILL_MISSING_COORDS !==
+    "false";
+
+
+/*
+   ერთ გაშვებაზე მაქსიმუმ რამდენ ძველ
+   განცხადებას მოვუძებნოთ კოორდინატა.
+
+   ეს საჭიროა Nominatim-ზე ზედმეტი
+   დატვირთვის თავიდან ასაცილებლად.
+*/
+
+const MAX_BACKFILL_PER_RUN =
+    Number(
+        process.env.MAX_BACKFILL_PER_RUN || 100
+    );
+
+
+/*
+   წარუმატებელი geocoding-ის ხელახლა
+   ცდა მხოლოდ 24 საათის შემდეგ.
+*/
+
+const GEO_RETRY_HOURS =
+    24;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function getValue(
+    text,
+    patterns
+) {
+
+    if (!text)
+        return "";
+
+    for (
+        const pattern of patterns
+    ) {
 
         const match =
             text.match(pattern);
 
         if (match) {
 
-            return match[1].trim();
+            return String(
+                match[1] || ""
+            ).trim();
 
         }
 
     }
 
     return "";
+
+}
+
+
+/* =========================================================
+   DATE → UNIX SECONDS
+========================================================= */
+
+function toUnixSeconds(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return 0;
+
+    }
+
+
+    if (
+        value instanceof Date
+    ) {
+
+        return Math.floor(
+            value.getTime() / 1000
+        );
+
+    }
+
+
+    if (
+        typeof value === "number"
+    ) {
+
+        /*
+           თუ მილიწამებია
+        */
+
+        if (
+            value > 100000000000
+        ) {
+
+            return Math.floor(
+                value / 1000
+            );
+
+        }
+
+        return Math.floor(value);
+
+    }
+
+
+    const date =
+        new Date(value);
+
+    if (
+        !Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return Math.floor(
+            date.getTime() / 1000
+        );
+
+    }
+
+
+    return 0;
 
 }
 
@@ -92,57 +259,181 @@ function savePosts(posts) {
 
 function normalizeDistrict(value) {
 
-    if (!value) return "-";
-
-    let d = value
-
-        .toLowerCase()
-
-        .replace(/#/g, "")
-
-        .replace(/📍/g, "")
-
-        .trim();
+    if (!value)
+        return "-";
 
 
-    if (d.includes("сабур"))
+    let d =
+        String(value)
+
+            .toLowerCase()
+
+            .replace(
+                /#/g,
+                ""
+            )
+
+            .replace(
+                /📍/g,
+                ""
+            )
+
+            .replace(
+                /\s+/g,
+                " "
+            )
+
+            .trim();
+
+
+    if (
+        d.includes("сабур") ||
+        d.includes("saburt")
+    ) {
+
         return "saburtalo";
 
+    }
 
-    if (d.includes("вак"))
+
+    if (
+        d.includes("вак") ||
+        d.includes("vake")
+    ) {
+
         return "vake";
 
+    }
 
-    if (d.includes("вер"))
+
+    if (
+        d.includes("вер") ||
+        d.includes("vera")
+    ) {
+
         return "vera";
 
+    }
 
-    if (d.includes("исан"))
+
+    if (
+        d.includes("исан") ||
+        d.includes("isani")
+    ) {
+
         return "isani";
 
+    }
 
-    if (d.includes("дигом"))
+
+    if (
+        d.includes("дигом") ||
+        d.includes("digomi")
+    ) {
+
         return "digomi";
 
+    }
 
-    if (d.includes("крцан"))
+
+    if (
+        d.includes("крцан") ||
+        d.includes("krtsan")
+    ) {
+
         return "krtsanisi";
 
+    }
 
-    if (d.includes("ортач"))
+
+    if (
+        d.includes("ортач") ||
+        d.includes("ortach")
+    ) {
+
         return "ortachala";
 
+    }
 
-    if (d.includes("мтац"))
+
+    if (
+        d.includes("мтац") ||
+        d.includes("mtats")
+    ) {
+
         return "mtatsminda";
 
+    }
 
-    if (d.includes("дидуб"))
+
+    if (
+        d.includes("дидуб") ||
+        d.includes("didube")
+    ) {
+
         return "didube";
 
+    }
 
-    if (d.includes("глдан"))
+
+    if (
+        d.includes("глдан") ||
+        d.includes("gldani")
+    ) {
+
         return "gldani";
+
+    }
+
+
+    if (
+        d.includes("чугур") ||
+        d.includes("chugur")
+    ) {
+
+        return "chugureti";
+
+    }
+
+
+    if (
+        d.includes("надзал") ||
+        d.includes("nadzal")
+    ) {
+
+        return "nadzaladevi";
+
+    }
+
+
+    if (
+        d.includes("самгор") ||
+        d.includes("samgor")
+    ) {
+
+        return "samgori";
+
+    }
+
+
+    if (
+        d.includes("ვარკეთ") ||
+        d.includes("varket")
+    ) {
+
+        return "varketili";
+
+    }
+
+
+    if (
+        d.includes("ორთაჭ") ||
+        d.includes("ortach")
+    ) {
+
+        return "ortachala";
+
+    }
 
 
     return d;
@@ -151,120 +442,733 @@ function normalizeDistrict(value) {
 
 
 /* =========================================================
-   GEOCODE
+   VALIDATE TBILISI COORDINATES
 ========================================================= */
-const geocodeCache = new Map();
 
-async function geocodeAddress(address) {
+function isTbilisiCoordinates(
+    lat,
+    lng
+) {
+
+    const latitude =
+        Number(lat);
+
+    const longitude =
+        Number(lng);
+
 
     if (
-        !address ||
-        address === "-" ||
-        address === "undefined" ||
-        address === "null"
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude)
     ) {
-        return {
-            lat: null,
-            lng: null
-        };
+
+        return false;
+
     }
 
-    let cleanAddress =
-        String(address)
-            .trim()
-            .replace(/\s+/g, " ");
+
+    /*
+       ფართო Tbilisi bounding box.
+
+       სპეციალურად ცოტა ფართოა,
+       რომ Didi Digomi / Tbilisi Sea
+       და გარეუბნები არ ამოვარდეს.
+    */
+
+    return (
+
+        latitude >= 41.55 &&
+        latitude <= 41.90 &&
+
+        longitude >= 44.50 &&
+        longitude <= 45.05
+
+    );
+
+}
+
+
+/* =========================================================
+   COORDINATE OBJECT
+========================================================= */
+
+function makeCoords(
+    lng,
+    lat,
+    source,
+    accuracy = ""
+) {
+
+    const latitude =
+        Number(lat);
+
+    const longitude =
+        Number(lng);
+
 
     if (
-        !cleanAddress ||
-        cleanAddress.length < 3
+        !isTbilisiCoordinates(
+            latitude,
+            longitude
+        )
     ) {
-        return {
-            lat: null,
-            lng: null
-        };
+
+        return null;
+
     }
 
-    if (
-        geocodeCache.has(cleanAddress)
-    ) {
-        return geocodeCache.get(
-            cleanAddress
+
+    return {
+
+        lat: latitude,
+
+        lng: longitude,
+
+        geoSource:
+            source || "unknown",
+
+        geoAccuracy:
+            accuracy || "unknown",
+
+        geoUpdatedAt:
+            new Date().toISOString()
+
+    };
+
+}
+/* =========================================================
+   YANDEX MAP LINK FINDER
+========================================================= */
+
+function extractYandexLinks(text) {
+
+    if (!text)
+        return [];
+
+    const matches =
+        String(text).match(
+            /https?:\/\/(?:www\.)?yandex\.[^\/\s<>"')]+\/maps\/[^\s<>"')]+/gi
         );
-    }
 
-    const queries = [
-        cleanAddress +
-        ", Tbilisi, Georgia"
+    if (!matches)
+        return [];
+
+    return [
+        ...new Set(
+            matches.map(
+                url =>
+                    String(url)
+                        .replace(
+                            /[),.;]+$/,
+                            ""
+                        )
+            )
+        )
+    ];
+}
+
+
+/* =========================================================
+   PARSE COORDINATES FROM YANDEX URL
+========================================================= */
+
+function parseCoordinatesFromUrl(url) {
+
+    if (!url)
+        return null;
+
+    const text =
+        decodeURIComponent(
+            String(url)
+        );
+
+    /*
+       Yandex URL-ში კოორდინატების
+       შესაძლო პარამეტრები.
+    */
+
+    const parameterNames = [
+        "sll",
+        "ll",
+        "rll"
     ];
 
-    const normalized =
-        cleanAddress
-            .replace(
-                /^ул\.?\s*/i,
-                "улица "
-            )
-            .replace(
-                /^пр\.?\s*/i,
-                "проспект "
-            )
-            .replace(
-                /^пер\.?\s*/i,
-                "переулок "
-            )
-            .replace(
-                /^наб\.?\s*/i,
-                "набережная "
+    for (
+        const parameter of parameterNames
+    ) {
+
+        const regex =
+            new RegExp(
+                "(?:[?&]" +
+                parameter +
+                "=|\\b" +
+                parameter +
+                "=)" +
+                "(-?\\d+(?:\\.\\d+)?)" +
+                "(?:,|%2C)" +
+                "(-?\\d+(?:\\.\\d+)?)",
+                "i"
             );
 
-    if (
-        normalized !== cleanAddress
-    ) {
-        queries.push(
-            normalized +
-            ", Tbilisi, Georgia"
-        );
+        const match =
+            text.match(regex);
+
+        if (!match)
+            continue;
+
+        /*
+           Yandex:
+           longitude,latitude
+
+           ამიტომ:
+           match[1] = longitude
+           match[2] = latitude
+        */
+
+        const coords =
+            makeCoords(
+                match[1],
+                match[2],
+                "yandex-url",
+                parameter === "sll"
+                    ? "exact-link"
+                    : "map-center"
+            );
+
+        if (coords) {
+
+            console.log(
+                "🟢 YANDEX COORDINATES:",
+                coords
+            );
+
+            return coords;
+        }
     }
 
-    const url =
-        "https://nominatim.openstreetmap.org/search";
+
+    /*
+       ზოგიერთი Yandex URL იყენებს pt-ს.
+    */
+
+    const ptMatch =
+        text.match(
+            /(?:[?&]pt=)(-?\d+(?:\.\d+)?),(?:%20)?(-?\d+(?:\.\d+)?)/i
+        );
+
+    if (ptMatch) {
+
+        const coords =
+            makeCoords(
+                ptMatch[1],
+                ptMatch[2],
+                "yandex-url",
+                "placemark"
+            );
+
+        if (coords) {
+
+            return coords;
+        }
+    }
+
+
+    return null;
+}
+
+
+/* =========================================================
+   RESOLVE YANDEX SHORT LINK
+========================================================= */
+
+async function resolveYandexLink(
+    originalUrl
+) {
+
+    if (!originalUrl)
+        return null;
+
+
+    /*
+       პირველი ცდა —
+       პირდაპირ URL-ში კოორდინატის ძებნა.
+    */
+
+    const direct =
+        parseCoordinatesFromUrl(
+            originalUrl
+        );
+
+    if (direct) {
+
+        return {
+            ...direct,
+            yandexMapUrl:
+                originalUrl
+        };
+
+    }
+
+
+    /*
+       თუ მოკლე Yandex ლინკია,
+       ვცდილობთ redirect-ის გავლას.
+    */
+
+    try {
+
+        console.log(
+            "🔗 Resolving Yandex link:",
+            originalUrl
+        );
+
+
+        const response =
+            await axios.get(
+                originalUrl,
+                {
+                    maxRedirects: 5,
+
+                    timeout: 10000,
+
+                    responseType:
+                        "text",
+
+                    validateStatus:
+                        () => true,
+
+                    headers: {
+                        "User-Agent":
+                            "Orange Real Estate Tbilisi"
+                    }
+                }
+            );
+
+
+        const finalUrl =
+            response
+                ?.request
+                ?.res
+                ?.responseUrl ||
+
+            response
+                ?.request
+                ?._redirectable
+                ?._currentUrl ||
+
+            "";
+
+
+        if (finalUrl) {
+
+            console.log(
+                "🔗 Yandex final URL:",
+                finalUrl
+            );
+
+
+            const fromFinal =
+                parseCoordinatesFromUrl(
+                    finalUrl
+                );
+
+
+            if (fromFinal) {
+
+                return {
+                    ...fromFinal,
+
+                    yandexMapUrl:
+                        originalUrl
+                };
+
+            }
+        }
+
+
+        /*
+           ზოგჯერ კოორდინატა HTML-შია.
+        */
+
+        const html =
+            String(
+                response?.data || ""
+            );
+
+
+        const htmlMatch =
+            html.match(
+                /(?:sll|ll)[=%3D]+(-?\d+(?:\.\d+)?)[,%3B%2C]+(-?\d+(?:\.\d+)?)/i
+            );
+
+
+        if (htmlMatch) {
+
+            const coords =
+                makeCoords(
+                    htmlMatch[1],
+                    htmlMatch[2],
+                    "yandex-html",
+                    "resolved-link"
+                );
+
+
+            if (coords) {
+
+                return {
+                    ...coords,
+
+                    yandexMapUrl:
+                        originalUrl
+                };
+
+            }
+        }
+
+    }
+    catch (error) {
+
+        console.log(
+            "⚠️ Yandex resolve error:",
+            error.message
+        );
+
+    }
+
+
+    return null;
+}
+
+
+/* =========================================================
+   GET YANDEX COORDINATES
+========================================================= */
+
+async function getYandexCoordinates(
+    text
+) {
+
+    const links =
+        extractYandexLinks(
+            text
+        );
+
+
+    if (!links.length) {
+
+        return null;
+
+    }
+
+
+    console.log(
+        "🗺️ YANDEX LINKS FOUND:",
+        links
+    );
+
 
     for (
-        let qIndex = 0;
-        qIndex < queries.length;
-        qIndex++
+        const link of links
     ) {
 
-        const query =
-            queries[qIndex];
+        const result =
+            await resolveYandexLink(
+                link
+            );
+
+
+        if (result) {
+
+            console.log(
+                "✅ YANDEX LOCATION FOUND:",
+                result
+            );
+
+            return result;
+
+        }
+
+    }
+
+
+    console.log(
+        "⚠️ Yandex link found, but coordinates were not extracted."
+    );
+
+
+    return null;
+}
+
+
+/* =========================================================
+   EXTRACT HOUSE NUMBER
+========================================================= */
+
+function extractHouseNumber(
+    address
+) {
+
+    if (!address)
+        return "";
+
+
+    const text =
+        String(address);
+
+
+    const match =
+        text.match(
+            /(?:№|N|#)?\s*(\d+[A-Za-zА-Яа-я]?(?:\/\d+[A-Za-zА-Яа-я]?)?)/
+        );
+
+
+    return match
+        ? match[1]
+        : "";
+}
+
+
+/* =========================================================
+   NORMALIZE ADDRESS
+========================================================= */
+
+function normalizeAddressText(
+    value
+) {
+
+    return String(
+        value || ""
+    )
+
+        .toLowerCase()
+
+        .replace(
+            /ё/g,
+            "е"
+        )
+
+        .replace(
+            /улица|ул\.?|street|st\.?|road|rd\.?|avenue|ave\.?|проспект|пр-т|пр\.?/gi,
+            " "
+        )
+
+        .replace(
+            /[^\p{L}\p{N}]+/gu,
+            " "
+        )
+
+        .replace(
+            /\s+/g,
+            " "
+        )
+
+        .trim();
+}
+
+
+/* =========================================================
+   NOMINATIM RATE LIMIT
+========================================================= */
+
+let lastNominatimRequest = 0;
+
+
+async function waitForNominatim() {
+
+    const now =
+        Date.now();
+
+
+    const elapsed =
+        now -
+        lastNominatimRequest;
+
+
+    /*
+       მინიმუმ 1.6 წამი
+       მოთხოვნებს შორის.
+    */
+
+    if (
+        elapsed < 3000
+    ) {
+
+        await new Promise(
+            resolve =>
+                setTimeout(
+                    resolve,
+                    3000 - elapsed
+                )
+        );
+
+    }
+
+
+    lastNominatimRequest =
+        Date.now();
+}
+
+/* =========================================================
+   GEOCODE ADDRESS
+   REAL ADDRESS → REAL COORDINATES
+========================================================= */
+const geocodeCache = new Map();
+async function geocodeAddress(address) {
+
+    if (!address || address === "-") {
+        return null;
+    }
+
+
+    const cleanAddress =
+        String(address)
+            .replace(/\s+/g, " ")
+            .trim();
+            const cacheKey =
+    cleanAddress.toLowerCase();
+
+if (geocodeCache.has(cacheKey)) {
+
+    console.log(
+        "♻️ GEOCODE CACHE:",
+        cleanAddress
+    );
+
+    return geocodeCache.get(cacheKey);
+}
+
+
+    if (cleanAddress.length < 4) {
+        return null;
+    }
+
+
+    /*
+       რუსული → ლათინური
+       საჭიროა Yandex/Nominatim-ისთვის
+    */
+
+    const transliterateRussianToLatin = text => {
+
+        const map = {
+            "А":"A","Б":"B","В":"V","Г":"G","Д":"D",
+            "Е":"E","Ё":"Yo","Ж":"Zh","З":"Z","И":"I",
+            "Й":"Y","К":"K","Л":"L","М":"M","Н":"N",
+            "О":"O","П":"P","Р":"R","С":"S","Т":"T",
+            "У":"U","Ф":"F","Х":"Kh","Ц":"Ts","Ч":"Ch",
+            "Ш":"Sh","Щ":"Shch","Ъ":"","Ы":"Y","Ь":"",
+            "Э":"E","Ю":"Yu","Я":"Ya",
+
+            "а":"a","б":"b","в":"v","г":"g","д":"d",
+            "е":"e","ё":"yo","ж":"zh","з":"z","и":"i",
+            "й":"y","к":"k","л":"l","м":"m","н":"n",
+            "о":"o","п":"p","р":"r","с":"s","т":"t",
+            "у":"u","ф":"f","х":"kh","ц":"ts","ч":"ch",
+            "ш":"sh","щ":"shch","ъ":"","ы":"y","ь":"",
+            "э":"e","ю":"yu","я":"ya"
+        };
+
+        return String(text)
+            .split("")
+            .map(char => map[char] ?? char)
+            .join("");
+    };
+
+
+    /*
+       სახლის ნომერი
+    */
+
+    const requestedHouse =
+        extractHouseNumber(
+            cleanAddress
+        );
+
+
+    /*
+       ქუჩის/მისამართის სხვადასხვა ვარიანტი
+    */
+
+    const latinAddress =
+        transliterateRussianToLatin(
+            cleanAddress
+        );
+
+const normalizedAddress =
+    cleanAddress
+        .replace(
+            /Жулии Шартава|Жули Шартава|Juli Shartava|Zhuli Shartava/gi,
+            "Julius Shartava Street"
+        )
+        .replace(
+            /Budapeshtis Street|Budapestis Street|Будапешти Street|Будапешტის Street/gi,
+            "Budapest Street"
+        );
+
+const queries = [
+
+    // 1. სრული მისამართი
+    `${cleanAddress}, Tbilisi, Georgia`,
+
+    // 2. რუსულიდან ლათინურად
+    `${latinAddress}, Tbilisi, Georgia`,
+
+    // 3. ნორმალიზებული მისამართი
+    `${normalizedAddress}, Tbilisi, Georgia`,
+
+    // 4. მხოლოდ ნორმალიზებული მისამართი
+    normalizedAddress
+
+];
+
+
+    /*
+       ერთი და იგივე query ორჯერ არ გავუშვათ
+    */
+
+    const uniqueQueries =
+        [
+            ...new Set(
+                queries
+            )
+        ];
+
+
+    console.log(
+        "📍 GEOCODING:",
+        cleanAddress
+    );
+
+
+    for (
+        const query of
+        uniqueQueries
+    ) {
 
         try {
 
-            await new Promise(
-                resolve =>
-                    setTimeout(
-                        resolve,
-                        1200
-                    )
-            );
+            /*
+               ყველა მოთხოვნა გადის ერთ რიგში.
+               429-ის თავიდან ასაცილებლად.
+            */
 
-            console.log(
-                "📍 Geocoding:",
-                query
-            );
+            await waitForNominatim();
 
-            const { data } =
+
+            const response =
                 await axios.get(
-                    url,
+                    "https://nominatim.openstreetmap.org/search",
                     {
                         params: {
 
-                            q: query,
+                            q:
+                                query,
 
                             format:
                                 "json",
 
                             limit:
-                                5,
+                                10,
 
                             countrycodes:
                                 "ge",
@@ -272,209 +1176,577 @@ async function geocodeAddress(address) {
                             addressdetails:
                                 1,
 
-                            viewbox:
-                                "44.65,41.82,44.95,41.60",
+                            "accept-language":
+                                "en"
 
-                            bounded:
-                                1
                         },
 
                         headers: {
 
                             "User-Agent":
-                                "Orange Real Estate Tbilisi"
+                                "Orange Real Estate Tbilisi/1.0",
+
+                            "Accept":
+                                "application/json"
+
                         },
 
                         timeout:
-                            10000
+                            15000
                     }
                 );
 
-            if (
-                !data ||
-                !data.length
-            ) {
+
+            const data =
+                Array.isArray(
+                    response.data
+                )
+                    ? response.data
+                    : [];
+
+
+            if (!data.length) {
 
                 console.log(
-                    "❌ Not found:",
+                    "❌ Nominatim not found:",
                     query
                 );
 
                 continue;
+
             }
 
-            let selected = null;
+
+            let best =
+                null;
+
+            let bestScore =
+                -Infinity;
+
+
+            /*
+               ყველა შედეგის შეფასება
+            */
 
             for (
-                const item of data
+                const item of
+                data
             ) {
 
                 const lat =
-                    Number(item.lat);
+                    Number(
+                        item.lat
+                    );
 
                 const lng =
-                    Number(item.lon);
+                    Number(
+                        item.lon
+                    );
+
+
+                /*
+                   მხოლოდ თბილისი
+                */
 
                 if (
-                    !Number.isFinite(lat) ||
-                    !Number.isFinite(lng)
+                    !isTbilisiCoordinates(
+                        lat,
+                        lng
+                    )
                 ) {
+
                     continue;
+
                 }
 
+
+                const returnedHouse =
+                    String(
+                        item.address
+                            ?.house_number ||
+                        ""
+                    )
+                    .trim();
+
+
+                const type =
+                    String(
+                        item.type ||
+                        item.addresstype ||
+                        ""
+                    )
+                    .toLowerCase();
+
+
+                const display =
+                    String(
+                        item.display_name ||
+                        ""
+                    );
+
+
+                const normalizedRequested =
+                    normalizeAddressText(
+                        cleanAddress
+                    );
+
+
+                const normalizedReturned =
+                    normalizeAddressText(
+                        display
+                    );
+
+
+                let score =
+                    0;
+
+
+                /*
+                   🔥 ზუსტი სახლის ნომერი
+                   ყველაზე დიდი პრიორიტეტი
+                */
+
                 if (
-                    lat >= 41.60 &&
-                    lat <= 41.82 &&
-                    lng >= 44.65 &&
-                    lng <= 44.95
+                    requestedHouse &&
+                    returnedHouse &&
+                    returnedHouse
+                        .toLowerCase() ===
+                    requestedHouse
+                        .toLowerCase()
                 ) {
 
-                    selected =
+                    score += 200;
+
+                }
+
+
+                /*
+                   სახლის ნომერი საერთოდ ემთხვევა
+                */
+
+                if (
+                    requestedHouse &&
+                    returnedHouse &&
+                    returnedHouse
+                        .toLowerCase()
+                        .includes(
+                            requestedHouse
+                                .toLowerCase()
+                        )
+                ) {
+
+                    score += 50;
+
+                }
+
+
+                /*
+                   შენობა / სახლი
+                */
+
+                if (
+                    type === "house"
+                ) {
+
+                    score += 50;
+
+                }
+
+
+                if (
+                    type === "building"
+                ) {
+
+                    score += 40;
+
+                }
+
+
+                if (
+                    type === "residential"
+                ) {
+
+                    score += 20;
+
+                }
+
+
+                /*
+                   ქუჩის სიტყვების მსგავსება
+                */
+
+                const words =
+                    normalizedRequested
+                        .split(" ")
+                        .filter(
+                            word =>
+                                word.length >= 4
+                        );
+
+
+                for (
+                    const word of
+                    words
+                ) {
+
+                    if (
+                        normalizedReturned
+                            .includes(
+                                word
+                            )
+                    ) {
+
+                        score += 5;
+
+                    }
+
+                }
+
+
+                /*
+                   თუ სახლის ნომერი გვაქვს,
+                   მაგრამ შედეგი მხოლოდ ქუჩაა,
+                   არ ავიღოთ.
+                */
+
+                if (
+                    requestedHouse &&
+                    !returnedHouse &&
+                    (
+                        type === "street" ||
+                        type === "road"
+                    )
+                ) {
+
+                    score -= 200;
+
+                }
+
+
+                /*
+                   თბილისის მისამართს
+                   დამატებითი ქულა
+                */
+
+                if (
+                    normalizedReturned
+                        .includes("tbilisi")
+                ) {
+
+                    score += 10;
+
+                }
+
+
+                if (
+                    score >
+                    bestScore
+                ) {
+
+                    bestScore =
+                        score;
+
+                    best =
                         item;
 
-                    break;
                 }
+
             }
 
-            if (!selected) {
+
+            /*
+               ძალიან სუსტი შედეგი არ გამოვიყენოთ
+            */
+
+            if (
+                !best ||
+                bestScore < 10
+            ) {
 
                 console.log(
-                    "⚠️ Result outside Tbilisi:",
-                    query
+                    "⚠️ Nominatim result rejected:",
+                    query,
+                    "SCORE:",
+                    bestScore
                 );
 
                 continue;
+
             }
 
-            const result = {
 
-    lat:
-        Number(
-            selected.lat
-        ),
+            const exactHouse =
+                Boolean(
+                    requestedHouse &&
+                    best.address
+                        ?.house_number &&
+                    String(
+                        best.address
+                            .house_number
+                    )
+                    .toLowerCase() ===
+                    String(
+                        requestedHouse
+                    )
+                    .toLowerCase()
+                );
 
-    lng:
-        Number(
-            selected.lon
-        )
+
+            const coords =
+                makeCoords(
+                    best.lon,
+                    best.lat,
+                    "nominatim",
+                    exactHouse
+                        ? "house-exact"
+                        : "address"
+                );
+
+
+            if (
+                coords
+            ) {
+
+                console.log(
+                    "✅ REAL ADDRESS:",
+                    cleanAddress
+                );
+
+                console.log(
+                    "📍 COORDINATES:",
+                    coords
+                );
+
+                console.log(
+                    "🎯 SCORE:",
+                    bestScore
+                );
+
+                console.log(
+                    "🏠 EXACT HOUSE:",
+                    exactHouse
+                );
+
+
+                const result = {
+    ...coords,
+
+    geoDisplayName:
+        best.display_name
 };
 
-
-// მიღებული ქუჩის შემოწმება
-const returnedAddress =
-    String(
-        selected.display_name || ""
-    ).toLowerCase();
-
-const requestedAddress =
-    cleanAddress.toLowerCase();
-
-const streetWords =
-    requestedAddress
-        .replace(
-            /^улица\s+/i,
-            ""
-        )
-        .replace(
-            /^ул\.?\s+/i,
-            ""
-        )
-        .replace(
-            /^проспект\s+/i,
-            ""
-        )
-        .replace(
-            /^пр\.?\s+/i,
-            ""
-        )
-        .split(",")[0]
-        .trim();
-
-if (
-    streetWords &&
-    !returnedAddress.includes(
-        streetWords
-    )
-) {
-
-    console.log(
-        "⚠️ Street mismatch:",
-        cleanAddress,
-        "=>",
-        selected.display_name
-    );
-
-    continue;
-}
-
-
 console.log(
-    "✅ Coordinates found:",
+    "✅ FINAL COORDINATES:",
     result
 );
 
-geocodeCache.set(
-    cleanAddress,
-    result
-);
+return result;
 
-            return result;
+            }
 
-        } catch (err) {
+        }
+        catch (error) {
 
             const status =
-                err.response?.status;
+                error
+                    ?.response
+                    ?.status;
 
-            console.log(
-                `Geocode error ${qIndex + 1}/${queries.length}:`,
-                status ||
-                err.message
-            );
 
             if (
                 status === 429
             ) {
 
-                const wait =
-                    10000 *
-                    (qIndex + 1);
-
                 console.log(
-                    `⏳ 429 - waiting ${wait / 1000}s...`
+                    "⏳ Nominatim 429 — waiting before retry"
                 );
+
 
                 await new Promise(
                     resolve =>
                         setTimeout(
                             resolve,
-                            wait
+                            5000
                         )
                 );
+
+                continue;
+
             }
+
+
+            console.log(
+                "❌ Nominatim error:",
+                error.message
+            );
+
         }
+
     }
 
-    const empty = {
-
-        lat: null,
-        lng: null
-    };
-
-    geocodeCache.set(
-        cleanAddress,
-        empty
-    );
 
     console.log(
-        "❌ Coordinates not found:",
+        "❌ REAL COORDINATES NOT FOUND:",
         cleanAddress
     );
 
-    return empty;
+
+    return null;
 }
 
 /* =========================================================
-   DOWNLOAD PHOTO
+   GET COORDINATES FOR POST
+   YANDEX URL FIRST → ADDRESS GEOCODING SECOND
+========================================================= */
+
+async function getCoordinatesForPost(post) {
+
+    /*
+       1. უკვე არსებული სწორი კოორდინატა
+    */
+
+    if (
+        isTbilisiCoordinates(
+            post.lat,
+            post.lng
+        )
+    ) {
+
+        return {
+
+            lat:
+                Number(post.lat),
+
+            lng:
+                Number(post.lng),
+
+            geoSource:
+                post.geoSource ||
+                "existing",
+
+            geoAccuracy:
+                post.geoAccuracy ||
+                "existing"
+
+        };
+
+    }
+
+
+    /* =====================================================
+       2. YANDEX MAP LINK
+    ===================================================== */
+
+    const yandex =
+        await getYandexCoordinates(
+            post.text || ""
+        );
+
+
+    if (yandex) {
+
+        console.log(
+            "✅ YANDEX LOCATION FOUND:",
+            yandex
+        );
+
+        return yandex;
+
+    }
+
+
+    /* =====================================================
+       3. ADDRESS → NOMINATIM
+    ===================================================== */
+
+    if (
+        post.street &&
+        post.street !== "-"
+    ) {
+
+        const address =
+            `${post.street}, ${post.district || ""}, Tbilisi, Georgia`;
+
+
+        console.log(
+            "📍 Finding location:",
+            address
+        );
+
+
+        const result =
+            await geocodeAddress(
+                address
+            );
+
+
+        if (result) {
+
+            console.log(
+                "✅ ADDRESS LOCATION FOUND:",
+                result
+            );
+
+            return result;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       4. STREET ONLY
+       თუ უბნის დამატებამ ვერ იპოვა,
+       მარტო ქუჩითაც ვცადოთ.
+    ===================================================== */
+
+    if (
+        post.street &&
+        post.street !== "-"
+    ) {
+
+        const streetOnly =
+            `${post.street}, Tbilisi, Georgia`;
+
+
+        console.log(
+            "📍 Finding street only:",
+            streetOnly
+        );
+
+
+        const result =
+            await geocodeAddress(
+                streetOnly
+            );
+
+
+        if (result) {
+
+            return result;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       5. NOTHING FOUND
+    ===================================================== */
+
+    console.log(
+        "❌ LOCATION NOT FOUND:",
+        post.street ||
+        post.text ||
+        "-"
+    );
+
+
+    return null;
+
+}
+/* =========================================================
+   DOWNLOAD TELEGRAM PHOTO
 ========================================================= */
 
 async function downloadPhoto(
@@ -491,17 +1763,16 @@ async function downloadPhoto(
             );
 
 
+        /*
+           თუ ფოტო უკვე ჩამოტვირთულია,
+           თავიდან აღარ ვიწერთ.
+        */
+
         if (
             fs.existsSync(
                 filePath
             )
         ) {
-
-            console.log(
-                "Already exists:",
-                fileName
-            );
-
 
             return (
                 "downloads/" +
@@ -517,15 +1788,6 @@ async function downloadPhoto(
             );
 
 
-        console.log(
-            "Downloading:",
-            fileName,
-            buffer
-                ? "OK"
-                : "FAIL"
-        );
-
-
         if (!buffer) {
 
             return null;
@@ -539,21 +1801,24 @@ async function downloadPhoto(
         );
 
 
+        console.log(
+            "📸 Downloaded:",
+            fileName
+        );
+
+
         return (
             "downloads/" +
             fileName
         );
 
     }
-
-    catch (err) {
+    catch (error) {
 
         console.log(
-            "Photo download error:"
+            "❌ Photo download error:",
+            error.message
         );
-
-
-        console.log(err);
 
 
         return null;
@@ -564,10 +1829,12 @@ async function downloadPhoto(
 
 
 /* =========================================================
-   DUPLICATE HELPERS
+   CLEAN TEXT FOR FINGERPRINT
 ========================================================= */
 
-function cleanFingerprint(value) {
+function cleanFingerprint(
+    value
+) {
 
     return String(
         value || "-"
@@ -596,10 +1863,12 @@ function cleanFingerprint(value) {
 
 
 /* =========================================================
-   APARTMENT KEY
+   APARTMENT UNIQUE KEY
 ========================================================= */
 
-function makeApartmentKey(post) {
+function makeApartmentKey(
+    post
+) {
 
     const district =
         cleanFingerprint(
@@ -638,8 +1907,9 @@ function makeApartmentKey(post) {
 
 
     /*
-       მისამართის გარეშე
-       დუბლიკატად არ ვთვლით.
+       თუ ქუჩა საერთოდ არ გვაქვს,
+       ბინას ხელოვნურად არ ვაერთიანებთ
+       სხვა განცხადებასთან.
     */
 
     if (
@@ -655,15 +1925,10 @@ function makeApartmentKey(post) {
     return [
 
         district,
-
         street,
-
         rooms,
-
         bedrooms,
-
         area,
-
         floor
 
     ].join("|");
@@ -672,590 +1937,662 @@ function makeApartmentKey(post) {
 
 
 /* =========================================================
-   START PARSER
+   LOAD EXISTING POSTS
 ========================================================= */
 
-async function start() {
-
-    await client.connect();
-
-
-    if (!client.connected) {
-
-        await client.connect();
-
-    }
-
-
-    console.log(
-        "✅ Bot connected"
-    );
-
-
-    console.log(
-        "CHANNEL:",
-        channel
-    );
-
-
-    const now = new Date();
-
-const startOfToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate()
-);
-
-const startOfTomorrow = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + 1
-);
-
-const messages =
-    await client.getMessages(
-        channel,
-        {
-            limit: 500,
-            offsetDate: Math.floor(
-                startOfTomorrow.getTime() / 1000
-            )
-        }
-    );
-
-const todayMessages = messages.filter(msg => {
-    const messageDate = new Date(
-        msg.date * 1000
-    );
-
-    return (
-        messageDate >= startOfToday &&
-        messageDate < startOfTomorrow
-    );
-});
-
-console.log(
-    "Today's messages:",
-    todayMessages.length
-);
-
-
-    console.log(
-        "Messages count:",
-       todayMessages.length
-    );
-
-
-    /*
-       ძველი posts.json
-       ვინარჩუნებთ.
-    */
-
-    let posts = [];
-
+function loadPosts() {
 
     if (
-        fs.existsSync(
+        !fs.existsSync(
             POSTS_FILE
         )
     ) {
 
-        posts =
-            JSON.parse(
-
-                fs.readFileSync(
-                    POSTS_FILE,
-                    "utf8"
-                )
-
-            );
+        return [];
 
     }
 
 
-    const albums = {};
+    try {
+
+        const raw =
+            fs.readFileSync(
+                POSTS_FILE,
+                "utf8"
+            );
+
+
+        const posts =
+            JSON.parse(
+                raw
+            );
+
+
+        if (
+            !Array.isArray(
+                posts
+            )
+        ) {
+
+            return [];
+
+        }
+
+
+        return posts;
+
+    }
+    catch (error) {
+
+        console.log(
+            "❌ posts.json read error:",
+            error.message
+        );
+
+
+        return [];
+
+    }
+
+}
+
+
+/* =========================================================
+   PROCESS TELEGRAM MESSAGE
+========================================================= */
+
+async function processMessage(
+    msg,
+    albums
+) {
+
+    const text =
+        msg.message || "";
 
 
     /*
-       Telegram messages
+       არც ფოტო გვაქვს,
+       არც ტექსტი → გამოტოვება.
     */
 
-    for (
-        const msg of
-        todayMessages.reverse()
+    if (
+        !msg.photo &&
+        !text
     ) {
 
+        return;
 
-        console.log(
-            "Processing message:",
-            msg.id
-        );
+    }
 
 
-        const text =
-            msg.message || "";
+    /*
+       Telegram album-ს ერთი
+       groupedId აქვს.
 
+       თუ album არ არის,
+       message ID გამოიყენება.
+    */
 
-        if (
-            !msg.photo &&
-            !text
-        ) {
+    const albumId =
+        msg.groupedId
 
-            continue;
+            ? String(
+                msg.groupedId
+            )
 
-        }
-
-
-        /*
-           Telegram album
-        */
-
-        const albumId =
-
-            msg.groupedId
-
-                ? String(
-                    msg.groupedId
-                )
-
-                : String(
-                    msg.id
-                );
-
-
-        if (
-            !albums[albumId]
-        ) {
-
-
-            albums[albumId] = {
-
-                id:
-                    msg.id,
-
-                groupId:
-                    albumId,
-
-                date:
-                    msg.date,
-
-                telegramLink:
-                    `https://t.me/kvartiri_tbilisi2023/${msg.id}`,
-
-                text:
-                    text,
-
-                images: [],
-
-                price: "",
-
-                district: "",
-
-                street: "",
-
-                rooms: "",
-
-                bedrooms: "",
-
-                area: "",
-
-                floor: "",
-
-                lat: null,
-
-                lng: null
-
-            };
-
-        }
-
-
-        const post =
-            albums[albumId];
-
-
-        /*
-           ყველაზე გრძელი ტექსტი
-        */
-
-        if (
-            text.length >
-            post.text.length
-        ) {
-
-            post.text =
-                text;
-
-        }
-
-
-        /* =====================================================
-           PRICE
-        ===================================================== */
-
-        post.price =
-            post.price ||
-
-            getValue(
-                text,
-                [
-
-                    /#Цена[_ ]?(\d+)/i,
-
-                    /#Цена[:_ ]*(\d+)/i,
-
-                    /Цена[:_ ]*(\d+)/i,
-
-                    /\$\s*(\d+)/i,
-
-                    /(\d+)\s*\$/i
-
-                ]
+            : String(
+                msg.id
             );
 
 
-        /* =====================================================
-           DISTRICT
-        ===================================================== */
+    /* =====================================================
+       CREATE POST
+    ===================================================== */
 
-        post.district =
+    if (
+        !albums[albumId]
+    ) {
 
-            normalizeDistrict(
+        albums[albumId] = {
 
-                post.district ||
+            id:
+                msg.id,
 
-                getValue(
+            groupId:
+                albumId,
 
-                    text,
+            date:
+                toUnixSeconds(
+                    msg.date
+                ),
 
-                    [
+            telegramLink:
+                `https://t.me/kvartiri_tbilisi2023/${msg.id}`,
 
-                        /📍?\s*Ра[йи]он:\s*#?([^📍\n]+)/i,
-
-                        /Ра[йи]он:\s*#?([^📍\n]+)/i,
-
-                        /Район\s*#([^\s#]+)/i,
-
-                        /квартира\s+в\s+([^\s📍\n]+)/i
-
-                    ]
-
-                )
-
-            );
-
-
-        /* =====================================================
-           STREET
-        ===================================================== */
-
-        post.street =
-
-            post.street ||
-
-            getValue(
-
+            text:
                 text,
 
-                [
+            images: [],
 
-                    /📍\s*Адрес:\s*([^\n]+)/i,
+            price:
+                "",
 
-                    /Адрес:\s*([^\n]+)/i
+            district:
+                "",
 
-                ]
+            street:
+                "",
 
-            );
+            rooms:
+                "",
 
-if (
-    post.street
-) {
+            bedrooms:
+                "",
 
-    post.street =
-        String(post.street)
+            area:
+                "",
 
-            // ქუჩის დასაწყისის გასწორება
-            .replace(
-                /^ул\.?\s*/i,
-                ""
-            )
+            floor:
+                "",
 
-            .replace(
-                /^улица\s*/i,
-                ""
-            )
-
-            // დაზიანებული "ица" ფორმა
-            .replace(
-                /^ица\s+/i,
-                ""
-            )
-
-            // ქართული/რუსული ზედმეტი ჰეშთეგები
-            .replace(
-                /#метро/gi,
-                ""
-            )
-
-           .replace(
-    /https?:\/\/\S+/gi,
-    ""
-)
-
-            // ჰეშთეგების მოცილება
-            .replace(
-                /#[^\s,]+/g,
-                ""
-            )
-
-            // ზედმეტი სიტყვების/ნიშნების გაწმენდა
-            .replace(
-                /📍/g,
-                ""
-            )
-
-            .replace(
-                /\s+/g,
-                " "
-            )
-
-            .replace(
-                /^\s*[,.-]+\s*/,
-                ""
-            )
-
-            .replace(
-                /\s*[,.-]+\s*$/,
-                ""
-            )
-
-            .trim();
-
-}
-
-
-        /* =====================================================
-           COORDINATES
-        ===================================================== */
-
-        let coords = {
+            agent:
+                "",
 
             lat:
-                post.lat ||
                 null,
 
             lng:
-                post.lng ||
-                null
+                null,
+
+            geoSource:
+                "",
+
+            geoAccuracy:
+                "",
+
+            geoAttemptAt:
+                "",
+
+            geoUpdatedAt:
+                "",
+
+            yandexMapUrl:
+                ""
 
         };
 
+    }
 
-        if (!coords.lat || !coords.lng) {
 
-    const addresses = [
+    const post =
+        albums[albumId];
 
-        `${post.street}, ${post.district}, Tbilisi, Georgia`,
 
-        `${post.street}, Tbilisi, Georgia`
+    /* =====================================================
+       KEEP LONGEST TEXT
+    ===================================================== */
 
-    ];
+    if (
+        text.length >
+        String(
+            post.text || ""
+        ).length
+    ) {
 
-    for (const address of addresses) {
+        post.text =
+            text;
 
-        console.log(
-            "📍 Geocoding:",
-            address
+    }
+
+
+    /* =====================================================
+       PRICE
+    ===================================================== */
+
+    const detectedPrice =
+        getValue(
+
+            text,
+
+            [
+
+                /#Цена[_ ]?(\d+)/i,
+
+                /#Цена[:_ ]*(\d+)/i,
+
+                /Цена[:_ ]*(\d+)/i,
+
+                /\$\s*(\d+)/i,
+
+                /(\d+)\s*\$/i
+
+            ]
+
         );
 
-        const result =
-            await geocodeAddress(address);
 
-        if (
-            result.lat &&
-            result.lng
-        ) {
+    if (
+        detectedPrice
+    ) {
 
-            coords = result;
+        post.price =
+            detectedPrice;
 
-            console.log(
-                "✅ Coordinates found:",
-                result
+    }
+
+
+    /* =====================================================
+       DISTRICT
+    ===================================================== */
+
+    const detectedDistrict =
+        getValue(
+
+            text,
+
+            [
+
+                /📍?\s*Ра[йи]он:\s*#?([^📍\n]+)/i,
+
+                /Ра[йи]он:\s*#?([^📍\n]+)/i,
+
+                /Район\s*#([^\s#]+)/i,
+
+                /квартира\s+в\s+([^\s📍\n]+)/i
+
+            ]
+
+        );
+
+
+    if (
+        detectedDistrict
+    ) {
+
+        post.district =
+            normalizeDistrict(
+                detectedDistrict
             );
 
-            break;
+    }
+    else {
+
+        post.district =
+            normalizeDistrict(
+                post.district
+            );
+
+    }
+
+
+    /* =====================================================
+       STREET / ADDRESS
+    ===================================================== */
+
+    const detectedStreet =
+        getValue(
+
+            text,
+
+            [
+
+                /📍\s*Адрес:\s*([^\n]+)/i,
+
+                /Адрес:\s*([^\n]+)/i
+
+            ]
+
+        );
+
+
+    if (
+        detectedStreet
+    ) {
+
+        post.street =
+            detectedStreet;
+
+    }
+
+
+    if (
+        post.street
+    ) {
+
+        post.street =
+
+            String(
+                post.street
+            )
+
+                .replace(
+                    /^ул\.?\s*/i,
+                    ""
+                )
+
+                .replace(
+                    /^улица\s*/i,
+                    ""
+                )
+
+                .replace(
+                    /^ица\s+/i,
+                    ""
+                )
+
+                .replace(
+                    /#метро/gi,
+                    ""
+                )
+
+                .replace(
+                    /https?:\/\/\S+/gi,
+                    ""
+                )
+
+                .replace(
+                    /#[^\s,]+/g,
+                    ""
+                )
+
+                .replace(
+                    /📍/g,
+                    ""
+                )
+
+                .replace(
+                    /\s+/g,
+                    " "
+                )
+
+                .replace(
+                    /^\s*[,.-]+\s*/,
+                    ""
+                )
+
+                .replace(
+                    /\s*[,.-]+\s*$/,
+                    ""
+                )
+
+                .trim();
+
+    }
+
+
+    /* =====================================================
+       YANDEX MAP URL
+    ===================================================== */
+
+    const yandexLinks =
+        extractYandexLinks(
+            post.text
+        );
+
+
+    if (
+        yandexLinks.length
+    ) {
+
+        post.yandexMapUrl =
+            yandexLinks[0];
+
+    }
+
+
+    /* =====================================================
+       ROOMS
+    ===================================================== */
+
+    const detectedRooms =
+        getValue(
+
+            text,
+
+            [
+
+                /Количество\s*#?Комнат[: ]*(\d+)/i,
+
+                /Количество\s*комнат[: ]*(\d+)/i,
+
+                /Комнат[: ]*(\d+)/i
+
+            ]
+
+        );
+
+
+    if (
+        detectedRooms
+    ) {
+
+        post.rooms =
+            detectedRooms;
+
+    }
+
+
+    /* =====================================================
+       BEDROOMS
+    ===================================================== */
+
+    const detectedBedrooms =
+        getValue(
+
+            text,
+
+            [
+
+                /Количество\s*#?Спален[: ]*(\d+)/i,
+
+                /Количество\s*спален[: ]*(\d+)/i,
+
+                /Спален[: ]*(\d+)/i
+
+            ]
+
+        );
+
+
+    if (
+        detectedBedrooms
+    ) {
+
+        post.bedrooms =
+            detectedBedrooms;
+
+    }
+
+
+    /* =====================================================
+       AREA
+    ===================================================== */
+
+    const detectedArea =
+        getValue(
+
+            text,
+
+            [
+
+                /Общая\s*площадь[: ]*([\d.,]+)/i,
+
+                /Площадь[: ]*([\d.,]+)/i
+
+            ]
+
+        );
+
+
+    if (
+        detectedArea
+    ) {
+
+        post.area =
+            detectedArea;
+
+    }
+
+
+    /* =====================================================
+       FLOOR
+    ===================================================== */
+
+    const detectedFloor =
+        getValue(
+
+            text,
+
+            [
+
+                /Этаж[: ]*([^\n]+)/i
+
+            ]
+
+        );
+
+
+    if (
+        detectedFloor
+    ) {
+
+        post.floor =
+            detectedFloor;
+
+    }
+
+
+    /* =====================================================
+       AGENT / CONTACT
+    ===================================================== */
+
+    const detectedAgent =
+        getValue(
+
+            text,
+
+            [
+
+                /Агент:\s*([^\n]+)/i,
+
+                /Риелтор:\s*([^\n]+)/i,
+
+                /Контакт:\s*([^\n]+)/i,
+
+                /@([A-Za-z0-9_]+)/i
+
+            ]
+
+        );
+
+
+    if (
+        detectedAgent
+    ) {
+
+        post.agent =
+            detectedAgent;
+
+    }
+
+
+    /* =====================================================
+       PHOTO
+    ===================================================== */
+
+    if (
+        msg.photo
+    ) {
+
+        const fileName =
+            `${msg.id}.jpg`;
+
+
+        const image =
+            await downloadPhoto(
+                msg,
+                fileName
+            );
+
+
+        if (
+            image &&
+            !post.images.includes(
+                image
+            )
+        ) {
+
+            post.images.push(
+                image
+            );
 
         }
 
     }
 
 }
+/* =========================================================
+   UPDATE POST COORDINATES
+========================================================= */
+
+async function updatePostCoordinates(
+    post,
+    force = false
+) {
+
+    /*
+       თუ უკვე გვაქვს სწორი კოორდინატები,
+       ხელახლა არ ვეძებთ.
+    */
+
+    if (
+        !force &&
+        isTbilisiCoordinates(
+            post.lat,
+            post.lng
+        )
+    ) {
+
+        return false;
+
+    }
 
 
-        post.lat =
-            coords.lat;
+    /*
+       თუ ბოლო მცდელობა ახლახან იყო,
+       თავიდან არ გავუშვათ geocoding.
+    */
 
+    if (
+        !force &&
+        post.geoAttemptAt
+    ) {
 
-        post.lng =
-            coords.lng;
+        const lastAttempt =
+            new Date(
+                post.geoAttemptAt
+            ).getTime();
 
-
-        /* =====================================================
-           AGENT
-        ===================================================== */
-
-        post.agent =
-
-            getValue(
-
-                text,
-
-                [
-
-                    /Агент:\s*([^\n]+)/i,
-
-                    /Риелтор:\s*([^\n]+)/i,
-
-                    /Контакт:\s*([^\n]+)/i,
-
-                    /@([A-Za-z0-9_]+)/i
-
-                ]
-
-            );
-
-
-        /* =====================================================
-           ROOMS
-        ===================================================== */
-
-        post.rooms =
-
-            post.rooms ||
-
-            getValue(
-
-                text,
-
-                [
-
-                    /Количество\s*#?Комнат[: ]*(\d+)/i,
-
-                    /Количество\s*комнат[: ]*(\d+)/i,
-
-                    /Комнат[: ]*(\d+)/i
-
-                ]
-
-            );
-
-
-        /* =====================================================
-           BEDROOMS
-        ===================================================== */
-
-        post.bedrooms =
-
-            post.bedrooms ||
-
-            getValue(
-
-                text,
-
-                [
-
-                    /Количество\s*#?Спален[: ]*(\d+)/i,
-
-                    /Количество\s*спален[: ]*(\d+)/i,
-
-                    /Спален[: ]*(\d+)/i
-
-                ]
-
-            );
-
-
-        /* =====================================================
-           AREA
-        ===================================================== */
-
-        post.area =
-
-            post.area ||
-
-            getValue(
-
-                text,
-
-                [
-
-                    /Общая\s*площадь[: ]*([\d.,]+)/i,
-
-                    /Площадь[: ]*([\d.,]+)/i
-
-                ]
-
-            );
-
-
-        /* =====================================================
-           FLOOR
-        ===================================================== */
-
-        post.floor =
-
-            post.floor ||
-
-            getValue(
-
-                text,
-
-                [
-
-                    /Этаж[: ]*([^\n]+)/i
-
-                ]
-
-            );
-
-
-        /* =====================================================
-           PHOTO
-        ===================================================== */
 
         if (
-            msg.photo
+            Number.isFinite(
+                lastAttempt
+            )
         ) {
 
-
-            const fileName =
-                `${msg.id}.jpg`;
-
-
-            const image =
-
-                await downloadPhoto(
-
-                    msg,
-
-                    fileName
-
-                );
+            const hours =
+                (
+                    Date.now() -
+                    lastAttempt
+                ) / 3600000;
 
 
             if (
-
-                image &&
-
-                !post.images.includes(
-                    image
-                )
-
+                hours <
+                GEO_RETRY_HOURS
             ) {
 
-                post.images.push(
-                    image
-                );
+                return false;
 
             }
 
@@ -1264,19 +2601,173 @@ if (
     }
 
 
-    /* =========================================================
-       SAVE / UPDATE / DUPLICATE CHECK
-    ========================================================= */
+    post.geoAttemptAt =
+        new Date().toISOString();
+
+
+    console.log(
+        "🧭 Finding location:",
+        post.street,
+        post.district
+    );
+
+
+    const result =
+        await getCoordinatesForPost(
+            post
+        );
+
+
+    if (!result) {
+
+        console.log(
+            "❌ LOCATION NOT FOUND:",
+            post.street,
+            post.district
+        );
+
+
+        /*
+           შემთხვევით კოორდინატას
+           არასოდეს ვწერთ.
+        */
+
+        post.lat =
+            null;
+
+        post.lng =
+            null;
+
+        post.geoSource =
+            "not-found";
+
+        post.geoAccuracy =
+            "none";
+
+
+        return false;
+
+    }
+
+
+    post.lat =
+        result.lat;
+
+    post.lng =
+        result.lng;
+
+    post.geoSource =
+        result.geoSource ||
+        "unknown";
+
+    post.geoAccuracy =
+        result.geoAccuracy ||
+        "unknown";
+
+    post.geoUpdatedAt =
+        result.geoUpdatedAt ||
+        new Date().toISOString();
+
+
+    if (
+        result.geoDisplayName
+    ) {
+
+        post.geoDisplayName =
+            result.geoDisplayName;
+
+    }
+
+
+    if (
+        result.yandexMapUrl
+    ) {
+
+        post.yandexMapUrl =
+            result.yandexMapUrl;
+
+    }
+
+
+    console.log(
+        "📍 LOCATION SAVED:",
+        post.street,
+        "=>",
+        post.lat,
+        post.lng,
+        "|",
+        post.geoSource,
+        "|",
+        post.geoAccuracy
+    );
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   UPDATE STATUS
+========================================================= */
+
+function updateStatus(
+    post
+) {
+
+    const timestamp =
+        toUnixSeconds(
+            post.date
+        );
+
+
+    if (!timestamp) {
+
+        post.status =
+            "active";
+
+        return;
+
+    }
+
+
+    const days =
+        (
+            Date.now() / 1000 -
+            timestamp
+        ) / 86400;
+
+
+    post.status =
+        days > 30
+            ? "rented"
+            : "active";
+
+}
+
+
+/* =========================================================
+   MERGE TELEGRAM POSTS
+========================================================= */
+
+async function mergePosts(
+    posts,
+    albums
+) {
 
     for (
         const key of
         Object.keys(albums)
     ) {
 
-
         const post =
             albums[key];
 
+
+        /*
+           ცარიელი ველები
+           ნორმალიზდება.
+        */
 
         post.price =
             post.price || "-";
@@ -1306,50 +2797,50 @@ if (
             post.floor || "-";
 
 
-        /*
-           Status
-        */
+        post.images =
+            Array.isArray(
+                post.images
+            )
+                ? post.images
+                : [];
 
-        const days =
 
-            (
-                Date.now() / 1000 -
+        post.date =
+            toUnixSeconds(
                 post.date
-            ) / 86400;
+            );
 
 
-        post.status =
-
-            days > 30
-
-                ? "rented"
-
-                : "active";
+        updateStatus(
+            post
+        );
 
 
-        /* =====================================================
-           FIRST: EXACT TELEGRAM ID
-        ===================================================== */
+        /* =================================================
+           FIND BY TELEGRAM ID
+        ================================================= */
 
         let existingIndex =
-
             posts.findIndex(
 
-                p =>
-                    String(p.id) ===
-                    String(post.id)
+                oldPost =>
+                    String(
+                        oldPost.id
+                    ) ===
+                    String(
+                        post.id
+                    )
 
             );
 
 
-        /* =====================================================
-           SECOND: SAME APARTMENT
-        ===================================================== */
+        /* =================================================
+           FIND SAME APARTMENT
+        ================================================= */
 
         if (
             existingIndex === -1
         ) {
-
 
             const newKey =
                 makeApartmentKey(
@@ -1359,9 +2850,7 @@ if (
 
             if (newKey) {
 
-
                 existingIndex =
-
                     posts.findIndex(
 
                         oldPost =>
@@ -1378,14 +2867,13 @@ if (
         }
 
 
-        /* =====================================================
+        /* =================================================
            UPDATE EXISTING
-        ===================================================== */
+        ================================================= */
 
         if (
             existingIndex >= 0
         ) {
-
 
             const oldPost =
                 posts[
@@ -1393,75 +2881,100 @@ if (
                 ];
 
 
-            /*
-               ახალი Telegram პოსტი
-               ანახლებს ძველს.
-            */
-
-            posts[
-                existingIndex
-            ] = {
+            const merged = {
 
                 ...oldPost,
 
-                ...post,
-
-
-                /*
-                   თუ ახალ პოსტს
-                   კოორდინატა არ აქვს,
-                   ძველი შევინარჩუნოთ.
-                */
-
-                lat:
-                    post.lat ||
-                    oldPost.lat ||
-                    null,
-
-                lng:
-                    post.lng ||
-                    oldPost.lng ||
-                    null,
-
-
-                /*
-                   ახალი Telegram
-                   message ხდება აქტიური.
-                */
-
-                id:
-                    post.id,
-
-                groupId:
-                    post.groupId,
-
-                date:
-                    post.date,
-
-                telegramLink:
-                    post.telegramLink
+                ...post
 
             };
 
 
-            console.log(
-                "♻️ DUPLICATE APARTMENT UPDATED:",
-                post.street,
-                post.district,
-                post.rooms,
-                post.area,
-                post.floor
-            );
+            /*
+               თუ ახალ შეტყობინებაში ფოტოები
+               არ გვაქვს, ძველი ფოტოები
+               შევინარჩუნოთ.
+            */
 
+            if (
+                !post.images ||
+                !post.images.length
+            ) {
+
+                merged.images =
+                    oldPost.images ||
+                    [];
+
+            }
+
+
+            /*
+               თუ ახალი პოსტის კოორდინატა
+               არ არსებობს, ძველი
+               კოორდინატა არ უნდა დაიკარგოს.
+            */
+
+            if (
+                !isTbilisiCoordinates(
+                    post.lat,
+                    post.lng
+                )
+            ) {
+
+                merged.lat =
+                    isTbilisiCoordinates(
+                        oldPost.lat,
+                        oldPost.lng
+                    )
+                        ? oldPost.lat
+                        : null;
+
+
+                merged.lng =
+                    isTbilisiCoordinates(
+                        oldPost.lat,
+                        oldPost.lng
+                    )
+                        ? oldPost.lng
+                        : null;
+
+
+                merged.geoSource =
+                    oldPost.geoSource ||
+                    "unknown";
+
+
+                merged.geoAccuracy =
+                    oldPost.geoAccuracy ||
+                    "unknown";
+
+
+                merged.geoUpdatedAt =
+                    oldPost.geoUpdatedAt ||
+                    "";
+
+            }
+
+
+            posts[
+                existingIndex
+            ] = merged;
+
+
+            console.log(
+                "♻️ UPDATED:",
+                merged.street,
+                merged.district
+            );
 
         }
 
-        /* =====================================================
+
+        /* =================================================
            NEW APARTMENT
-        ===================================================== */
+        ================================================= */
 
         else {
-
 
             posts.push(
                 post
@@ -1469,7 +2982,7 @@ if (
 
 
             console.log(
-                "🆕 NEW APARTMENT:",
+                "🆕 NEW:",
                 post.street,
                 post.district
             );
@@ -1478,61 +2991,442 @@ if (
 
     }
 
-
-    /* =========================================================
-       SORT
-    ========================================================= */
-
-    posts.sort(
-
-        (a, b) =>
-
-            Number(b.id) -
-            Number(a.id)
-
-    );
+}
 
 
-    /* =========================================================
-       DEBUG
-    ========================================================= */
+/* =========================================================
+   BACKFILL OLD POSTS
+========================================================= */
 
-    for (
-        const p of posts
+async function backfillOldPosts(
+    posts
+) {
+
+    if (
+        !BACKFILL_MISSING_COORDS
     ) {
 
         console.log(
+            "ℹ️ Old coordinate backfill disabled."
+        );
 
-            p.street,
+        return;
 
-            "=>",
+    }
 
-            p.lat,
 
-            p.lng
+    let processed =
+        0;
 
+
+    console.log(
+        "🔄 Checking old posts for missing coordinates..."
+    );
+
+
+    for (
+        const post of
+        posts
+    ) {
+
+        if (
+            processed >=
+            MAX_BACKFILL_PER_RUN
+        ) {
+
+            break;
+
+        }
+
+
+        /*
+           უკვე სწორად განთავსებული
+           ბინა აღარ გვჭირდება.
+        */
+
+        if (
+            isTbilisiCoordinates(
+                post.lat,
+                post.lng
+            )
+        ) {
+
+            continue;
+
+        }
+
+
+        /*
+           ქუჩის გარეშე ძებნა არ ღირს.
+        */
+
+        if (
+            !post.street ||
+            post.street === "-"
+        ) {
+
+            continue;
+
+        }
+
+
+        processed++;
+
+
+        await updatePostCoordinates(
+            post
         );
 
     }
 
 
     console.log(
-        "Albums:",
+        "🔄 Old posts checked:",
+        processed
+    );
+
+}
+
+
+/* =========================================================
+   LOAD TELEGRAM MESSAGES
+========================================================= */
+
+async function loadTelegramMessages() {
+
+    const messages = [];
+
+
+    console.log(
+        "📥 Loading Telegram messages..."
+    );
+
+
+    for await (
+        const msg of
+        client.iterMessages(
+            channel,
+            {
+                limit:
+                    SYNC_MESSAGES_LIMIT
+            }
+        )
+    ) {
+
+        messages.push(
+            msg
+        );
+
+    }
+
+
+    /*
+       ძველი → ახალი
+    */
+
+    messages.reverse();
+
+
+    console.log(
+        "📥 Telegram messages loaded:",
+        messages.length
+    );
+
+
+    return messages;
+
+}
+
+
+/* =========================================================
+   MAIN PARSER
+========================================================= */
+
+async function start() {
+
+    console.log(
+        "======================================"
+    );
+
+    console.log(
+        "🍊 ORANGE REAL ESTATE PARSER"
+    );
+
+    console.log(
+        "======================================"
+    );
+
+
+    /* =====================================================
+       CONNECT TELEGRAM
+    ===================================================== */
+
+    await client.connect();
+
+
+    if (
+        !client.connected
+    ) {
+
+        await client.connect();
+
+    }
+
+
+    console.log(
+        "✅ Telegram connected"
+    );
+
+
+    console.log(
+        "CHANNEL:",
+        channel
+    );
+
+
+    /* =====================================================
+       LOAD EXISTING POSTS
+    ===================================================== */
+
+    let posts =
+        loadPosts();
+
+
+    console.log(
+        "📦 Existing posts:",
+        posts.length
+    );
+
+
+    /* =====================================================
+       LOAD TELEGRAM
+    ===================================================== */
+
+    const messages =
+        await loadTelegramMessages();
+
+
+    const albums = {};
+
+
+    /* =====================================================
+       PROCESS MESSAGES
+    ===================================================== */
+
+    for (
+        const msg of
+        messages
+    ) {
+
+        try {
+
+            console.log(
+                "📨 Processing:",
+                msg.id
+            );
+
+
+            await processMessage(
+                msg,
+                albums
+            );
+
+        }
+        catch (error) {
+
+            console.log(
+                "❌ Message error:",
+                msg.id,
+                error.message
+            );
+
+        }
+
+    }
+
+
+    console.log(
+        "📚 Albums:",
         Object.keys(
             albums
         ).length
     );
 
 
-    console.log(
-        "Posts before save:",
-        posts.length
+    /* =====================================================
+       GET COORDINATES FOR NEW POSTS
+    ===================================================== */
+
+    for (
+        const key of
+        Object.keys(albums)
+    ) {
+
+        const post =
+            albums[key];
+
+
+        if (
+            isTbilisiCoordinates(
+                post.lat,
+                post.lng
+            )
+        ) {
+
+            continue;
+
+        }
+
+
+        await updatePostCoordinates(
+            post
+        );
+
+    }
+
+
+    /* =====================================================
+       MERGE
+    ===================================================== */
+
+    await mergePosts(
+        posts,
+        albums
     );
 
 
-    /* =========================================================
-       SAVE
-    ========================================================= */
+    /* =====================================================
+       BACKFILL OLD POSTS
+    ===================================================== */
+
+    await backfillOldPosts(
+        posts
+    );
+
+
+    /* =====================================================
+       FINAL STATUS
+    ===================================================== */
+
+    for (
+        const post of
+        posts
+    ) {
+
+        updateStatus(
+            post
+        );
+
+    }
+
+
+    /* =====================================================
+       SORT
+    ===================================================== */
+
+    posts.sort(
+
+        (a, b) =>
+
+            Number(
+                b.id
+            ) -
+            Number(
+                a.id
+            )
+
+    );
+
+
+    /* =====================================================
+       COORDINATE STATISTICS
+    ===================================================== */
+
+    let withCoordinates =
+        0;
+
+    let withoutCoordinates =
+        0;
+
+
+    for (
+        const post of
+        posts
+    ) {
+
+        if (
+            isTbilisiCoordinates(
+                post.lat,
+                post.lng
+            )
+        ) {
+
+            withCoordinates++;
+
+
+            console.log(
+
+                "📍",
+
+                post.street,
+
+                "=>",
+
+                post.lat,
+
+                post.lng,
+
+                "|",
+
+                post.geoSource,
+
+                "|",
+
+                post.geoAccuracy
+
+            );
+
+        }
+        else {
+
+            withoutCoordinates++;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       FINAL LOG
+    ===================================================== */
+
+    console.log(
+        "======================================"
+    );
+
+    console.log(
+        "📦 TOTAL POSTS:",
+        posts.length
+    );
+
+    console.log(
+        "📍 WITH COORDINATES:",
+        withCoordinates
+    );
+
+    console.log(
+        "❌ WITHOUT COORDINATES:",
+        withoutCoordinates
+    );
+
+    console.log(
+        "======================================"
+    );
+
+
+    /* =====================================================
+       SAVE POSTS.JSON
+    ===================================================== */
 
     savePosts(
         posts
@@ -1540,11 +3434,10 @@ if (
 
 
     console.log(
-        `✅ Saved ${posts.length} posts`
+        `✅ SAVED ${posts.length} POSTS`
     );
 
 }
-
 
 /* =========================================================
    RUN PARSER
@@ -1557,11 +3450,11 @@ async function runParser() {
         await start();
 
     }
-
-    catch (err) {
+    catch (error) {
 
         console.error(
-            err
+            "🔥 PARSER ERROR:",
+            error
         );
 
     }
@@ -1573,7 +3466,7 @@ runParser();
 
 
 /* =========================================================
-   EVERY 2 MINUTES
+   AUTO SYNC — EVERY 2 MINUTES
 ========================================================= */
 
 setInterval(
