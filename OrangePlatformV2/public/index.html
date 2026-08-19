@@ -2,16 +2,25 @@
 <html lang="ru">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>🍊 Orange Real Estate</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <!-- Leaflet -->
+
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -46,6 +55,11 @@
             color: white;
         }
 
+
+        /* =========================
+           MAP
+        ========================= */
+
         #map {
             display: none;
             width: 100%;
@@ -56,54 +70,49 @@
             margin-bottom: 20px;
         }
 
-        /* ფასის მარკერი */
+
+        /* =========================
+           PRICE MARKER
+        ========================= */
 
         .price-marker {
             background: white;
             border: 2px solid #ff7a00;
             border-radius: 18px;
-
             box-shadow: 0 2px 8px rgba(0,0,0,.18);
-
             padding: 6px 9px;
-
             font-weight: 800;
             color: #222;
-
             white-space: nowrap;
-
             font-size: 13px;
         }
 
-        /* ბევრი ბინა ერთ ადგილზე */
+
+        /* =========================
+           CLUSTER MARKER
+        ========================= */
 
         .cluster-marker {
             background: #ff7a00;
             color: white;
-
             border: 3px solid white;
-
             border-radius: 50%;
-
             box-shadow: 0 2px 8px rgba(0,0,0,.25);
-
             width: 48px;
             height: 48px;
-
             display: flex;
-
             align-items: center;
             justify-content: center;
-
             text-align: center;
-
             font-weight: 800;
             font-size: 12px;
-
             line-height: 1.05;
         }
 
-        /* Popup */
+
+        /* =========================
+           MAP POPUP
+        ========================= */
 
         .map-popup {
             min-width: 190px;
@@ -123,18 +132,139 @@
 
         .map-popup button {
             width: 100%;
-
             border: none;
             border-radius: 8px;
-
             padding: 8px;
-
             background: #ff7a00;
             color: white;
-
             font-weight: 700;
-
             cursor: pointer;
+        }
+
+
+        /* =========================
+           FILTER WINDOW
+        ========================= */
+
+        .filter-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(0,0,0,.35);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .filter-window {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,.25);
+        }
+
+        .filter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .filter-header h2 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .filter-close {
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 50%;
+            background: #f1f1f1;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .filter-window-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .filter-window-content select,
+        .filter-window-content input {
+            width: 100%;
+            min-height: 46px;
+            padding: 11px 13px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background: white;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .filter-window-content select:focus,
+        .filter-window-content input:focus {
+            border-color: #ff7a00;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .filter-actions button {
+            flex: 1;
+            min-height: 46px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .filter-actions button:first-child {
+            background: #ff7a00;
+            color: white;
+        }
+
+        .filter-actions button:last-child {
+            background: #f1f1f1;
+            color: #444;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .view-switcher {
+                margin: 8px;
+                gap: 6px;
+            }
+
+            .view-btn {
+                font-size: 13px;
+                padding: 10px 5px;
+            }
+
+            .filter-overlay {
+                padding: 12px;
+            }
+
+            .filter-window {
+                max-width: 100%;
+                border-radius: 18px;
+                padding: 17px;
+            }
+
         }
 
     </style>
@@ -144,11 +274,15 @@
 
 <body>
 
+
     <!-- =========================
          LOADER
     ========================= -->
 
-    <div id="loader" class="loader-screen">
+    <div
+        id="loader"
+        class="loader-screen"
+    >
 
         <div class="loader-logo">
             🍊
@@ -163,11 +297,9 @@
         </div>
 
         <div class="loader-dots">
-
             <span></span>
             <span></span>
             <span></span>
-
         </div>
 
     </div>
@@ -187,85 +319,71 @@
 
 
     <!-- =========================
-         FILTERS
+         OLD FILTERS
+         ვინარჩუნებთ არსებულ სისტემას
     ========================= -->
 
     <section class="filters">
 
-        <!-- Район -->
+
+        <!-- DISTRICT -->
 
         <select
             id="districtFilter"
-            onchange="filterPosts()">
+            onchange="filterPosts()"
+        >
 
-           <option value="">Все районы</option>
+            <option value="">
+                Все районы
+            </option>
 
-<option value="Saburtalo">Saburtalo</option>
-<option value="Vake">Vake</option>
-<option value="Vera">Vera</option>
-
-<option value="Mtatsminda">Mtatsminda</option>
-<option value="Sololaki">Sololaki</option>
-<option value="Chugureti">Chugureti</option>
-
-<option value="Didube">Didube</option>
-<option value="Nadzaladevi">Nadzaladevi</option>
-<option value="Gldani">Gldani</option>
-
-<option value="Didi Digomi">Didi Digomi</option>
-<option value="Digomi">Digomi</option>
-<option value="Temka">Temka</option>
-
-<option value="Isani">Isani</option>
-<option value="Samgori">Samgori</option>
-<option value="Varketili">Varketili</option>
-<option value="Vazisubani">Vazisubani</option>
-
-<option value="Krtsanisi">Krtsanisi</option>
-<option value="Ortachala">Ortachala</option>
-<option value="Ponichala">Ponichala</option>
-
-<option value="Avlabari">Avlabari</option>
-<option value="Navtlughi">Navtlughi</option>
-<option value="Tbilisi Sea">Tbilisi Sea</option>
+            <option value="Saburtalo">Saburtalo</option>
+            <option value="Vake">Vake</option>
+            <option value="Vera">Vera</option>
+            <option value="Mtatsminda">Mtatsminda</option>
+            <option value="Sololaki">Sololaki</option>
+            <option value="Chugureti">Chugureti</option>
+            <option value="Didube">Didube</option>
+            <option value="Nadzaladevi">Nadzaladevi</option>
+            <option value="Gldani">Gldani</option>
+            <option value="Didi Digomi">Didi Digomi</option>
+            <option value="Digomi">Digomi</option>
+            <option value="Temka">Temka</option>
+            <option value="Isani">Isani</option>
+            <option value="Samgori">Samgori</option>
+            <option value="Varketili">Varketili</option>
+            <option value="Vazisubani">Vazisubani</option>
+            <option value="Krtsanisi">Krtsanisi</option>
+            <option value="Ortachala">Ortachala</option>
+            <option value="Ponichala">Ponichala</option>
+            <option value="Avlabari">Avlabari</option>
+            <option value="Navtlughi">Navtlughi</option>
+            <option value="Tbilisi Sea">Tbilisi Sea</option>
 
         </select>
 
 
-        <!-- Комнаты -->
+        <!-- ROOMS -->
 
         <select
             id="roomsFilter"
-            onchange="filterPosts()">
+            onchange="filterPosts()"
+        >
 
             <option value="">
                 Комнаты
             </option>
 
-            <option value="1">
-                1
-            </option>
-
-            <option value="2">
-                2
-            </option>
-
-            <option value="3">
-                3
-            </option>
-
-            <option value="4">
-                4
-            </option>
-
-            <option value="5">
-                5+
-            </option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5+</option>
 
         </select>
 
 
-        <!-- Цена от -->
+        <!-- MIN PRICE -->
 
         <input
             id="minPrice"
@@ -276,7 +394,7 @@
         >
 
 
-        <!-- Цена до -->
+        <!-- MAX PRICE -->
 
         <input
             id="maxPrice"
@@ -290,32 +408,45 @@
 
 
     <!-- =========================
-         КАТАЛОГ / КАРТА
+         CATALOG / FILTER / MAP
     ========================= -->
 
     <div class="view-switcher">
 
+
+        <!-- CATALOG -->
+
         <button
             id="catalogViewBtn"
             class="view-btn active"
-            onclick="showCatalog()">
+            onclick="showCatalog()"
+        >
 
             🏠 Каталог
 
         </button>
-<button
-    id="filterViewBtn"
-    class="view-btn"
-    onclick="openFilters()">
 
-    🔎 Фильтр
 
-</button>
+        <!-- FILTER -->
+
+        <button
+            id="filterViewBtn"
+            class="view-btn"
+            onclick="openFilters()"
+        >
+
+            🔎 Фильтр
+
+        </button>
+
+
+        <!-- MAP -->
 
         <button
             id="mapViewBtn"
             class="view-btn"
-            onclick="showMap()">
+            onclick="showMap()"
+        >
 
             🗺️ Карта
 
@@ -329,55 +460,141 @@
     ========================= -->
 
     <div id="map"></div>
-<!-- =========================
-     FILTER WINDOW
-========================= -->
 
-<div
-    id="filterOverlay"
-    class="filter-overlay"
->
 
-    <div class="filter-window">
+    <!-- =========================
+         FILTER WINDOW
+    ========================= -->
 
-        <div class="filter-header">
+    <div
+        id="filterOverlay"
+        class="filter-overlay"
+    >
 
-            <h2>🔎 Фильтр</h2>
+        <div class="filter-window">
 
-            <button
-                type="button"
-                class="filter-close"
-                onclick="closeFilters()"
-            >
-                ✕
-            </button>
+
+            <!-- FILTER HEADER -->
+
+            <div class="filter-header">
+
+                <h2>
+                    🔎 Фильтр
+                </h2>
+
+                <button
+                    type="button"
+                    class="filter-close"
+                    onclick="closeFilters()"
+                >
+
+                    ✕
+
+                </button>
+
+            </div>
+
+
+            <!-- FILTER CONTENT -->
+
+            <div class="filter-window-content">
+
+
+                <!-- DISTRICT -->
+
+                <select id="filterDistrict">
+
+                    <option value="">
+                        🏙 Все районы
+                    </option>
+
+                    <option value="Saburtalo">Saburtalo</option>
+                    <option value="Vake">Vake</option>
+                    <option value="Vera">Vera</option>
+                    <option value="Mtatsminda">Mtatsminda</option>
+                    <option value="Sololaki">Sololaki</option>
+                    <option value="Chugureti">Chugureti</option>
+                    <option value="Didube">Didube</option>
+                    <option value="Nadzaladevi">Nadzaladevi</option>
+                    <option value="Gldani">Gldani</option>
+                    <option value="Didi Digomi">Didi Digomi</option>
+                    <option value="Digomi">Digomi</option>
+                    <option value="Temka">Temka</option>
+                    <option value="Isani">Isani</option>
+                    <option value="Samgori">Samgori</option>
+                    <option value="Varketili">Varketili</option>
+                    <option value="Vazisubani">Vazisubani</option>
+                    <option value="Krtsanisi">Krtsanisi</option>
+                    <option value="Ortachala">Ortachala</option>
+                    <option value="Ponichala">Ponichala</option>
+                    <option value="Avlabari">Avlabari</option>
+                    <option value="Navtlughi">Navtlughi</option>
+                    <option value="Tbilisi Sea">Tbilisi Sea</option>
+
+                </select>
+
+
+                <!-- ROOMS -->
+
+                <select id="filterRooms">
+
+                    <option value="">
+                        🛏 Комнаты
+                    </option>
+
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5+</option>
+
+                </select>
+
+
+                <!-- MIN PRICE -->
+
+                <input
+                    type="number"
+                    id="filterMinPrice"
+                    placeholder="Цена от $"
+                >
+
+
+                <!-- MAX PRICE -->
+
+                <input
+                    type="number"
+                    id="filterMaxPrice"
+                    placeholder="Цена до $"
+                >
+
+
+                <!-- ACTIONS -->
+
+                <div class="filter-actions">
+
+                    <button
+                        type="button"
+                        onclick="applyFilters()"
+                    >
+                        🔎 Найти
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="clearFilterWindow()"
+                    >
+                        🗑 Очистить
+                    </button>
+
+                </div>
+
+            </div>
 
         </div>
 
+    </div>
 
-        <div class="filter-window-content">
-
-            <select id="filterDistrict">
-
-                <option value="">
-                    🏙 Все районы
-                </option>
-
-                <option value="Saburtalo">Saburtalo</option>
-                <option value="Vake">Vake</option>
-                <option value="Vera">Vera</option>
-                <option value="Mtatsminda">Mtatsminda</option>
-                <option value="Sololaki">Sololaki</option>
-                <option value="Chugureti">Chugureti</option>
-                <option value="Didube">Didube</option>
-                <option value="Nadzaladevi">Nadzaladevi</option>
-                <option value="Gldani">Gldani</option>
-                <option value="Didi Digomi">Didi Digomi</option>
-                <option value="Digomi">Digomi</option>
-                <option value="Isani">Isani</option>
-                <option value="Samgori">Samgori</option>
-                <option value="Varketili">Varketili</option>
-                <option value="Ortachala">Or
 
     <!-- =========================
          POSTS
@@ -385,7 +602,8 @@
 
     <div
         id="posts"
-        class="grid">
+        class="grid"
+    >
 
         Загрузка...
 
@@ -399,7 +617,8 @@
     <button
         id="statsBtn"
         style="display:none;"
-        onclick="window.location.href='stats.html'">
+        onclick="window.location.href='stats.html'"
+    >
 
         📊 Статистика
 
@@ -412,7 +631,8 @@
 
     <script>
 
-        const tg = window.Telegram?.WebApp;
+        const tg =
+            window.Telegram?.WebApp;
 
         if (tg) {
 
@@ -421,7 +641,10 @@
             const userId =
                 tg.initDataUnsafe?.user?.id;
 
-            if (String(userId) === "5172653731") {
+            if (
+                String(userId) ===
+                "5172653731"
+            ) {
 
                 document
                     .getElementById("statsBtn")
@@ -434,16 +657,22 @@
     </script>
 
 
-    <!-- Leaflet -->
+    <!-- =========================
+         LEAFLET
+    ========================= -->
 
     <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-    </script>
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    ></script>
 
 
-    <!-- ჩვენი app.js -->
+    <!-- =========================
+         APP JS
+    ========================= -->
 
-    <script src="app.js"></script>
+    <script
+        src="app.js"
+    ></script>
 
 
 </body>
