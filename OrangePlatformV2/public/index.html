@@ -674,7 +674,136 @@
         src="app.js"
     ></script>
 
+<script>
 
+function openFilters() {
+
+    const overlay =
+        document.getElementById("filterOverlay");
+
+    if (!overlay) return;
+
+    overlay.style.display = "flex";
+}
+
+
+function closeFilters() {
+
+    const overlay =
+        document.getElementById("filterOverlay");
+
+    if (!overlay) return;
+
+    overlay.style.display = "none";
+}
+
+
+function applyFilters() {
+
+    const district =
+        document.getElementById("filterDistrict");
+
+    const rooms =
+        document.getElementById("filterRooms");
+
+    const minPrice =
+        document.getElementById("filterMinPrice");
+
+    const maxPrice =
+        document.getElementById("filterMaxPrice");
+
+
+    const mainDistrict =
+        document.getElementById("districtFilter");
+
+    const mainRooms =
+        document.getElementById("roomsFilter");
+
+    const mainMinPrice =
+        document.getElementById("minPrice");
+
+    const mainMaxPrice =
+        document.getElementById("maxPrice");
+
+
+    if (mainDistrict && district)
+        mainDistrict.value = district.value;
+
+    if (mainRooms && rooms)
+        mainRooms.value = rooms.value;
+
+    if (mainMinPrice && minPrice)
+        mainMinPrice.value = minPrice.value;
+
+    if (mainMaxPrice && maxPrice)
+        mainMaxPrice.value = maxPrice.value;
+
+
+    if (typeof filterPosts === "function") {
+        filterPosts();
+    }
+
+    closeFilters();
+
+}
+
+
+function clearFilterWindow() {
+
+    const district =
+        document.getElementById("filterDistrict");
+
+    const rooms =
+        document.getElementById("filterRooms");
+
+    const minPrice =
+        document.getElementById("filterMinPrice");
+
+    const maxPrice =
+        document.getElementById("filterMaxPrice");
+
+
+    if (district)
+        district.value = "";
+
+    if (rooms)
+        rooms.value = "";
+
+    if (minPrice)
+        minPrice.value = "";
+
+    if (maxPrice)
+        maxPrice.value = "";
+
+
+    applyFilters();
+
+}
+
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const overlay =
+            document.getElementById("filterOverlay");
+
+        if (!overlay)
+            return;
+
+        if (
+            overlay.style.display === "flex" &&
+            event.target === overlay
+        ) {
+
+            closeFilters();
+
+        }
+
+    }
+);
+
+</script>
 </body>
 
 </html>
