@@ -74,7 +74,7 @@ if (!fs.existsSync(DOWNLOADS)) {
 /*
    რამდენი ბოლო Telegram პოსტი შევამოწმოთ.
 
-   200 საკმარისია ახალი განცხადებების
+   1000 საკმარისია ახალი განცხადებების
    მუდმივი სინქრონიზაციისთვის.
 
    ძველი განცხადებები posts.json-ში
@@ -83,7 +83,7 @@ if (!fs.existsSync(DOWNLOADS)) {
 
 const SYNC_MESSAGES_LIMIT =
     Number(
-        process.env.SYNC_MESSAGES_LIMIT || 200
+        process.env.SYNC_MESSAGES_LIMIT || 1000
     );
 
 
@@ -536,6 +536,8 @@ function makeCoords(
     };
 
 }
+
+
 /* =========================================================
    YANDEX MAP LINK FINDER
 ========================================================= */
@@ -565,6 +567,7 @@ function extractYandexLinks(text) {
             )
         )
     ];
+
 }
 
 
@@ -619,10 +622,6 @@ function parseCoordinatesFromUrl(url) {
         /*
            Yandex:
            longitude,latitude
-
-           ამიტომ:
-           match[1] = longitude
-           match[2] = latitude
         */
 
         const coords =
@@ -643,7 +642,9 @@ function parseCoordinatesFromUrl(url) {
             );
 
             return coords;
+
         }
+
     }
 
 
@@ -669,11 +670,14 @@ function parseCoordinatesFromUrl(url) {
         if (coords) {
 
             return coords;
+
         }
+
     }
 
 
     return null;
+
 }
 
 
@@ -783,6 +787,7 @@ async function resolveYandexLink(
                 };
 
             }
+
         }
 
 
@@ -823,9 +828,11 @@ async function resolveYandexLink(
                 };
 
             }
+
         }
 
     }
+
     catch (error) {
 
         console.log(
@@ -837,6 +844,7 @@ async function resolveYandexLink(
 
 
     return null;
+
 }
 
 
@@ -897,6 +905,7 @@ async function getYandexCoordinates(
 
 
     return null;
+
 }
 
 
@@ -925,6 +934,7 @@ function extractHouseNumber(
     return match
         ? match[1]
         : "";
+
 }
 
 
@@ -963,6 +973,7 @@ function normalizeAddressText(
         )
 
         .trim();
+
 }
 
 
@@ -985,7 +996,7 @@ async function waitForNominatim() {
 
 
     /*
-       მინიმუმ 1.6 წამი
+       მინიმუმ 3 წამი
        მოთხოვნებს შორის.
     */
 
@@ -1006,17 +1017,27 @@ async function waitForNominatim() {
 
     lastNominatimRequest =
         Date.now();
+
 }
+
 
 /* =========================================================
    GEOCODE ADDRESS
    REAL ADDRESS → REAL COORDINATES
 ========================================================= */
-const geocodeCache = new Map();
-async function geocodeAddress(address) {
+
+const geocodeCache =
+    new Map();
+
+
+async function geocodeAddress(
+    address
+) {
 
     if (!address || address === "-") {
+
         return null;
+
     }
 
 
@@ -1024,22 +1045,28 @@ async function geocodeAddress(address) {
         String(address)
             .replace(/\s+/g, " ")
             .trim();
-            const cacheKey =
-    cleanAddress.toLowerCase();
 
-if (geocodeCache.has(cacheKey)) {
 
-    console.log(
-        "♻️ GEOCODE CACHE:",
-        cleanAddress
-    );
+    const cacheKey =
+        cleanAddress.toLowerCase();
 
-    return geocodeCache.get(cacheKey);
-}
+
+    if (geocodeCache.has(cacheKey)) {
+
+        console.log(
+            "♻️ GEOCODE CACHE:",
+            cleanAddress
+        );
+
+        return geocodeCache.get(cacheKey);
+
+    }
 
 
     if (cleanAddress.length < 4) {
+
         return null;
+
     }
 
 
@@ -1048,31 +1075,39 @@ if (geocodeCache.has(cacheKey)) {
        საჭიროა Yandex/Nominatim-ისთვის
     */
 
-    const transliterateRussianToLatin = text => {
+    const transliterateRussianToLatin =
+        text => {
 
-        const map = {
-            "А":"A","Б":"B","В":"V","Г":"G","Д":"D",
-            "Е":"E","Ё":"Yo","Ж":"Zh","З":"Z","И":"I",
-            "Й":"Y","К":"K","Л":"L","М":"M","Н":"N",
-            "О":"O","П":"P","Р":"R","С":"S","Т":"T",
-            "У":"U","Ф":"F","Х":"Kh","Ц":"Ts","Ч":"Ch",
-            "Ш":"Sh","Щ":"Shch","Ъ":"","Ы":"Y","Ь":"",
-            "Э":"E","Ю":"Yu","Я":"Ya",
+            const map = {
 
-            "а":"a","б":"b","в":"v","г":"g","д":"d",
-            "е":"e","ё":"yo","ж":"zh","з":"z","и":"i",
-            "й":"y","к":"k","л":"l","м":"m","н":"n",
-            "о":"o","п":"p","р":"r","с":"s","т":"t",
-            "у":"u","ф":"f","х":"kh","ц":"ts","ч":"ch",
-            "ш":"sh","щ":"shch","ъ":"","ы":"y","ь":"",
-            "э":"e","ю":"yu","я":"ya"
+                "А":"A","Б":"B","В":"V","Г":"G","Д":"D",
+                "Е":"E","Ё":"Yo","Ж":"Zh","З":"Z","И":"I",
+                "Й":"Y","К":"K","Л":"L","М":"M","Н":"N",
+                "О":"O","П":"P","Р":"R","С":"S","Т":"T",
+                "У":"U","Ф":"F","Х":"Kh","Ц":"Ts","Ч":"Ch",
+                "Ш":"Sh","Щ":"Shch","Ъ":"","Ы":"Y","Ь":"",
+                "Э":"E","Ю":"Yu","Я":"Ya",
+
+                "а":"a","б":"b","в":"v","г":"g","д":"d",
+                "е":"e","ё":"yo","ж":"zh","з":"z","и":"i",
+                "й":"y","к":"k","л":"l","м":"m","н":"n",
+                "о":"o","п":"p","р":"r","с":"s","т":"t",
+                "у":"u","ф":"f","х":"kh","ц":"ts","ч":"ch",
+                "ш":"sh","щ":"shch","ъ":"","ы":"y","ь":"",
+                "э":"e","ю":"yu","я":"ya"
+
+            };
+
+
+            return String(text)
+                .split("")
+                .map(
+                    char =>
+                        map[char] ?? char
+                )
+                .join("");
+
         };
-
-        return String(text)
-            .split("")
-            .map(char => map[char] ?? char)
-            .join("");
-    };
 
 
     /*
@@ -1094,32 +1129,36 @@ if (geocodeCache.has(cacheKey)) {
             cleanAddress
         );
 
-const normalizedAddress =
-    cleanAddress
-        .replace(
-            /Жулии Шартава|Жули Шартава|Juli Shartava|Zhuli Shartava/gi,
-            "Julius Shartava Street"
-        )
-        .replace(
-            /Budapeshtis Street|Budapestis Street|Будапешти Street|Будапешტის Street/gi,
-            "Budapest Street"
-        );
 
-const queries = [
+    const normalizedAddress =
+        cleanAddress
 
-    // 1. სრული მისამართი
-    `${cleanAddress}, Tbilisi, Georgia`,
+            .replace(
+                /Жулии Шартава|Жули Шартава|Juli Shartava|Zhuli Shartava/gi,
+                "Julius Shartava Street"
+            )
 
-    // 2. რუსულიდან ლათინურად
-    `${latinAddress}, Tbilisi, Georgia`,
+            .replace(
+                /Budapeshtis Street|Budapestis Street|Будапешти Street|Будапешტის Street/gi,
+                "Budapest Street"
+            );
 
-    // 3. ნორმალიზებული მისამართი
-    `${normalizedAddress}, Tbilisi, Georgia`,
 
-    // 4. მხოლოდ ნორმალიზებული მისამართი
-    normalizedAddress
+    const queries = [
 
-];
+        // 1. სრული მისამართი
+        `${cleanAddress}, Tbilisi, Georgia`,
+
+        // 2. რუსულიდან ლათინურად
+        `${latinAddress}, Tbilisi, Georgia`,
+
+        // 3. ნორმალიზებული მისამართი
+        `${normalizedAddress}, Tbilisi, Georgia`,
+
+        // 4. მხოლოდ ნორმალიზებული მისამართი
+        normalizedAddress
+
+    ];
 
 
     /*
@@ -1193,6 +1232,7 @@ const queries = [
 
                         timeout:
                             15000
+
                     }
                 );
 
@@ -1266,7 +1306,7 @@ const queries = [
                             ?.house_number ||
                         ""
                     )
-                    .trim();
+                        .trim();
 
 
                 const type =
@@ -1275,7 +1315,7 @@ const queries = [
                         item.addresstype ||
                         ""
                     )
-                    .toLowerCase();
+                        .toLowerCase();
 
 
                 const display =
@@ -1484,11 +1524,11 @@ const queries = [
                         best.address
                             .house_number
                     )
-                    .toLowerCase() ===
+                        .toLowerCase() ===
                     String(
                         requestedHouse
                     )
-                    .toLowerCase()
+                        .toLowerCase()
                 );
 
 
@@ -1529,22 +1569,33 @@ const queries = [
 
 
                 const result = {
-    ...coords,
 
-    geoDisplayName:
-        best.display_name
-};
+                    ...coords,
 
-console.log(
-    "✅ FINAL COORDINATES:",
-    result
-);
+                    geoDisplayName:
+                        best.display_name
 
-return result;
+                };
+
+
+                console.log(
+                    "✅ FINAL COORDINATES:",
+                    result
+                );
+
+
+                geocodeCache.set(
+                    cacheKey,
+                    result
+                );
+
+
+                return result;
 
             }
 
         }
+
         catch (error) {
 
             const status =
@@ -1570,6 +1621,7 @@ return result;
                         )
                 );
 
+
                 continue;
 
             }
@@ -1591,15 +1643,23 @@ return result;
     );
 
 
-    return null;
-}
+    geocodeCache.set(
+        cacheKey,
+        null
+    );
 
+
+    return null;
+
+}
 /* =========================================================
    GET COORDINATES FOR POST
    YANDEX URL FIRST → ADDRESS GEOCODING SECOND
 ========================================================= */
 
-async function getCoordinatesForPost(post) {
+async function getCoordinatesForPost(
+    post
+) {
 
     /*
        1. უკვე არსებული სწორი კოორდინატა
@@ -1745,6 +1805,8 @@ async function getCoordinatesForPost(post) {
     return null;
 
 }
+
+
 /* =========================================================
    DOWNLOAD TELEGRAM PHOTO
 ========================================================= */
@@ -1813,6 +1875,7 @@ async function downloadPhoto(
         );
 
     }
+
     catch (error) {
 
         console.log(
@@ -1982,6 +2045,7 @@ function loadPosts() {
         return posts;
 
     }
+
     catch (error) {
 
         console.log(
@@ -2215,6 +2279,7 @@ async function processMessage(
             );
 
     }
+
     else {
 
         post.district =
@@ -2772,26 +2837,20 @@ async function mergePosts(
         post.price =
             post.price || "-";
 
-
         post.district =
             post.district || "-";
-
 
         post.street =
             post.street || "-";
 
-
         post.rooms =
             post.rooms || "-";
-
 
         post.bedrooms =
             post.bedrooms || "-";
 
-
         post.area =
             post.area || "-";
-
 
         post.floor =
             post.floor || "-";
@@ -2824,6 +2883,7 @@ async function mergePosts(
             posts.findIndex(
 
                 oldPost =>
+
                     String(
                         oldPost.id
                     ) ===
@@ -2834,42 +2894,16 @@ async function mergePosts(
             );
 
 
-        /* =================================================
-           FIND SAME APARTMENT
-        ================================================= */
+        /*
+           IMPORTANT:
 
-        if (
-            existingIndex === -1
-        ) {
+           Telegram ID არის მთავარი უნიკალური
+           იდენტიფიკატორი.
 
-            const newKey =
-                makeApartmentKey(
-                    post
-                );
-
-
-            if (newKey) {
-
-                existingIndex =
-                    posts.findIndex(
-
-                        oldPost =>
-
-                            makeApartmentKey(
-                                oldPost
-                            ) ===
-                            newKey
-
-                    );
-
-            }
-
-        }
-
-
-        /* =================================================
-           UPDATE EXISTING
-        ================================================= */
+           ამიტომ ახალი Telegram პოსტი
+           სხვა ბინას მხოლოდ მონაცემების
+           მსგავსების გამო აღარ უნდა შეერწყას.
+        */
 
         if (
             existingIndex >= 0
@@ -2964,7 +2998,9 @@ async function mergePosts(
             console.log(
                 "♻️ UPDATED:",
                 merged.street,
-                merged.district
+                merged.district,
+                "| Telegram ID:",
+                merged.id
             );
 
         }
@@ -2976,6 +3012,11 @@ async function mergePosts(
 
         else {
 
+            /*
+               ახალი Telegram ID ყოველთვის
+               ახალი ჩანაწერია.
+            */
+
             posts.push(
                 post
             );
@@ -2984,7 +3025,9 @@ async function mergePosts(
             console.log(
                 "🆕 NEW:",
                 post.street,
-                post.district
+                post.district,
+                "| Telegram ID:",
+                post.id
             );
 
         }
@@ -3073,9 +3116,23 @@ async function backfillOldPosts(
         processed++;
 
 
-        await updatePostCoordinates(
-            post
-        );
+        try {
+
+            await updatePostCoordinates(
+                post
+            );
+
+        }
+
+        catch (error) {
+
+            console.log(
+                "⚠️ Backfill error:",
+                post.id,
+                error.message
+            );
+
+        }
 
     }
 
@@ -3086,8 +3143,6 @@ async function backfillOldPosts(
     );
 
 }
-
-
 /* =========================================================
    LOAD TELEGRAM MESSAGES
 ========================================================= */
@@ -3121,7 +3176,9 @@ async function loadTelegramMessages() {
 
 
     /*
-       ძველი → ახალი
+       Telegram აბრუნებს ახალიდან ძველისკენ.
+       ჩვენ ვაბრუნებთ ძველიდან ახალისკენ,
+       რათა album-ებიც სწორად შეიკრას.
     */
 
     messages.reverse();
@@ -3232,6 +3289,7 @@ async function start() {
             );
 
         }
+
         catch (error) {
 
             console.log(
@@ -3254,7 +3312,44 @@ async function start() {
 
 
     /* =====================================================
-       GET COORDINATES FOR NEW POSTS
+       MERGE FIRST
+       
+       ძალიან მნიშვნელოვანი:
+       ახალი განცხადებები ჯერ posts.json-ში
+       უნდა მოხვდეს.
+    ===================================================== */
+
+    await mergePosts(
+        posts,
+        albums
+    );
+
+
+    /* =====================================================
+       IMMEDIATE SAVE
+       
+       ამ ეტაპზე ყველა ახალი Telegram
+       განცხადება უკვე შენახულია.
+
+       თუნდაც geocoding შემდეგ გაიჭედოს,
+       ბინა აღარ დაიკარგება.
+    ===================================================== */
+
+    savePosts(
+        posts
+    );
+
+
+    console.log(
+        `💾 SYNC SAVED: ${posts.length} POSTS`
+    );
+
+
+    /* =====================================================
+       GET COORDINATES
+       
+       კოორდინატები უკვე ცალკე ეტაპზე
+       იძებნება.
     ===================================================== */
 
     for (
@@ -3262,9 +3357,49 @@ async function start() {
         Object.keys(albums)
     ) {
 
-        const post =
+        const telegramPost =
             albums[key];
 
+
+        /*
+           posts.json-ში ვიპოვოთ იგივე
+           Telegram ID.
+        */
+
+        const postIndex =
+            posts.findIndex(
+                post =>
+                    String(
+                        post.id
+                    ) ===
+                    String(
+                        telegramPost.id
+                    )
+            );
+
+
+        if (
+            postIndex === -1
+        ) {
+
+            console.log(
+                "⚠️ Post disappeared from posts array:",
+                telegramPost.id
+            );
+
+            continue;
+
+        }
+
+
+        const post =
+            posts[postIndex];
+
+
+        /*
+           თუ უკვე აქვს სწორი კოორდინატა,
+           აღარ ვეძებთ.
+        */
 
         if (
             isTbilisiCoordinates(
@@ -3278,21 +3413,47 @@ async function start() {
         }
 
 
-        await updatePostCoordinates(
-            post
-        );
+        try {
+
+            await updatePostCoordinates(
+                post
+            );
+
+
+            /*
+               თითოეული პოსტის შემდეგ
+               აუცილებლად შევინახოთ.
+            */
+
+            savePosts(
+                posts
+            );
+
+
+        }
+
+        catch (error) {
+
+            console.log(
+                "⚠️ Geocoding error — post kept:",
+                post.id,
+                error.message
+            );
+
+
+            /*
+               ყველაზე მნიშვნელოვანი:
+               geocoding-ის შეცდომა
+               განცხადებას არ შლის.
+            */
+
+            savePosts(
+                posts
+            );
+
+        }
 
     }
-
-
-    /* =====================================================
-       MERGE
-    ===================================================== */
-
-    await mergePosts(
-        posts,
-        albums
-    );
 
 
     /* =====================================================
@@ -3300,6 +3461,16 @@ async function start() {
     ===================================================== */
 
     await backfillOldPosts(
+        posts
+    );
+
+
+    /*
+       Backfill-ის შემდეგაც
+       საბოლოოდ შევინახოთ.
+    */
+
+    savePosts(
         posts
     );
 
@@ -3331,6 +3502,7 @@ async function start() {
             Number(
                 b.id
             ) -
+
             Number(
                 a.id
             )
@@ -3387,6 +3559,7 @@ async function start() {
             );
 
         }
+
         else {
 
             withoutCoordinates++;
@@ -3404,20 +3577,24 @@ async function start() {
         "======================================"
     );
 
+
     console.log(
         "📦 TOTAL POSTS:",
         posts.length
     );
+
 
     console.log(
         "📍 WITH COORDINATES:",
         withCoordinates
     );
 
+
     console.log(
         "❌ WITHOUT COORDINATES:",
         withoutCoordinates
     );
+
 
     console.log(
         "======================================"
@@ -3425,7 +3602,7 @@ async function start() {
 
 
     /* =====================================================
-       SAVE POSTS.JSON
+       FINAL SAVE
     ===================================================== */
 
     savePosts(
@@ -3438,18 +3615,49 @@ async function start() {
     );
 
 }
-
 /* =========================================================
    RUN PARSER
 ========================================================= */
 
+let parserRunning =
+    false;
+
+
+/* =========================================================
+   PARSER RUNNER
+   ერთდროულად ორი parser არ გაეშვას
+========================================================= */
+
 async function runParser() {
+
+    if (
+        parserRunning
+    ) {
+
+        console.log(
+            "⏳ Parser is already running — skipping this cycle."
+        );
+
+        return;
+
+    }
+
+
+    parserRunning =
+        true;
+
+
+    console.log(
+        "🍊 Starting parser..."
+    );
+
 
     try {
 
         await start();
 
     }
+
     catch (error) {
 
         console.error(
@@ -3459,19 +3667,40 @@ async function runParser() {
 
     }
 
+    finally {
+
+        parserRunning =
+            false;
+
+
+        console.log(
+            "✅ Parser finished."
+        );
+
+    }
+
 }
 
+
+/* =========================================================
+   FIRST RUN
+========================================================= */
 
 runParser();
 
 
 /* =========================================================
-   AUTO SYNC — EVERY 2 MINUTES
+   AUTO SYNC
+   ყოველ 2 წუთში ერთხელ
 ========================================================= */
 
 setInterval(
 
-    runParser,
+    () => {
+
+        runParser();
+
+    },
 
     2 * 60 * 1000
 
