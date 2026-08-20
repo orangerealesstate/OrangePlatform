@@ -2975,8 +2975,7 @@ function addMapControls() {
 
     `;
 
-
-    ffilterButton.onclick =
+filterButton.onclick =
     event => {
 
         event.preventDefault();
@@ -2987,46 +2986,22 @@ function addMapControls() {
     };
 
 
-            const hidden =
-                filters.style.display ===
-                    "none" ||
-
-                getComputedStyle(
-                    filters
-                ).display ===
-                    "none";
+controls.appendChild(
+    catalogButton
+);
 
 
-            if (hidden) {
-
-                filters.style.display =
-                    "flex";
-
-            }
-
-            else {
-
-                filters.style.display =
-                    "none";
-
-            }
-
-        };
+controls.appendChild(
+    filterButton
+);
 
 
-    controls.appendChild(
-        catalogButton
-    );
+map.appendChild(
+    controls
+);
 
+}
 
-    controls.appendChild(
-        filterButton
-    );
-
-
-    map.appendChild(
-        controls
-    );
 
 
 /* =========================================================
