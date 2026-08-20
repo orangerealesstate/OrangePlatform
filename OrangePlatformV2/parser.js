@@ -1984,7 +1984,7 @@ if (
     }
 
 }
-
+}
 
 /* =========================================================
    DOWNLOAD TELEGRAM PHOTO
@@ -4459,7 +4459,6 @@ async function start() {
 let parserRunning =
     false;
 
-
 /* =========================================================
    RUN PARSER
 ========================================================= */
@@ -4471,7 +4470,7 @@ async function runParser() {
     ) {
 
         console.log(
-            "⏳ Parser is already running — skipping this cycle."
+            "Parser is already running - skipping this cycle."
         );
 
         return;
@@ -4484,7 +4483,7 @@ async function runParser() {
 
 
     console.log(
-        "🍊 Starting parser..."
+        "Starting parser..."
     );
 
 
@@ -4499,15 +4498,10 @@ async function runParser() {
     ) {
 
         console.error(
-            "🔥 PARSER ERROR:",
+            "PARSER ERROR:",
             error
         );
 
-
-        /*
-           შეცდომის შემთხვევაშიც
-           posts.json-ის შენახვა ვცადოთ.
-        */
 
         try {
 
@@ -4534,7 +4528,7 @@ async function runParser() {
         ) {
 
             console.error(
-                "❌ Emergency save error:",
+                "Emergency save error:",
                 saveError.message
             );
 
@@ -4549,7 +4543,7 @@ async function runParser() {
 
 
         console.log(
-            "✅ Parser cycle finished."
+            "Parser cycle finished."
         );
 
     }
@@ -4570,7 +4564,6 @@ runParser();
 ========================================================= */
 
 setInterval(
-
     () => {
 
         runParser();
@@ -4578,6 +4571,4 @@ setInterval(
     },
 
     2 * 60 * 1000
-
 );
- }

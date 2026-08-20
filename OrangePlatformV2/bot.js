@@ -85,6 +85,13 @@ bot.on("callback_query", async (query) => {
         }
 
         const favorites = await response.json();
+        console.log(
+    "❤️ BOT FAVORITES:",
+    {
+        userId,
+        favorites
+    }
+);
 
         if (
             !Array.isArray(favorites) ||
