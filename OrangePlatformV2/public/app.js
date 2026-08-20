@@ -3190,10 +3190,10 @@ function initMap() {
 
             {
                 position:
-                    "topright",
+                    "bottomrigh",
 
                 collapsed:
-                    false
+                    true
             }
 
         ).addTo(
