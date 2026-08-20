@@ -610,7 +610,10 @@ app.post(
     "/api/favorites",
     (req, res) => {
 
-
+console.log(
+            "❤️ FAVORITE REQUEST:",
+            req.body
+        );
         const favorites =
             getFavorites();
 
