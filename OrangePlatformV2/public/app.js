@@ -3161,7 +3161,14 @@ function initMap() {
                         "Tiles &copy; Esri"
                 }
             );
+window.mapLayerNormal =
+    mapLayerNormal;
 
+window.mapLayerSatellite =
+    mapLayerSatellite;
+
+window.mapSatelliteMode =
+    false;
 
         mapLayerNormal.addTo(
             mapInstance
@@ -3173,33 +3180,86 @@ function initMap() {
                 .addTo(
                     mapInstance
                 );
+const satelliteButton =
+    document.createElement("button");
 
+satelliteButton.type =
+    "button";
 
-       L.control.layers(
-    {
+satelliteButton.innerHTML =
+    "🛰️";
 
-        "🗺️ Карта":
-            mapLayerNormal,
+satelliteButton.title =
+    "Спутник";
 
-        "🛰️ Спутник":
-            mapLayerSatellite
+satelliteButton.style.cssText = `
+    width:48px;
+    height:48px;
+    border:0;
+    border-radius:14px;
+    background:white;
+    box-shadow:0 3px 12px rgba(0,0,0,.25);
+    font-size:23px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-left:8px;
+`;
 
-    },
+satelliteButton.onclick =
+    function(event) {
 
-    null,
+        event.preventDefault();
+        event.stopPropagation();
 
-    {
-        position:
-            "bottomrigh",
+        if (
+            window.mapSatelliteMode === false
+        ) {
 
-        collapsed:
-            true
-    }
+            mapLayerNormal.removeFrom(
+                mapInstance
+            );
 
-).addTo(
-    mapInstance
+            mapLayerSatellite.addTo(
+                mapInstance
+            );
+
+            window.mapSatelliteMode =
+                true;
+
+            satelliteButton.innerHTML =
+                "🗺️";
+
+            satelliteButton.title =
+                "Карта";
+
+        } else {
+
+            mapLayerSatellite.removeFrom(
+                mapInstance
+            );
+
+            mapLayerNormal.addTo(
+                mapInstance
+            );
+
+            window.mapSatelliteMode =
+                false;
+
+            satelliteButton.innerHTML =
+                "🛰️";
+
+            satelliteButton.title =
+                "Спутник";
+        }
+
+        mapInstance.invalidateSize();
+    };
+
+controls.appendChild(
+    satelliteButton
 );
-
     }
 
 
