@@ -2938,7 +2938,92 @@ function addMapControls() {
             openFilters();
 
         };
+/* =========================================================
+   SATELLITE / MAP BUTTON
+========================================================= */
 
+const satelliteButton =
+    document.createElement("button");
+
+satelliteButton.type =
+    "button";
+
+satelliteButton.id =
+    "mapSatelliteButton";
+
+satelliteButton.innerHTML =
+    "🛰️";
+
+satelliteButton.title =
+    "Спутник";
+
+satelliteButton.style.cssText = `
+    border:0;
+    border-radius:12px;
+    width:46px;
+    height:46px;
+    padding:0;
+    background:#ffffff;
+    color:#333333;
+    font-size:21px;
+    box-shadow:0 3px 12px rgba(0,0,0,.20);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+`;
+
+satelliteButton.onclick =
+    event => {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (
+            window.mapSatelliteMode
+        ) {
+
+            window.mapLayerSatellite.removeFrom(
+                mapInstance
+            );
+
+            window.mapLayerNormal.addTo(
+                mapInstance
+            );
+
+            window.mapSatelliteMode =
+                false;
+
+            satelliteButton.innerHTML =
+                "🛰️";
+
+            satelliteButton.title =
+                "Спутник";
+
+        }
+
+        else {
+
+            window.mapLayerNormal.removeFrom(
+                mapInstance
+            );
+
+            window.mapLayerSatellite.addTo(
+                mapInstance
+            );
+
+            window.mapSatelliteMode =
+                true;
+
+            satelliteButton.innerHTML =
+                "🗺️";
+
+            satelliteButton.title =
+                "Карта";
+
+        }
+
+    };
 
     controls.appendChild(
         catalogButton
@@ -2947,7 +3032,9 @@ function addMapControls() {
     controls.appendChild(
         filterButton
     );
-
+controls.appendChild(
+    satelliteButton
+);
     map.appendChild(
         controls
     );
