@@ -725,21 +725,16 @@ function openFilters() {
 
 function closeFilters() {
 
-    const filters =
-        document.querySelector(".search-panel");
+    const overlay =
+        document.getElementById("filterOverlay");
 
-    if (!filters) {
-
+    if (!overlay) {
         return;
-
     }
 
-    filters.style.display = "none";
+    overlay.style.display = "none";
 
-    console.log(
-        "🔎 Filters closed"
-    );
-
+    console.log("🔴 Filters closed");
 }
 
 
