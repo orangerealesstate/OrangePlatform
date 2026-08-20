@@ -1941,25 +1941,37 @@ async function getCoordinatesForPost(
 
     }
 
+/*
+   Street only
 
-    /*
-       Street only
-    */
+   მხოლოდ ქუჩის ცენტრს აღარ ვიყენებთ
+   ბინის ზუსტ ლოკაციად.
+
+   თუ სახლის ნომერი არ გვაქვს,
+   არ ვაბრუნებთ არაზუსტ კოორდინატას.
+*/
+
+if (
+    post.street &&
+    post.street !== "-"
+) {
+
+    const houseNumber =
+        extractHouseNumber(
+            post.street
+        );
 
     if (
-        post.street &&
-        post.street !== "-"
+        houseNumber
     ) {
 
-        const streetOnly =
+        const exactAddress =
             `${post.street}, Tbilisi, Georgia`;
-
 
         const result =
             await geocodeAddress(
-                streetOnly
+                exactAddress
             );
-
 
         if (
             result
@@ -1970,9 +1982,6 @@ async function getCoordinatesForPost(
         }
 
     }
-
-
-    return null;
 
 }
 
@@ -2451,21 +2460,21 @@ function processMessage(
     /* =====================================================
        ADDRESS
     ===================================================== */
+const detectedStreet =
+    getValue(
+        text,
+        [
 
-    const detectedStreet =
-        getValue(
+            /📍\s*Адрес:\s*([^\n]+)/i,
 
-            text,
+            /Адрес:\s*([^\n]+)/i,
 
-            [
+            /📍\s*(?:ул\.?|улица|проспект|пр-т|пр\.?|avenue|street|st\.?)\s+([^\n]+)/i,
 
-                /📍\s*Адрес:\s*([^\n]+)/i,
+            /(?:ул\.?|улица|проспект|пр-т|пр\.?|avenue|street|st\.?)\s+([А-Яа-яЁёA-Za-zА-Яа-яЁё0-9\s.-]+?)(?=\s*(?:#|📍|Цена|Комнат|Площадь|Этаж|$))/i
 
-                /Адрес:\s*([^\n]+)/i
-
-            ]
-
-        );
+        ]
+    );
 
 
     if (
@@ -4571,3 +4580,4 @@ setInterval(
     2 * 60 * 1000
 
 );
+ }
