@@ -3175,30 +3175,30 @@ function initMap() {
                 );
 
 
-        L.control.layers(
-            {
+       L.control.layers(
+    {
 
-                "🗺️ Карта":
-                    mapLayerNormal,
+        "🗺️ Карта":
+            mapLayerNormal,
 
-                "🛰️ Спутник":
-                    mapLayerSatellite
+        "🛰️ Спутник":
+            mapLayerSatellite
 
-            },
+    },
 
-            null,
+    null,
 
-            {
-                position:
-                    "bottomrigh",
+    {
+        position:
+            "bottomrigh",
 
-                collapsed:
-                    true
-            }
+        collapsed:
+            true
+    }
 
-        ).addTo(
-            mapInstance
-        );
+).addTo(
+    mapInstance
+);
 
     }
 
