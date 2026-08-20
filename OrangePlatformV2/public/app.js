@@ -2839,101 +2839,65 @@ function showMap() {
 /* =========================================================
    MAP CONTROLS
 ========================================================= */
-
 function addMapControls() {
 
     const map =
-        document.getElementById(
-            "map"
-        );
-
+        document.getElementById("map");
 
     if (!map) {
-
         return;
-
     }
-
 
     const oldControls =
-        document.getElementById(
-            "mapControls"
-        );
-
+        document.getElementById("mapControls");
 
     if (oldControls) {
-
         oldControls.remove();
-
     }
 
-
     const controls =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
-
-    controls.id =
-        "mapControls";
-
+    controls.id = "mapControls";
 
     controls.style.cssText = `
-
         position:absolute;
-
         left:12px;
         bottom:12px;
-
         z-index:1000;
-
         display:flex;
-
         gap:8px;
-
     `;
 
 
-    const catalogButton =
-        document.createElement(
-            "button"
-        );
+    /* =========================
+       CATALOG BUTTON
+    ========================= */
 
+    const catalogButton =
+        document.createElement("button");
+
+    catalogButton.type = "button";
 
     catalogButton.innerHTML =
         "🏠 Каталог";
 
-
     catalogButton.style.cssText = `
-
         border:0;
-
         border-radius:12px;
-
         padding:11px 15px;
-
         background:#ff7a00;
-
         color:white;
-
         font-size:14px;
-
         font-weight:700;
-
-        box-shadow:
-            0 3px 12px
-            rgba(0,0,0,.25);
-
+        box-shadow:0 3px 12px rgba(0,0,0,.25);
         cursor:pointer;
-
     `;
-
 
     catalogButton.onclick =
         event => {
 
             event.preventDefault();
-
             event.stopPropagation();
 
             showCatalog();
@@ -2941,69 +2905,99 @@ function addMapControls() {
         };
 
 
-    const filterButton =
-        document.createElement(
-            "button"
-        );
+    /* =========================
+       FILTER BUTTON
+    ========================= */
 
+    const filterButton =
+        document.createElement("button");
+
+    filterButton.type = "button";
 
     filterButton.innerHTML =
         "⚱ Фильтры";
 
-
     filterButton.style.cssText = `
-
         border:0;
-
         border-radius:12px;
-
         padding:11px 15px;
-
         background:#22a447;
-
         color:white;
-
         font-size:14px;
-
         font-weight:700;
-
-        box-shadow:
-            0 3px 12px
-            rgba(0,0,0,.25);
-
+        box-shadow:0 3px 12px rgba(0,0,0,.25);
         cursor:pointer;
-
     `;
 
-filterButton.onclick =
-    event => {
+    filterButton.onclick =
+        event => {
 
-        event.preventDefault();
-        event.stopPropagation();
+            event.preventDefault();
+            event.stopPropagation();
 
-        openFilters();
+            openFilters();
 
-    };
-
-
-controls.appendChild(
-    catalogButton
-);
+        };
 
 
-controls.appendChild(
-    filterButton
-);
+    controls.appendChild(
+        catalogButton
+    );
 
+    controls.appendChild(
+        filterButton
+    );
 
-map.appendChild(
-    controls
-);
+    map.appendChild(
+        controls
+    );
 
 }
 
 
+/* =========================================================
+   OPEN / CLOSE FILTERS
+========================================================= */
 
+function openFilters() {
+
+    const filters =
+        document.querySelector(
+            ".search-panel"
+        );
+
+    if (!filters) {
+
+        console.error(
+            "❌ .search-panel not found"
+        );
+
+        return;
+
+    }
+
+
+    const hidden =
+        getComputedStyle(
+            filters
+        ).display === "none";
+
+
+    if (hidden) {
+
+        filters.style.display =
+            "flex";
+
+    }
+
+    else {
+
+        filters.style.display =
+            "none";
+
+    }
+
+}
 /* =========================================================
    INIT MAP
 ========================================================= */
