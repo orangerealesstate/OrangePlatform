@@ -1554,14 +1554,11 @@ function renderPosts(
         post => {
 
             const images =
-                Array.isArray(
-                    post.images
-                ) &&
-                post.images.length
-                    ? post.images
-                    : [
-                        "https://via.placeholder.com/600x400?text=No+Photo"
-                    ];
+    Array.isArray(post.images) && post.images.length
+        ? post.images
+        : [
+            "https://via.placeholder.com/600x400?text=No+Photo"
+        ];
 
 
             if (
@@ -1672,11 +1669,14 @@ function renderPosts(
 
 
                     <img
-                        id="card-image-${post.id}"
-                        src="${imageSrc}"
-                        class="card-image"
-                        alt=""
-                    >
+    id="card-image-${post.id}"
+    src="${imageSrc}"
+    class="card-image"
+    alt=""
+    loading="lazy"
+    decoding="async"
+    fetchpriority="low"
+>
 
 
                     <button
