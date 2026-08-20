@@ -697,72 +697,188 @@
 
 function openFilters() {
 
-    const overlay =
-        document.getElementById("filterOverlay");
+    const filters =
+        document.querySelector(".search-panel");
 
-    if (!overlay) return;
+    if (!filters) {
 
-    overlay.style.display = "flex";
+        console.error(
+            "❌ .search-panel not found"
+        );
+
+        return;
+
+    }
+
+    filters.style.display = "flex";
+
+    filters.style.position = "fixed";
+    filters.style.top = "70px";
+    filters.style.left = "10px";
+    filters.style.right = "10px";
+
+    filters.style.zIndex = "5000";
+
+    filters.style.background = "white";
+
+    filters.style.padding = "15px";
+
+    filters.style.borderRadius = "15px";
+
+    filters.style.boxShadow =
+        "0 5px 25px rgba(0,0,0,.30)";
+
+    filters.style.maxHeight =
+        "calc(100vh - 90px)";
+
+    filters.style.overflowY =
+        "auto";
+
+    console.log(
+        "🔎 Filters opened"
+    );
+
 }
 
 
 function closeFilters() {
 
-    const overlay =
-        document.getElementById("filterOverlay");
+    const filters =
+        document.querySelector(".search-panel");
 
-    if (!overlay) return;
+    if (!filters) {
 
-    overlay.style.display = "none";
+        return;
+
+    }
+
+    filters.style.display = "none";
+
+    console.log(
+        "🔎 Filters closed"
+    );
+
 }
 
 
 function applyFilters() {
 
+    console.log("🔎 APPLY FILTERS");
+
     const district =
-        document.getElementById("filterDistrict");
+        document.getElementById(
+            "filterDistrict"
+        );
 
     const rooms =
-        document.getElementById("filterRooms");
+        document.getElementById(
+            "filterRooms"
+        );
 
     const minPrice =
-        document.getElementById("filterMinPrice");
+        document.getElementById(
+            "filterMinPrice"
+        );
 
     const maxPrice =
-        document.getElementById("filterMaxPrice");
+        document.getElementById(
+            "filterMaxPrice"
+        );
 
 
     const mainDistrict =
-        document.getElementById("districtFilter");
+        document.getElementById(
+            "districtFilter"
+        );
 
     const mainRooms =
-        document.getElementById("roomsFilter");
+        document.getElementById(
+            "roomsFilter"
+        );
 
     const mainMinPrice =
-        document.getElementById("minPrice");
+        document.getElementById(
+            "minPrice"
+        );
 
     const mainMaxPrice =
-        document.getElementById("maxPrice");
+        document.getElementById(
+            "maxPrice"
+        );
 
 
-    if (mainDistrict && district)
-        mainDistrict.value = district.value;
+    /*
+       OVERLAY → MAIN FILTERS
+    */
 
-    if (mainRooms && rooms)
-        mainRooms.value = rooms.value;
+    if (
+        district &&
+        mainDistrict
+    ) {
 
-    if (mainMinPrice && minPrice)
-        mainMinPrice.value = minPrice.value;
+        mainDistrict.value =
+            district.value;
 
-    if (mainMaxPrice && maxPrice)
-        mainMaxPrice.value = maxPrice.value;
-
-
-    if (typeof filterPosts === "function") {
-        filterPosts();
     }
 
+
+    if (
+        rooms &&
+        mainRooms
+    ) {
+
+        mainRooms.value =
+            rooms.value;
+
+    }
+
+
+    if (
+        minPrice &&
+        mainMinPrice
+    ) {
+
+        mainMinPrice.value =
+            minPrice.value;
+
+    }
+
+
+    if (
+        maxPrice &&
+        mainMaxPrice
+    ) {
+
+        mainMaxPrice.value =
+            maxPrice.value;
+
+    }
+
+
+    /*
+       RUN MAIN FILTER
+    */
+
+    if (
+        typeof filterPosts ===
+        "function"
+    ) {
+
+        filterPosts();
+
+    }
+
+
+    /*
+       CLOSE FILTER PANEL
+    */
+
     closeFilters();
+
+
+    console.log(
+        "✅ Filters applied"
+    );
 
 }
 
