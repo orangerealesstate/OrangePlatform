@@ -1,5 +1,179 @@
 [
   {
+    "id": 187025,
+    "groupId": "14297829054255330",
+    "date": 1787228631,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/187025",
+    "text": "#Сдается #2комнатная квартира в #Мтацминда\n\n🍊 Код: 32486708\n\n🌃 Новостройка: Да\n\n📍 Адрес: Gergetis Street, 5\n\n🛋 #Комнат2\n\n🛏 #Спален1\n\n🛁 #Санузел1\n\n📐 площадь: 60\n\n🍊 Этаж: 2/4\n\n🍊 Бытовая техника: ✅ #Посудомоечная_машина, ✅#духовка, ✅#стиральная_машина, ✅#кондиционер,✅ #телевизор \n\n🐶🐈‍⬛ #Животные:         \n\n📅Срок ареньди: 6-12\n\n🍊 Описание: Сдается в аренду 70 квадратных метров эксклюзивного дизайна, с новым ремонтом в старом Тбилиси. возле #площадиСвободы,#ГалереяТбилиси #Метро в 5-7 минутах ходьбы,\n\n🍊 #Цена_1400\n\n📱 По всем вопросам: @tornikeorange1\n\n🍊Отзиви👉 @otziviorange1\n\n🌃 Поиск с фильтрами: @TBILISI2026_BOT\n\n#аренда #Комлпекс #Сниму #АрендаТбилиси #ТбилисиАренда #сдам #сдаю #премиум #Центр",
+    "images": [
+      "downloads/187025.jpg",
+      "downloads/187026.jpg",
+      "downloads/187027.jpg",
+      "downloads/187028.jpg",
+      "downloads/187029.jpg",
+      "downloads/187030.jpg",
+      "downloads/187031.jpg",
+      "downloads/187032.jpg"
+    ],
+    "price": "1400",
+    "district": "mtatsminda",
+    "street": "Gergetis Street, 5",
+    "rooms": "2",
+    "bedrooms": "1",
+    "area": "60",
+    "floor": "2/4",
+    "agent": "tornikeorange1",
+    "lat": 41.6915645,
+    "lng": 44.7954603,
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoAttemptAt": "",
+    "geoUpdatedAt": "2026-08-20T12:24:24.949Z",
+    "yandexMapUrl": "",
+    "status": "active",
+    "geoDisplayName": "Gergeti Street, Sololaki, Mtatsminda, Sololaki, Mtatsminda District, Tbilisi, 0108, Georgia"
+  },
+  {
+    "id": 187015,
+    "groupId": "14297824555817874",
+    "date": 1787228069,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/187015",
+    "text": "#Сдается #3комнатная квартира в #Сабуртало\n\n\n🍊 Код: 36491838\n\n🌃 Новостройка: Да\n\n📍 Адрес: Vakhtang Chabukiani Street, 8\n\n🛋 #Комнат3\n\n🛏 #Спален2\n\n🛁 #Санузел1\n\n📐 площадь: 75\n\n🍊 Этаж: 18\n\n🍊 Бытовая техника: ✅ #Посудомоечная_машина, ✅#духовка, ✅#стиральная_машина, ✅#кондиционер,✅ #телевизор \n\n🐶🐈‍⬛ #Животные:     ✅\n\n📅Срок ареньди: 6-12\n\n🍊 Описание:  Сабуртало Саакадзе, башня Саакадзе, в элитном комплексе, круглосуточная охрана во дворе, закрытый вход, здание также обеспечивает безопасную среду, вся необходимая мебель и бытовая техника есть в квартире, станция метро, ​​Технический университет в 2 минутах ходьбы, Технический университет, Университет Грузии, Кавказский университет, а также школы (частные и государственные), детские сады, точки питания McDonald's, рестораны, банки, магазины, торговые центры – абсолютно вся инфраструктура находится рядом.\n\n🍊 #Цена_1100💲\n\n📱По всем вопросам: @Orangerealestatetbilisi\n\n🍊Отзиви👉 @otziviorange1\n\n🌃 Поиск с фильтрами: @TBILISI2026_BOT\n\n#аренда #Комлпекс #Сниму #АрендаТбилиси #ТбилисиАренда #сдам #сдаю #премиум #Центр",
+    "images": [
+      "downloads/187015.jpg",
+      "downloads/187016.jpg",
+      "downloads/187017.jpg",
+      "downloads/187018.jpg",
+      "downloads/187019.jpg",
+      "downloads/187020.jpg",
+      "downloads/187021.jpg",
+      "downloads/187022.jpg",
+      "downloads/187023.jpg",
+      "downloads/187024.jpg"
+    ],
+    "price": "1100",
+    "district": "saburtalo",
+    "street": "Vakhtang Chabukiani Street, 8",
+    "rooms": "3",
+    "bedrooms": "2",
+    "area": "75",
+    "floor": "18",
+    "agent": "Orangerealestatetbilisi",
+    "lat": 41.7231996,
+    "lng": 44.7747655,
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoAttemptAt": "",
+    "geoUpdatedAt": "2026-08-20T12:16:05.352Z",
+    "yandexMapUrl": "",
+    "status": "active",
+    "geoDisplayName": "Vakhtang Chabukiani Street, Saburtalo, Kostava, Bakhtrioni, Dolidze, Khiliani, Saburtalo District, Tbilisi, 0160, Georgia"
+  },
+  {
+    "id": 187007,
+    "groupId": "14297822365003882",
+    "date": 1787227795,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/187007",
+    "text": "#Сдается #2комнатная квартира в #Сабуртало\n\n\n🍊 Код: 36470369\n\n🌃 Новостройка: Да\n\n📍 Адрес: проспект Маршала Геловани, 23\n\n🛋 #Комнат2\n\n🛏 #Спален1\n\n🛁 #Санузел1\n\n📐 площадь: 50\n\n🍊 Этаж: 17\n\n🍊 Бытовая техника: ✅ #Посудомоечная_машина, ✅#духовка, ✅#стиральная_машина, ✅#кондиционер,✅ #телевизор \n\n🐶🐈‍⬛ #Животные:         ❌\n\n📅Срок ареньди: 12\n\n🍊 Описание:\n\n🍊 #Цена_750💲\n\n📱 По всем вопросам: @Orangerealestatetbilisi\n\n🍊Отзиви👉 @otziviorange1\n\n🌃 Поиск с фильтрами: @TBILISI2026_BOT\n\n#аренда #Комлпекс #Сниму #АрендаТбилиси #ТбилисиАренда #сдам #сдаю #премиум #Центр",
+    "images": [
+      "downloads/187007.jpg",
+      "downloads/187008.jpg",
+      "downloads/187009.jpg",
+      "downloads/187010.jpg",
+      "downloads/187011.jpg",
+      "downloads/187012.jpg",
+      "downloads/187013.jpg",
+      "downloads/187014.jpg"
+    ],
+    "price": "750",
+    "district": "saburtalo",
+    "street": "проспект Маршала Геловани, 23",
+    "rooms": "2",
+    "bedrooms": "1",
+    "area": "50",
+    "floor": "17",
+    "agent": "Orangerealestatetbilisi",
+    "lat": 41.7505318,
+    "lng": 44.7709321,
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoAttemptAt": "",
+    "geoUpdatedAt": "2026-08-20T12:15:59.372Z",
+    "yandexMapUrl": "",
+    "status": "active",
+    "geoDisplayName": "M3 Marshal Gelovani, 23 კორპ. 7, Marshal Gelovani Avenue, Dighomi, Vashlijvari, Saburtalo District, Tbilisi, 0159, Georgia"
+  },
+  {
+    "id": 186998,
+    "groupId": "14297789333643498",
+    "date": 1787223666,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/186998",
+    "text": "#Сдается #2комнатная квартира в #Тбилиси\n\n🍊 Код: 36455356\n\n🌃 Новостройка: Да\n\n📍 Адрес: Giorgi Chkondidelis Street, 38 \n\n🛋 #Комнат2\n\n🛏 #Спален1\n\n🛁 #Санузел1\n\n📐 площадь: 58\n\n🍊 Этаж: 7/10\n\n🍊 Бытовая техника: ✅ #Посудомоечная_машина, ✅#духовка, ✅#стиральная_машина, ✅#кондиционер,✅ #телевизор \n\n🐶🐈‍⬛ #Животные:         \n\n📅Срок ареньди: 6-12\n\n🍊 Описание:#Сдается квартира, недалеко от #парка Киквидзе и #метро, ​​в #комплексе М2, со всей мебелью и техникой. В квартире никто никогда не жил. Все новое. Владелец приобретет стол и стулья в соответствии с пожеланиями арендатора.\n\n🍊 #Цена_700\n\n📱 По всем вопросам: @tornikeorange1\n\n🍊Отзиви👉 @otziviorange1\n\n🌃 Поиск с фильтрами: @TBILISI2026_BOT\n\n#аренда #Комлпекс #Сниму #АрендаТбилиси #ТбилисиАренда #сдам #сдаю #премиум #Центр",
+    "images": [
+      "downloads/186998.jpg",
+      "downloads/186999.jpg",
+      "downloads/187000.jpg",
+      "downloads/187001.jpg",
+      "downloads/187002.jpg",
+      "downloads/187003.jpg",
+      "downloads/187004.jpg",
+      "downloads/187005.jpg",
+      "downloads/187006.jpg"
+    ],
+    "price": "700",
+    "district": "тбилиси",
+    "street": "Giorgi Chkondidelis Street, 38",
+    "rooms": "2",
+    "bedrooms": "1",
+    "area": "58",
+    "floor": "7/10",
+    "agent": "tornikeorange1",
+    "lat": null,
+    "lng": null,
+    "geoSource": "",
+    "geoAccuracy": "",
+    "geoAttemptAt": "2026-08-20T12:26:14.184Z",
+    "geoUpdatedAt": "",
+    "yandexMapUrl": "",
+    "status": "active"
+  },
+  {
+    "id": 186988,
+    "groupId": "14297786041930650",
+    "date": 1787223255,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/186988",
+    "text": "#Сдается #2комнатная квартира в #Тбилиси\n\n\n🍊 Код: 36059692\n\n🌃 Новостройка: Да\n\n📍 Адрес:Vakhtang Ninuas Street, 3-3 \n\n🛋 #Комнат2\n\n🛏 #Спален1\n🛁 #Санузел1\n\n📐 площадь: 60\n\n🍊 Этаж:4/15\n\n🍊 Бытовая техника: ✅ #Посудомоечная_машина, ✅#духовка, ✅#стиральная_машина, ✅#кондиционер,✅ #телевизор \n\n🐶🐈‍⬛ #Животные:         \n\n📅Срок ареньди: 6-12\n\n🍊 Описание:#Сдается квартира в #Надзаладеви, в #комплексе, в #парке #Киквидзе. В квартире есть вся необходимая мебель и техника, на территории комплекса есть супермаркет, аптеки. Рядом с парком Киквидзе есть кафе, #Макдоналдс, #Реформа фитнес-центров. В парке Киквидзе есть детская зона и место для наших четвероногих друзей. В квартире есть вся необходимая мебель и бытовая техника\n\n🍊 #Цена_600\n\n📱 По всем вопросам: @tornikeorange1\n\n🍊Отзиви👉 @otziviorange1\n\n🌃 Поиск с фильтрами: @TBILISI2026_BOT\n\n#аренда #Комлпекс #Сниму #АрендаТбилиси #ТбилисиАренда #сдам #сдаю #премиум #Центр",
+    "images": [
+      "downloads/186988.jpg",
+      "downloads/186989.jpg",
+      "downloads/186990.jpg",
+      "downloads/186991.jpg",
+      "downloads/186992.jpg",
+      "downloads/186993.jpg",
+      "downloads/186994.jpg",
+      "downloads/186995.jpg",
+      "downloads/186996.jpg",
+      "downloads/186997.jpg"
+    ],
+    "price": "600",
+    "district": "тбилиси",
+    "street": "Vakhtang Ninuas Street, 3-3",
+    "rooms": "2",
+    "bedrooms": "1",
+    "area": "60",
+    "floor": "4/15",
+    "agent": "tornikeorange1",
+    "lat": 41.7442348,
+    "lng": 44.7873998,
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoAttemptAt": "",
+    "geoUpdatedAt": "2026-08-20T11:38:40.031Z",
+    "yandexMapUrl": "",
+    "status": "active",
+    "geoDisplayName": "Vakhtang Ninua Street, Nadzaladevi, Nadzaladevi District, Tbilisi, 0180, Georgia"
+  },
+  {
     "id": 186981,
     "groupId": "14297783125717498",
     "date": 1787222890,
@@ -26,7 +200,7 @@
     "lng": null,
     "geoSource": "",
     "geoAccuracy": "",
-    "geoAttemptAt": "2026-08-20T10:54:37.828Z",
+    "geoAttemptAt": "2026-08-20T12:26:14.192Z",
     "geoUpdatedAt": "",
     "yandexMapUrl": "",
     "status": "active"
@@ -133,7 +307,7 @@
     "lng": null,
     "geoSource": "",
     "geoAccuracy": "",
-    "geoAttemptAt": "2026-08-20T10:54:37.837Z",
+    "geoAttemptAt": "2026-08-20T12:26:14.239Z",
     "geoUpdatedAt": "",
     "yandexMapUrl": "",
     "status": "active"
@@ -168,7 +342,7 @@
     "lng": null,
     "geoSource": "",
     "geoAccuracy": "",
-    "geoAttemptAt": "2026-08-20T10:54:37.846Z",
+    "geoAttemptAt": "2026-08-20T12:26:14.248Z",
     "geoUpdatedAt": "",
     "yandexMapUrl": "",
     "status": "active"
@@ -399,7 +573,7 @@
     "lng": null,
     "geoSource": "",
     "geoAccuracy": "",
-    "geoAttemptAt": "2026-08-20T10:54:37.859Z",
+    "geoAttemptAt": "2026-08-20T12:26:14.265Z",
     "geoUpdatedAt": "",
     "yandexMapUrl": "",
     "status": "active"
@@ -609,9 +783,69 @@
     "status": "active",
     "geoSource": "",
     "geoAccuracy": "",
-    "geoAttemptAt": "2026-08-20T10:54:37.873Z",
+    "geoAttemptAt": "2026-08-20T12:26:14.276Z",
     "geoUpdatedAt": "",
     "yandexMapUrl": ""
+  },
+  {
+    "id": 186833,
+    "groupId": "14296427666117978",
+    "date": 1787053458,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/186833",
+    "text": "",
+    "images": [
+      "downloads/186833.jpg"
+    ],
+    "price": "-",
+    "district": "-",
+    "street": "-",
+    "rooms": "-",
+    "bedrooms": "-",
+    "area": "-",
+    "floor": "-",
+    "agent": "",
+    "lat": null,
+    "lng": null,
+    "geoSource": "",
+    "geoAccuracy": "",
+    "geoAttemptAt": "",
+    "geoUpdatedAt": "",
+    "yandexMapUrl": "",
+    "status": "active"
+  },
+  {
+    "id": 186825,
+    "groupId": "14296427666117978",
+    "date": 1787053458,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/186825",
+    "text": "",
+    "images": [
+      "downloads/186825.jpg",
+      "downloads/186826.jpg",
+      "downloads/186827.jpg",
+      "downloads/186828.jpg",
+      "downloads/186829.jpg",
+      "downloads/186830.jpg",
+      "downloads/186831.jpg",
+      "downloads/186832.jpg",
+      "downloads/186833.jpg"
+    ],
+    "price": "-",
+    "district": "-",
+    "street": "-",
+    "rooms": "-",
+    "bedrooms": "-",
+    "area": "-",
+    "floor": "-",
+    "agent": "",
+    "lat": null,
+    "lng": null,
+    "geoSource": "",
+    "geoAccuracy": "",
+    "geoAttemptAt": "",
+    "geoUpdatedAt": "",
+    "yandexMapUrl": "",
+    "status": "active"
   },
   {
     "id": 186824,
@@ -710,9 +944,36 @@
     "status": "active",
     "geoSource": "",
     "geoAccuracy": "",
-    "geoAttemptAt": "2026-08-20T10:54:37.880Z",
+    "geoAttemptAt": "2026-08-20T12:16:05.430Z",
     "geoUpdatedAt": "",
     "yandexMapUrl": ""
+  },
+  {
+    "id": 186807,
+    "groupId": "14296380561374834",
+    "date": 1787047570,
+    "telegramLink": "https://t.me/kvartiri_tbilisi2023/186807",
+    "text": "",
+    "images": [
+      "downloads/186807.jpg",
+      "downloads/186808.jpg"
+    ],
+    "price": "-",
+    "district": "-",
+    "street": "-",
+    "rooms": "-",
+    "bedrooms": "-",
+    "area": "-",
+    "floor": "-",
+    "agent": "",
+    "lat": null,
+    "lng": null,
+    "geoSource": "",
+    "geoAccuracy": "",
+    "geoAttemptAt": "",
+    "geoUpdatedAt": "",
+    "yandexMapUrl": "",
+    "status": "active"
   },
   {
     "id": 186799,
@@ -7436,7 +7697,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:38:40.419Z"
   },
   {
     "id": 183694,
@@ -7462,10 +7724,15 @@
     "bedrooms": "1",
     "area": "68",
     "floor": "3/5",
-    "lat": null,
-    "lng": null,
+    "lat": 41.6929043,
+    "lng": 44.8205689,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:38:49.317Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:38:58.253Z",
+    "geoDisplayName": "17, Nikifore Irbakhi Street, Avlabari, Zemo Avlabari, Metromsheni, Isani District, Tbilisi, 0155, Georgia"
   },
   {
     "id": 183684,
@@ -7491,10 +7758,15 @@
     "bedrooms": "1",
     "area": "70",
     "floor": "4/12",
-    "lat": null,
-    "lng": null,
+    "lat": 41.6796971,
+    "lng": 44.8159418,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:38:58.258Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:39:04.229Z",
+    "geoDisplayName": "Monolith Green City Block B, Taboris Mta 1st Dead End, Ortachala, Kala, Ortachala, Krtsanisi District, Tbilisi, 0114, Georgia"
   },
   {
     "id": 183676,
@@ -7521,7 +7793,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:39:04.235Z"
   },
   {
     "id": 183671,
@@ -7542,10 +7815,15 @@
     "bedrooms": "1",
     "area": "60",
     "floor": "4/5",
-    "lat": null,
-    "lng": null,
+    "lat": 41.6796971,
+    "lng": 44.8159418,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:39:23.042Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:39:04.229Z",
+    "geoDisplayName": "Monolith Green City Block B, Taboris Mta 1st Dead End, Ortachala, Kala, Ortachala, Krtsanisi District, Tbilisi, 0114, Georgia"
   },
   {
     "id": 183661,
@@ -7571,10 +7849,15 @@
     "bedrooms": "1",
     "area": "68",
     "floor": "3/5",
-    "lat": null,
-    "lng": null,
+    "lat": 41.6929043,
+    "lng": 44.8205689,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:39:23.051Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:38:58.253Z",
+    "geoDisplayName": "17, Nikifore Irbakhi Street, Avlabari, Zemo Avlabari, Metromsheni, Isani District, Tbilisi, 0155, Georgia"
   },
   {
     "id": 183660,
@@ -7623,7 +7906,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:39:23.062Z"
   },
   {
     "id": 183640,
@@ -7649,10 +7933,15 @@
     "bedrooms": "1",
     "area": "50",
     "floor": "4",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7118656,
+    "lng": 44.8029225,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:39:40.881Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:39:49.360Z",
+    "geoDisplayName": "Reikartz City Tbilisi Hotel, 9ა/51, Giorgi Chubinashvili Street, Okros ubani, Kveda Chugureti, Chugureti District, Tbilisi, 0102, Georgia"
   },
   {
     "id": 183630,
@@ -7681,7 +7970,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:39:49.366Z"
   },
   {
     "id": 183620,
@@ -7707,10 +7997,15 @@
     "bedrooms": "1",
     "area": "59",
     "floor": "8",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7271492,
+    "lng": 44.7327281,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:40:07.567Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:40:17.113Z",
+    "geoDisplayName": "Kiria's Martial Arts Academy, 129ა, Shalva Nutsubidze Street, Saburtalo, Vazha-Pshavela Blocks, Vake District, Tbilisi, 0186, Georgia"
   },
   {
     "id": 183610,
@@ -7736,10 +8031,15 @@
     "bedrooms": "2",
     "area": "80",
     "floor": "3",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7271085,
+    "lng": 44.7360102,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:40:17.118Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:40:25.572Z",
+    "geoDisplayName": "Ministry of Sport of Georgia, 68, Shalva Nutsubidze Street, Saburtalo, Vazha-Pshavela Blocks, Vake District, Tbilisi, 0186, Georgia"
   },
   {
     "id": 183601,
@@ -7767,7 +8067,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:40:25.578Z"
   },
   {
     "id": 183592,
@@ -7795,7 +8096,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:40:44.102Z"
   },
   {
     "id": 183582,
@@ -7824,7 +8126,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:41:01.617Z"
   },
   {
     "id": 183574,
@@ -7851,7 +8154,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:41:20.329Z"
   },
   {
     "id": 183566,
@@ -7878,7 +8182,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:41:37.707Z"
   },
   {
     "id": 183556,
@@ -7904,10 +8209,15 @@
     "bedrooms": "2",
     "area": "75",
     "floor": "8/11",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7282755,
+    "lng": 44.7333378,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:41:56.220Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:42:04.819Z",
+    "geoDisplayName": "Ramaz Chkhikvadze Street, Nutsubidze Slope, Nutsubidze Microdistricts, Vake District, Tbilisi, 0186, Georgia"
   },
   {
     "id": 183546,
@@ -7933,10 +8243,15 @@
     "bedrooms": "1",
     "area": "64",
     "floor": "6/8",
-    "lat": null,
-    "lng": null,
+    "lat": 41.679443,
+    "lng": 44.8176273,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:42:04.827Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:42:14.453Z",
+    "geoDisplayName": "Suliko Tortladze Street, Ortachala, Kala, Ortachala, Krtsanisi District, Tbilisi, 0114, Georgia"
   },
   {
     "id": 183536,
@@ -7962,10 +8277,15 @@
     "bedrooms": "1",
     "area": "64",
     "floor": "4/8",
-    "lat": null,
-    "lng": null,
+    "lat": 41.679443,
+    "lng": 44.8176273,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:42:14.458Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:42:14.453Z",
+    "geoDisplayName": "Suliko Tortladze Street, Ortachala, Kala, Ortachala, Krtsanisi District, Tbilisi, 0114, Georgia"
   },
   {
     "id": 183526,
@@ -7991,10 +8311,15 @@
     "bedrooms": "1",
     "area": "65",
     "floor": "3/20",
-    "lat": null,
-    "lng": null,
+    "lat": 41.678461,
+    "lng": 44.8241935,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:42:14.472Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:42:23.067Z",
+    "geoDisplayName": "61, Vakhtang Gorgasali Street, Ortachala, Kala, Ortachala, Krtsanisi District, Tbilisi, 0114, Georgia"
   },
   {
     "id": 183516,
@@ -8020,10 +8345,15 @@
     "bedrooms": "1",
     "area": "57",
     "floor": "3/20",
-    "lat": null,
-    "lng": null,
+    "lat": 41.678461,
+    "lng": 44.8241935,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:42:23.074Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:42:23.067Z",
+    "geoDisplayName": "61, Vakhtang Gorgasali Street, Ortachala, Kala, Ortachala, Krtsanisi District, Tbilisi, 0114, Georgia"
   },
   {
     "id": 183507,
@@ -8048,10 +8378,15 @@
     "bedrooms": "2",
     "area": "86",
     "floor": "22",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7474235,
+    "lng": 44.796904,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:42:23.084Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:42:32.548Z",
+    "geoDisplayName": "Konstantine Iluridze 1st Lane, Nadzaladevi, Nadzaladevi District, Tbilisi, 0180, Georgia"
   },
   {
     "id": 183497,
@@ -8077,10 +8412,15 @@
     "bedrooms": "1",
     "area": "70",
     "floor": "7/8",
-    "lat": null,
-    "lng": null,
+    "lat": 41.6796971,
+    "lng": 44.8159418,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:42:32.555Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:39:04.229Z",
+    "geoDisplayName": "Monolith Green City Block B, Taboris Mta 1st Dead End, Ortachala, Kala, Ortachala, Krtsanisi District, Tbilisi, 0114, Georgia"
   },
   {
     "id": 183487,
@@ -8109,7 +8449,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:42:32.564Z"
   },
   {
     "id": 183477,
@@ -8138,7 +8479,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:42:51.115Z"
   },
   {
     "id": 183468,
@@ -8166,7 +8508,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:42:51.129Z"
   },
   {
     "id": 183461,
@@ -8189,10 +8532,15 @@
     "bedrooms": "1",
     "area": "65",
     "floor": "5/7",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7317178,
+    "lng": 44.7456295,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:43:08.318Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:43:17.117Z",
+    "geoDisplayName": "24, Ilia Abuladze Street, Saburtalo, Vedzisi, Kazbegi, Gotua, Saburtalo Street, Saburtalo District, Tbilisi, 0177, Georgia"
   },
   {
     "id": 183451,
@@ -8218,10 +8566,15 @@
     "bedrooms": "1",
     "area": "65",
     "floor": "11",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7348437,
+    "lng": 44.7709211,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:43:17.122Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:43:26.233Z",
+    "geoDisplayName": "75, Zhiuli Shartava Street, Saburtalo, Vedzisi, Kazbegi, Gotua, Saburtalo Street, Saburtalo District, Tbilisi, 0160, Georgia"
   },
   {
     "id": 183441,
@@ -8250,7 +8603,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:43:26.238Z"
   },
   {
     "id": 183434,
@@ -8276,7 +8630,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:43:44.049Z"
   },
   {
     "id": 183388,
@@ -8305,7 +8660,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:44:02.114Z"
   },
   {
     "id": 183378,
@@ -8334,7 +8690,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:44:20.488Z"
   },
   {
     "id": 183371,
@@ -8360,7 +8717,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:44:38.555Z"
   },
   {
     "id": 183361,
@@ -8386,10 +8744,15 @@
     "bedrooms": "1",
     "area": "48",
     "floor": "3/6",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7346273,
+    "lng": 44.7411332,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:44:56.461Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:45:15.159Z",
+    "geoDisplayName": "Khomli Street, Nutsubidze Microdistricts, Vake District, Tbilisi, 0177, Georgia"
   },
   {
     "id": 183356,
@@ -8413,7 +8776,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:45:15.165Z"
   },
   {
     "id": 183346,
@@ -8442,7 +8806,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:45:32.708Z"
   },
   {
     "id": 183340,
@@ -8464,10 +8829,15 @@
     "bedrooms": "1",
     "area": "54",
     "floor": "11/23",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7198999,
+    "lng": 44.7097865,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:45:50.775Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:45:59.816Z",
+    "geoDisplayName": "Biota Park, 20, Anna Politkovskaya Street, Saburtalo, Vazha-Pshavela Blocks, Vake District, Tbilisi, 0168, Georgia"
   },
   {
     "id": 183330,
@@ -8496,7 +8866,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:45:59.821Z"
   },
   {
     "id": 183320,
@@ -8522,10 +8893,15 @@
     "bedrooms": "3",
     "area": "120",
     "floor": "7/10",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7082899,
+    "lng": 44.775277,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:46:17.837Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:46:26.779Z",
+    "geoDisplayName": "11ა, Zakaria Paliashvili Street, Vake, Vake District, Tbilisi, 0179, Georgia"
   },
   {
     "id": 183300,
@@ -8608,10 +8984,15 @@
     "bedrooms": "4",
     "area": "170",
     "floor": "3/3",
-    "lat": null,
-    "lng": null,
+    "lat": 41.6955291,
+    "lng": 44.8111744,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:46:26.785Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:46:30.058Z",
+    "geoDisplayName": "Ministry of Foreign Affairs of Georgia, 3, Giorgi Leonidze Street, Mtatsminda, Sololaki, Mtatsminda District, Tbilisi, 0108, Georgia"
   },
   {
     "id": 183271,
@@ -8640,7 +9021,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:46:30.063Z"
   },
   {
     "id": 183261,
@@ -8666,10 +9048,15 @@
     "bedrooms": "3",
     "area": "130",
     "floor": "2/5",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7417736,
+    "lng": 44.7528425,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:46:47.843Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:46:57.319Z",
+    "geoDisplayName": "Lisi Veranda, Dighomi, Vashlijvari, Saburtalo District, Tbilisi, 0176, Georgia"
   },
   {
     "id": 183251,
@@ -8698,7 +9085,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:46:57.324Z"
   },
   {
     "id": 183241,
@@ -8727,7 +9115,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:47:15.022Z"
   },
   {
     "id": 183231,
@@ -8753,10 +9142,15 @@
     "bedrooms": "22",
     "area": "120",
     "floor": "7/8",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7241449,
+    "lng": 44.7638834,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:47:32.954Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:47:38.899Z",
+    "geoDisplayName": "28, Adam Mitskevich Street, Saburtalo, Vedzisi, Kazbegi, Gotua, Saburtalo Street, Saburtalo District, Tbilisi, 0160, Georgia"
   },
   {
     "id": 183221,
@@ -8785,7 +9179,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:47:38.905Z"
   },
   {
     "id": 183211,
@@ -8814,7 +9209,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:47:56.953Z"
   },
   {
     "id": 183201,
@@ -8840,10 +9236,15 @@
     "bedrooms": "1",
     "area": "59",
     "floor": "9/20",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7478778,
+    "lng": 44.7839995,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:48:15.340Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:48:33.250Z",
+    "geoDisplayName": "Zaira Kikvidze Street, დიდუბის დასახლება, Nadzaladevi, Nadzaladevi District, Tbilisi, 0180, Georgia"
   },
   {
     "id": 183191,
@@ -8872,7 +9273,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:48:33.258Z"
   },
   {
     "id": 183181,
@@ -8901,7 +9303,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:48:51.615Z"
   },
   {
     "id": 183171,
@@ -8930,7 +9333,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:49:00.549Z"
   },
   {
     "id": 183161,
@@ -8956,10 +9360,15 @@
     "bedrooms": "2",
     "area": "84",
     "floor": "11",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7505318,
+    "lng": 44.7709321,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:49:09.550Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:49:18.584Z",
+    "geoDisplayName": "M3 Marshal Gelovani, 23 კორპ. 7, Marshal Gelovani Avenue, Dighomi, Vashlijvari, Saburtalo District, Tbilisi, 0159, Georgia"
   },
   {
     "id": 183151,
@@ -8985,10 +9394,15 @@
     "bedrooms": "2",
     "area": "130",
     "floor": "3/5",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7417736,
+    "lng": 44.7528425,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:49:18.589Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:49:27.745Z",
+    "geoDisplayName": "Lisi Veranda, Dighomi, Vashlijvari, Saburtalo District, Tbilisi, 0176, Georgia"
   },
   {
     "id": 183141,
@@ -9014,10 +9428,15 @@
     "bedrooms": "1",
     "area": "43",
     "floor": "7",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7191112,
+    "lng": 44.740336,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:49:27.752Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T11:49:36.789Z",
+    "geoDisplayName": "Universiteti Street, Saburtalo, Vake, Vake District, Tbilisi, 0177, Georgia"
   },
   {
     "id": 183131,
@@ -9043,10 +9462,15 @@
     "bedrooms": "2",
     "area": "81",
     "floor": "5",
-    "lat": null,
-    "lng": null,
+    "lat": 41.6751795,
+    "lng": 44.8398445,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:49:36.795Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:49:45.777Z",
+    "geoDisplayName": "10, Grigol Apshinashvili Street, Cholokashvili, Navtlughi, Isani District, Tbilisi, 0144, Georgia"
   },
   {
     "id": 183121,
@@ -9075,7 +9499,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:49:45.782Z"
   },
   {
     "id": 183101,
@@ -9104,7 +9529,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:49:55.231Z"
   },
   {
     "id": 183091,
@@ -9133,7 +9559,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:50:03.740Z"
   },
   {
     "id": 183081,
@@ -9248,7 +9675,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:50:03.749Z"
   },
   {
     "id": 183041,
@@ -9274,10 +9702,15 @@
     "bedrooms": "2",
     "area": "75",
     "floor": "2",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7045381,
+    "lng": 44.7829767,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:50:12.642Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T11:50:22.312Z",
+    "geoDisplayName": "45, Vasil Barnov Street, Vera, Mtatsminda District, Tbilisi, 0108, Georgia"
   },
   {
     "id": 183031,
@@ -9306,7 +9739,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T11:50:22.319Z"
   },
   {
     "id": 183021,
@@ -9335,7 +9769,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:16:11.266Z"
   },
   {
     "id": 183011,
@@ -9390,10 +9825,15 @@
     "bedrooms": "1",
     "area": "75",
     "floor": "е.",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7323614,
+    "lng": 44.7701218,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:16:30.232Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T12:16:47.912Z",
+    "geoDisplayName": "Zhiuli Shartava Street, Saburtalo, Vedzisi, Kazbegi, Gotua, Saburtalo Street, Saburtalo District, Tbilisi, 0160, Georgia"
   },
   {
     "id": 182991,
@@ -9422,7 +9862,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:16:47.919Z"
   },
   {
     "id": 182981,
@@ -9448,10 +9889,15 @@
     "bedrooms": "1",
     "area": "56",
     "floor": "11",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7191112,
+    "lng": 44.740336,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:17:03.245Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T12:17:11.737Z",
+    "geoDisplayName": "Universiteti Street, Saburtalo, Vake, Vake District, Tbilisi, 0177, Georgia"
   },
   {
     "id": 182973,
@@ -9504,10 +9950,15 @@
     "bedrooms": "1",
     "area": "70",
     "floor": "10",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7164022,
+    "lng": 44.7671414,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:17:11.742Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T12:17:21.072Z",
+    "geoDisplayName": "Viktor Dolidze Street, Saburtalo, Kostava, Bakhtrioni, Dolidze, Khiliani, Saburtalo District, Tbilisi, 0160, Georgia"
   },
   {
     "id": 182955,
@@ -9533,7 +9984,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:17:21.077Z"
   },
   {
     "id": 182947,
@@ -9557,10 +10009,15 @@
     "bedrooms": "2",
     "area": "80",
     "floor": "7/9",
-    "lat": null,
-    "lng": null,
+    "lat": 41.8302895,
+    "lng": 44.7998432,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:17:30.444Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T12:17:48.038Z",
+    "geoDisplayName": "Petre Melikishvili 1st Dead End, Avchala-2, Avchala, Gldani Khevi, Gldani District, Tbilisi, 0178, Georgia"
   },
   {
     "id": 182940,
@@ -9583,10 +10040,15 @@
     "bedrooms": "1",
     "area": "70",
     "floor": "6/7",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7237914,
+    "lng": 44.762388,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:17:48.045Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T12:17:57.030Z",
+    "geoDisplayName": "49, Archil Tsagareli Street, Saburtalo, Vedzisi, Kazbegi, Gotua, Saburtalo Street, Saburtalo District, Tbilisi, 0160, Georgia"
   },
   {
     "id": 182930,
@@ -9612,10 +10074,15 @@
     "bedrooms": "1",
     "area": "65",
     "floor": "2/2",
-    "lat": null,
-    "lng": null,
+    "lat": 41.6955291,
+    "lng": 44.8111744,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:17:57.037Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T12:18:00.532Z",
+    "geoDisplayName": "Ministry of Foreign Affairs of Georgia, 3, Giorgi Leonidze Street, Mtatsminda, Sololaki, Mtatsminda District, Tbilisi, 0108, Georgia"
   },
   {
     "id": 182920,
@@ -9641,10 +10108,15 @@
     "bedrooms": "1",
     "area": "58",
     "floor": "2",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7330186,
+    "lng": 44.7690195,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:18:00.541Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "house-exact",
+    "geoUpdatedAt": "2026-08-20T12:18:09.288Z",
+    "geoDisplayName": "7, Yuri Gagarin Street, Saburtalo, Vedzisi, Kazbegi, Gotua, Saburtalo Street, Saburtalo District, Tbilisi, 0160, Georgia"
   },
   {
     "id": 182913,
@@ -9670,7 +10142,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:18:09.293Z"
   },
   {
     "id": 182904,
@@ -9698,7 +10171,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:18:27.293Z"
   },
   {
     "id": 182894,
@@ -9724,10 +10198,15 @@
     "bedrooms": "-",
     "area": "49",
     "floor": "6/10",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7505318,
+    "lng": 44.7709321,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:18:39.669Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T12:18:48.340Z",
+    "geoDisplayName": "M3 Marshal Gelovani, 23 კორპ. 7, Marshal Gelovani Avenue, Dighomi, Vashlijvari, Saburtalo District, Tbilisi, 0159, Georgia"
   },
   {
     "id": 182889,
@@ -9779,7 +10258,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:18:48.345Z"
   },
   {
     "id": 182876,
@@ -9831,7 +10311,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:19:06.394Z"
   },
   {
     "id": 182860,
@@ -9860,7 +10341,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:19:18.319Z"
   },
   {
     "id": 182856,
@@ -9936,7 +10418,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:19:36.547Z"
   },
   {
     "id": 182835,
@@ -9965,7 +10448,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:19:55.015Z"
   },
   {
     "id": 182829,
@@ -10019,7 +10503,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:20:12.838Z"
   },
   {
     "id": 182815,
@@ -10073,7 +10558,8 @@
     "lat": null,
     "lng": null,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:23:03.309Z"
   },
   {
     "id": 182799,
@@ -10099,9 +10585,14 @@
     "bedrooms": "2",
     "area": "88",
     "floor": "6/12",
-    "lat": null,
-    "lng": null,
+    "lat": 41.7412374,
+    "lng": 44.7902083,
     "agent": "",
-    "status": "rented"
+    "status": "rented",
+    "geoAttemptAt": "2026-08-20T12:23:21.104Z",
+    "geoSource": "nominatim",
+    "geoAccuracy": "address",
+    "geoUpdatedAt": "2026-08-20T12:23:30.118Z",
+    "geoDisplayName": "Giorgi Chqondideli 1st Dead End, Nadzaladevi, Nadzaladevi District, Tbilisi, 0180, Georgia"
   }
 ]
