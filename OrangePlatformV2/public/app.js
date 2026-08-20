@@ -722,79 +722,435 @@ async function toggleFavorite(
    FILTERS
 ========================================================= */
 
+/* =========================================================
+   FILTERS — FIXED
+========================================================= */
+
+function normalizeSearchText(value) {
+
+    return String(value || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[.,;:!?()[\]{}"'`]/g, " ")
+        .replace(/\s+/g, " ");
+
+}
+
+
+/* =========================================================
+   EXTRACT NUMBER
+========================================================= */
+
+function extractNumber(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return 0;
+
+    }
+
+    const match =
+        String(value)
+            .replace(",", ".")
+            .match(/\d+(?:\.\d+)?/);
+
+    return match
+        ? Number(match[0])
+        : 0;
+
+}
+
+
+/* =========================================================
+   GET POST DISTRICT
+========================================================= */
+
+function getPostDistrict(post) {
+
+    const directDistrict =
+        String(
+            post?.district || ""
+        )
+            .trim();
+
+
+    const invalidDistricts = [
+
+        "",
+        "-",
+        "—",
+        "unknown",
+        "undefined",
+        "null",
+        "none"
+
+    ];
+
+
+    if (
+        !invalidDistricts.includes(
+            directDistrict.toLowerCase()
+        )
+    ) {
+
+        const normalized =
+            normalizeDistrict(
+                directDistrict
+            );
+
+
+        if (normalized) {
+
+            return normalized;
+
+        }
+
+    }
+
+
+    const text =
+        String(
+            post?.text || ""
+        );
+
+
+    return normalizeDistrict(
+        text
+    );
+
+}
+
+
+/* =========================================================
+   GET POST ROOMS
+========================================================= */
+
+function getPostRooms(post) {
+
+    const directRooms =
+        extractNumber(
+            post?.rooms
+        );
+
+
+    if (
+        directRooms > 0
+    ) {
+
+        return directRooms;
+
+    }
+
+
+    const text =
+        String(
+            post?.text || ""
+        );
+
+
+    const patterns = [
+
+        /(\d+)\s*(?:комнат|комната|комнаты|комн)/i,
+
+        /(\d+)\s*(?:ოთახი|ოთახიანი)/i,
+
+        /(\d+)\s*rooms?/i,
+
+        /(\d+)\s*bedrooms?/i
+
+    ];
+
+
+    for (
+        const pattern of patterns
+    ) {
+
+        const match =
+            text.match(
+                pattern
+            );
+
+
+        if (match) {
+
+            const rooms =
+                Number(
+                    match[1]
+                );
+
+
+            if (
+                rooms > 0
+            ) {
+
+                return rooms;
+
+            }
+
+        }
+
+    }
+
+
+    return 0;
+
+}
+
+
+/* =========================================================
+   GET POST PRICE
+========================================================= */
+
+function getPostPrice(post) {
+
+    const directPrice =
+        extractNumber(
+            post?.price
+        );
+
+
+    if (
+        directPrice > 0
+    ) {
+
+        return directPrice;
+
+    }
+
+
+    const text =
+        String(
+            post?.text || ""
+        );
+
+
+    const patterns = [
+
+        /(?:\$|usd|долл\.?|доллар(?:ов)?|ფასი|price)\s*([\d\s,.]+)/i,
+
+        /([\d\s,.]+)\s*(?:\$|usd|долл\.?|доллар(?:ов)?)/i
+
+    ];
+
+
+    for (
+        const pattern of patterns
+    ) {
+
+        const match =
+            text.match(
+                pattern
+            );
+
+
+        if (match) {
+
+            const value =
+                Number(
+                    match[1]
+                        .replace(/\s/g, "")
+                        .replace(/,/g, "")
+                );
+
+
+            if (
+                value > 0
+            ) {
+
+                return value;
+
+            }
+
+        }
+
+    }
+
+
+    return 0;
+
+}
+
+
+/* =========================================================
+   GET POST SEARCHABLE TEXT
+========================================================= */
+
+function getPostSearchText(post) {
+
+    return normalizeSearchText(
+
+        [
+
+            post?.text,
+
+            post?.district,
+
+            post?.street,
+
+            post?.rooms,
+
+            post?.area,
+
+            post?.price,
+
+            post?.address,
+
+            post?.description
+
+        ]
+
+            .filter(
+                value =>
+                    value !== null &&
+                    value !== undefined &&
+                    String(value).trim() !== ""
+            )
+
+            .join(" ")
+
+    );
+
+}
+
+
+/* =========================================================
+   MAIN FILTER
+========================================================= */
+
 function getFilteredPosts() {
 
+    const searchInput =
+        document.getElementById(
+            "search"
+        );
+
+
+    const districtInput =
+        document.getElementById(
+            "districtFilter"
+        );
+
+
+    const roomsInput =
+        document.getElementById(
+            "roomsFilter"
+        );
+
+
+    const minPriceInput =
+        document.getElementById(
+            "minPrice"
+        );
+
+
+    const maxPriceInput =
+        document.getElementById(
+            "maxPrice"
+        );
+
+
     const search =
-        (
-            document.getElementById(
-                "search"
-            )?.value ||
-            ""
+        normalizeSearchText(
+            searchInput?.value
+        );
+
+
+    const districtValue =
+        String(
+            districtInput?.value || ""
         )
-            .toLowerCase()
             .trim();
 
 
     const selectedDistrict =
-        normalizeDistrict(
-            document.getElementById(
-                "districtFilter"
-            )?.value ||
-            ""
-        );
+        districtValue
+            ? normalizeDistrict(
+                districtValue
+            )
+            : "";
 
 
     const selectedRooms =
-        document.getElementById(
-            "roomsFilter"
-        )?.value ||
-        "";
+        String(
+            roomsInput?.value || ""
+        )
+            .trim();
 
 
     const minPrice =
-        Number(
-            document.getElementById(
-                "minPrice"
-            )?.value
-        ) || 0;
+        extractNumber(
+            minPriceInput?.value
+        );
+
+
+    const maxPriceRaw =
+        extractNumber(
+            maxPriceInput?.value
+        );
 
 
     const maxPrice =
-        Number(
-            document.getElementById(
-                "maxPrice"
-            )?.value
-        ) || 999999999;
+        maxPriceRaw > 0
+            ? maxPriceRaw
+            : Infinity;
+
+
+    console.log(
+        "🔎 FILTER:",
+        {
+            search,
+            selectedDistrict,
+            selectedRooms,
+            minPrice,
+            maxPrice
+        }
+    );
 
 
     return allPosts.filter(
         post => {
 
+            /* =========================================
+               SEARCH
+            ========================================= */
+
             if (search) {
 
                 const searchable =
-                    [
+                    getPostSearchText(
+                        post
+                    );
 
-                        post.text,
 
-                        post.district,
+                const district =
+                    getPostDistrict(
+                        post
+                    );
 
-                        post.street,
 
-                        post.rooms,
+                const rooms =
+                    getPostRooms(
+                        post
+                    );
 
-                        post.area,
 
-                        post.price
+                const searchableExtended =
+                    normalizeSearchText(
 
-                    ]
-                        .filter(Boolean)
-                        .join(" ")
-                        .toLowerCase();
+                        searchable +
+                        " " +
+                        district +
+                        " " +
+                        rooms
+
+                    );
 
 
                 if (
-                    !searchable.includes(
+                    !searchableExtended.includes(
                         search
                     )
                 ) {
@@ -806,13 +1162,33 @@ function getFilteredPosts() {
             }
 
 
-            if (selectedDistrict) {
+            /* =========================================
+               DISTRICT
+            ========================================= */
+
+            if (
+                selectedDistrict
+            ) {
 
                 const postDistrict =
-                    normalizeDistrict(
-                        post.district ||
-                        post.text
+                    getPostDistrict(
+                        post
                     );
+
+
+                console.log(
+                    "📍 DISTRICT:",
+                    {
+                        post:
+                            post.id,
+
+                        selected:
+                            selectedDistrict,
+
+                        actual:
+                            postDistrict
+                    }
+                );
 
 
                 if (
@@ -827,12 +1203,18 @@ function getFilteredPosts() {
             }
 
 
-            if (selectedRooms) {
+            /* =========================================
+               ROOMS
+            ========================================= */
+
+            if (
+                selectedRooms
+            ) {
 
                 const rooms =
-                    Number(
-                        post.rooms
-                    ) || 0;
+                    getPostRooms(
+                        post
+                    );
 
 
                 if (
@@ -850,29 +1232,41 @@ function getFilteredPosts() {
 
                 }
 
-                else if (
-                    rooms !==
-                    Number(
-                        selectedRooms
-                    )
-                ) {
+                else {
 
-                    return false;
+                    const requiredRooms =
+                        extractNumber(
+                            selectedRooms
+                        );
+
+
+                    if (
+                        requiredRooms > 0 &&
+                        rooms !==
+                        requiredRooms
+                    ) {
+
+                        return false;
+
+                    }
 
                 }
 
             }
 
 
+            /* =========================================
+               PRICE
+            ========================================= */
+
             const price =
-                Number(
-                    post.price
-                ) || 0;
+                getPostPrice(
+                    post
+                );
 
 
             if (
-                price < minPrice ||
-                price > maxPrice
+                price < minPrice
             ) {
 
                 return false;
@@ -881,9 +1275,24 @@ function getFilteredPosts() {
 
 
             if (
+                price > maxPrice
+            ) {
+
+                return false;
+
+            }
+
+
+            /* =========================================
+               FAVORITES
+            ========================================= */
+
+            if (
                 favoritesOnly &&
                 !favoritePostIds.has(
-                    String(post.id)
+                    String(
+                        post.id
+                    )
                 )
             ) {
 
@@ -898,7 +1307,6 @@ function getFilteredPosts() {
     );
 
 }
-
 
 /* =========================================================
    FILTER POSTS
