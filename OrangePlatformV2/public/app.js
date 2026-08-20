@@ -2976,25 +2976,15 @@ function addMapControls() {
     `;
 
 
-    filterButton.onclick =
-        event => {
+    ffilterButton.onclick =
+    event => {
 
-            event.preventDefault();
+        event.preventDefault();
+        event.stopPropagation();
 
-            event.stopPropagation();
+        openFilters();
 
-
-            const filters =
-                document.querySelector(
-                    ".search-panel"
-                );
-
-
-            if (!filters) {
-
-                return;
-
-            }
+    };
 
 
             const hidden =
@@ -3038,7 +3028,7 @@ function addMapControls() {
         controls
     );
 
-}
+
 /* =========================================================
    INIT MAP
 ========================================================= */
