@@ -83,7 +83,7 @@ if (!fs.existsSync(DOWNLOADS)) {
 
 const SYNC_MESSAGES_LIMIT =
     Number(
-        process.env.SYNC_MESSAGES_LIMIT || 1000
+        process.env.SYNC_MESSAGES_LIMIT || 200
     );
 
 
