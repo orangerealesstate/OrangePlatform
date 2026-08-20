@@ -697,48 +697,30 @@
 
 function openFilters() {
 
-    const filters =
-        document.querySelector(".search-panel");
+    const overlay =
+        document.getElementById(
+            "filterOverlay"
+        );
 
-    if (!filters) {
+    if (!overlay) {
 
         console.error(
-            "❌ .search-panel not found"
+            "❌ #filterOverlay not found"
         );
 
         return;
 
     }
 
-    filters.style.display = "flex";
-
-    filters.style.position = "fixed";
-    filters.style.top = "70px";
-    filters.style.left = "10px";
-    filters.style.right = "10px";
-
-    filters.style.zIndex = "5000";
-
-    filters.style.background = "white";
-
-    filters.style.padding = "15px";
-
-    filters.style.borderRadius = "15px";
-
-    filters.style.boxShadow =
-        "0 5px 25px rgba(0,0,0,.30)";
-
-    filters.style.maxHeight =
-        "calc(100vh - 90px)";
-
-    filters.style.overflowY =
-        "auto";
+    overlay.style.display =
+        "flex";
 
     console.log(
         "🔎 Filters opened"
     );
 
 }
+
 
 
 function closeFilters() {
