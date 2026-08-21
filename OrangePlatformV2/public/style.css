@@ -1989,3 +1989,119 @@ body:not(.map-mode) #mapBackButton {
         font-size: 11px;
     }
 }
+/* PROPERTY INFO - NEW DESIGN */
+
+.price-date-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.property-price {
+    font-size: 25px;
+    font-weight: 800;
+    color: #f05a24;
+}
+
+.property-date {
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+}
+
+.property-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.property-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 8px;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.property-icon {
+    font-size: 21px;
+    width: 28px;
+    min-width: 28px;
+    text-align: center;
+}
+
+.property-info-item strong {
+    display: block;
+    font-size: 14px;
+    color: #333333;
+    font-weight: 700;
+}
+
+.property-info-item small {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #999999;
+}
+/* PRICE + DATE */
+
+.price-date-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.property-price {
+    font-size: 25px;
+    font-weight: 800;
+    color: #f05a24;
+}
+
+.property-date {
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+}
+
+/* PROPERTY INFO */
+
+.property-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.property-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 8px;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.property-icon {
+    font-size: 21px;
+    width: 28px;
+    min-width: 28px;
+    text-align: center;
+}
+
+.property-info-item strong {
+    display: block;
+    font-size: 14px;
+    color: #333333;
+    font-weight: 700;
+}
+
+.property-info-item small {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: #999999;
+}

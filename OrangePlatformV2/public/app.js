@@ -1709,7 +1709,26 @@ function renderPosts(
 
 
                 
+<div class="price-date-row">
 
+    <div class="property-price">
+        ${post.price || "-"}$
+    </div>
+
+    <div class="property-date">
+        ${post.date
+            ? new Date(post.date).toLocaleDateString(
+                "ru-RU",
+                {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                }
+            )
+            : ""}
+    </div>
+
+</div>
                     <div class="property-info">
 
     <div class="property-info-item">
