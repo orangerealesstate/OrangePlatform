@@ -1879,7 +1879,115 @@ card.querySelector(
     }
 );
 
+/* =========================
+   ADMIN ICONS
+========================= */
 
+if (telegramUserId === "5172653731") {
+
+    const actions =
+        card.querySelector(".card-actions");
+
+    if (actions) {
+
+        const editBtn =
+            document.createElement("button");
+
+        editBtn.type = "button";
+        editBtn.className = "admin-edit-btn";
+        editBtn.title = "Редактировать";
+        editBtn.setAttribute(
+            "aria-label",
+            "Редактировать"
+        );
+
+        editBtn.innerHTML = `
+            <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+            </svg>
+        `;
+
+        editBtn.style.cssText = `
+            width:46px;
+            height:46px;
+            border:none;
+            border-radius:14px;
+            background:#fff3e8;
+            color:#ff6600;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            flex-shrink:0;
+        `;
+
+
+        const deleteBtn =
+            document.createElement("button");
+
+        deleteBtn.type = "button";
+        deleteBtn.className = "admin-delete-btn";
+        deleteBtn.title = "Удалить";
+        deleteBtn.setAttribute(
+            "aria-label",
+            "Удалить"
+        );
+
+        deleteBtn.innerHTML = `
+            <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M3 6h18"/>
+                <path d="M8 6V4h8v2"/>
+                <path d="M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v5"/>
+                <path d="M14 11v5"/>
+            </svg>
+        `;
+
+        deleteBtn.style.cssText = `
+            width:46px;
+            height:46px;
+            border:none;
+            border-radius:14px;
+            background:#ffeaea;
+            color:#e53935;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            flex-shrink:0;
+        `;
+
+
+        actions.prepend(
+            deleteBtn
+        );
+
+        actions.prepend(
+            editBtn
+        );
+
+    }
+
+}
 /* =========================
    ADMIN DELETE
 ========================= */
