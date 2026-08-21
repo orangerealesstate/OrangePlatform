@@ -1865,38 +1865,56 @@ function renderPosts(posts) {
 
         container.appendChild(card);
 
+/* =========================
+   LOCATION
+========================= */
 
-        /* =========================
-           LOCATION
-        ========================= */
+card.querySelector(
+    ".location-btn"
+)?.addEventListener(
+    "click",
+    event => {
 
-        card.querySelector(
-            ".location-btn"
-        )?.addEventListener(
-            "click",
-            event => {
+        event.stopPropagation();
 
-                event.stopPropagation();
-
-                if (
-                    post.lat &&
-                    post.lng
-                ) {
-
-                    window.open(
-                        `https://yandex.com/maps/?ll=${post.lng},${post.lat}&z=16&pt=${post.lng},${post.lat},pm2rdm`,
-                        "_blank"
-                    );
-
-                }
-
-            }
+        const lat = Number(
+            post.latitude ??
+            post.lat ??
+            post.location?.latitude ??
+            post.location?.lat
         );
 
+        const lng = Number(
+            post.longitude ??
+            post.lng ??
+            post.lon ??
+            post.location?.longitude ??
+            post.location?.lng
+        );
 
-        /* =========================
-           TELEGRAM MAIN
-        ========================= */
+        if (
+            !Number.isFinite(lat) ||
+            !Number.isFinite(lng)
+        ) {
+            alert(
+                "ამ ბინისთვის ზუსტი ლოკაცია ვერ მოიძებნა"
+            );
+            return;
+        }
+
+        const yandexUrl =
+            `https://yandex.com/maps/?ll=${lng},${lat}&z=17&pt=${lng},${lat},pm2rdm`;
+
+        window.open(
+            yandexUrl,
+            "_blank"
+        );
+    }
+);
+/* =========================
+   TELEGRAM MAIN
+========================= */
+
 card.querySelector(
     ".telegram-main-btn"
 )?.addEventListener(
@@ -1906,7 +1924,6 @@ card.querySelector(
         event.stopPropagation();
 
         const telegramUrl =
-            post.telegramLink ||
             `https://t.me/kvartiri_tbilisi2023/${post.id}`;
 
         window.open(
