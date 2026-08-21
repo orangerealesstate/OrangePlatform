@@ -1862,19 +1862,42 @@ const date = post.date
 
 
         container.appendChild(card);
-        /* =========================
-   ADMIN EDIT
+     /* =========================
+   ADMIN EDIT + DELETE
 ========================= */
 
-card.querySelector(
-    ".admin-edit-btn"
-)?.addEventListener(
+card.addEventListener(
     "click",
     event => {
 
-        event.stopPropagation();
+        const editButton =
+            event.target.closest(
+                ".admin-edit-btn"
+            );
 
-        alert("EDIT მუშაობს");
+        if (editButton) {
+
+            event.stopPropagation();
+
+            editPost(post);
+
+            return;
+        }
+
+
+        const deleteButton =
+            event.target.closest(
+                ".admin-delete-btn"
+            );
+
+        if (deleteButton) {
+
+            event.stopPropagation();
+
+            deletePost(post);
+
+            return;
+        }
 
     }
 );
@@ -1988,22 +2011,7 @@ if (telegramUserId === "5172653731") {
     }
 
 }
-/* =========================
-   ADMIN DELETE
-========================= */
 
-card.querySelector(
-    ".admin-delete-btn"
-)?.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        alert("DELETE მუშაობს");
-
-    }
-);
 
 /* =========================
    LOCATION
