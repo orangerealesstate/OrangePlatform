@@ -1738,14 +1738,32 @@ function renderPosts(
                     </div>
 
 
-                    <button
-                        type="button"
-                        class="details-btn"
-                    >
-                        Подробнее
-                    </button>
+                    <div class="card-actions">
 
-                </div>
+    <button
+        type="button"
+        class="details-btn"
+    >
+        Подробнее
+    </button>
+
+    <button
+        type="button"
+        class="location-btn"
+        title="Открыть карту"
+    >
+        📍
+    </button>
+
+    <button
+        type="button"
+        class="telegram-btn"
+        title="Написать"
+    >
+        ✉️
+    </button>
+
+</div>
 
             `;
 
@@ -1753,7 +1771,45 @@ function renderPosts(
             container.appendChild(
                 card
             );
+card.querySelector(
+    ".location-btn"
+)?.addEventListener(
+    "click",
+    event => {
 
+        event.stopPropagation();
+
+        if (
+            post.lat &&
+            post.lng
+        ) {
+
+            window.open(
+                `https://www.google.com/maps?q=${post.lat},${post.lng}`,
+                "_blank"
+            );
+
+        }
+
+    }
+);
+
+
+card.querySelector(
+    ".telegram-btn"
+)?.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        window.open(
+            "https://t.me/Orangerealestatetbilisi",
+            "_blank"
+        );
+
+    }
+);
 
             card.querySelector(
                 ".favorite-btn"

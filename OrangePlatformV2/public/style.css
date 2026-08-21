@@ -1802,3 +1802,59 @@ body:not(.map-mode) #mapBackButton {
     }
 
 }
+.card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.card-actions .details-btn {
+    flex: 1;
+    height: 40px;
+    min-height: 40px;
+    padding: 0 18px;
+    font-size: 15px;
+    border-radius: 12px;
+}
+
+.card-actions .location-btn,
+.card-actions .telegram-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: #f5f5f5;
+    font-size: 19px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-actions .location-btn:active,
+.card-actions .telegram-btn:active,
+.card-actions .details-btn:active {
+    transform: scale(0.96);
+}
+/* პატარა მოქმედების ღილაკები */
+.card-actions .details-btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 0;
+    height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
+    border-radius: 12px;
+}
+
+.card-actions .location-btn,
+.card-actions .telegram-btn {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+    flex: 0 0 40px;
+}
