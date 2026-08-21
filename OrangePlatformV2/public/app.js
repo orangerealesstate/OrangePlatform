@@ -1897,22 +1897,25 @@ function renderPosts(posts) {
         /* =========================
            TELEGRAM MAIN
         ========================= */
+card.querySelector(
+    ".telegram-main-btn"
+)?.addEventListener(
+    "click",
+    event => {
 
-        card.querySelector(
-            ".telegram-main-btn"
-        )?.addEventListener(
-            "click",
-            event => {
+        event.stopPropagation();
 
-                event.stopPropagation();
+        const telegramUrl =
+            post.telegramLink ||
+            `https://t.me/kvartiri_tbilisi2023/${post.id}`;
 
-                window.open(
-                    "https://t.me/Orangerealestatetbilisi",
-                    "_blank"
-                );
-
-            }
+        window.open(
+            telegramUrl,
+            "_blank"
         );
+
+    }
+);
 
 
         /* =========================
