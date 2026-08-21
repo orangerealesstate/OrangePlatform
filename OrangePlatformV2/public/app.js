@@ -1585,18 +1585,16 @@ function renderPosts(posts) {
 
         const floor =
             post.floor || "-";
-
-        const date =
-            post.date
-                ? new Date(post.date).toLocaleDateString(
-                    "ru-RU",
-                    {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric"
-                    }
-                )
-                : "";
+const date = post.date
+    ? new Date(Number(post.date) * 1000).toLocaleDateString(
+        "ru-RU",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    )
+    : "";
 
         const card =
             document.createElement("div");
@@ -1956,8 +1954,8 @@ card.querySelector(
 
                 event.stopPropagation();
 
-                const shareUrl =
-    https://t.me/kvartiri_tbilisi2023/${post.id};
+               const shareUrl =
+    `https://t.me/kvartiri_tbilisi2023/${post.id}`;
 
                 try {
 
