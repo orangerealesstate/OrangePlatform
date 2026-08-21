@@ -2105,3 +2105,526 @@ body:not(.map-mode) #mapBackButton {
     font-size: 10px;
     color: #999999;
 }
+/* =========================================================
+   ORANGE MAIN CATALOG — NEW PREMIUM CARD
+========================================================= */
+
+.card {
+    background: #ffffff;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(0,0,0,.09);
+    border: 1px solid #eeeeee;
+}
+
+
+/* PHOTO */
+
+.card-slider {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    background: #eee;
+}
+
+.card-image {
+    width: 100% !important;
+    height: 240px !important;
+    object-fit: cover !important;
+    display: block;
+}
+
+
+/* FAVORITE */
+
+.favorite-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.95);
+
+    font-size: 23px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    z-index: 30;
+
+    box-shadow: 0 3px 12px rgba(0,0,0,.15);
+}
+
+
+/* IMAGE ARROWS */
+
+.prev-btn,
+.next-btn {
+    position: absolute;
+
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.55);
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    z-index: 20;
+
+    font-size: 14px;
+}
+
+.prev-btn {
+    left: 10px;
+}
+
+.next-btn {
+    right: 10px;
+}
+
+
+/* PHOTO COUNTER */
+
+.photo-counter {
+    position: absolute;
+
+    right: 10px;
+    bottom: 10px;
+
+    background: rgba(0,0,0,.68);
+
+    color: #fff;
+
+    padding: 6px 11px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    z-index: 20;
+}
+
+
+/* PRICE + DATE */
+
+.price-date-row {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 18px 8px;
+
+    margin: 0;
+}
+
+.property-price {
+    font-size: 36px;
+    line-height: 1;
+
+    font-weight: 800;
+
+    color: #f04f1f;
+}
+
+.property-date {
+    font-size: 14px;
+
+    color: #777;
+
+    font-weight: 500;
+
+    align-self: flex-start;
+
+    padding-top: 5px;
+}
+
+
+/* PROPERTY INFO */
+
+.property-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0;
+
+    margin: 0;
+
+    padding: 0 18px;
+}
+
+
+/* EACH ROW */
+
+.property-info-item {
+    display: flex;
+
+    align-items: center;
+
+    width: 100%;
+
+    min-height: 66px;
+
+    padding: 9px 0;
+
+    background: #fff;
+
+    border: none;
+
+    border-bottom: 1px solid #e7e7e7;
+
+    border-radius: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* ICON BOX */
+
+.property-icon {
+    width: 42px;
+    height: 42px;
+
+    min-width: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    font-size: 22px;
+
+    margin-right: 13px;
+}
+
+
+/* ICON COLORS */
+
+.district-item .property-icon {
+    background: #dcf8e5;
+}
+
+.rooms-item .property-icon {
+    background: #eee5ff;
+}
+
+.bedroom-item .property-icon {
+    background: #ffe3ea;
+}
+
+.bathroom-item .property-icon {
+    background: #dff0ff;
+}
+
+.area-item .property-icon {
+    background: #dff0ff;
+}
+
+.floor-item .property-icon {
+    background: #fff1cf;
+}
+
+
+/* TEXT */
+
+.property-text {
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 7px;
+
+    font-size: 18px;
+
+    line-height: 1.2;
+}
+
+.property-text strong {
+    font-size: 18px;
+
+    font-weight: 700;
+
+    color: #253044;
+}
+
+.property-text span {
+    font-size: 18px;
+
+    color: #222;
+
+    font-weight: 400;
+}
+
+
+/* DISTRICT MORE EMPHASIZED */
+
+.district-item .property-text strong {
+    font-size: 19px;
+}
+
+
+/* ACTION BAR */
+
+.card-actions {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2.2fr)
+        58px
+        58px
+        58px;
+
+    gap: 10px;
+
+    align-items: center;
+
+    padding: 16px 18px 18px;
+
+    margin-top: 0;
+}
+
+
+/* ALL SMALL BUTTONS */
+
+.card-actions button {
+    height: 52px;
+
+    border-radius: 14px;
+
+    border: 1px solid #e3e3e3;
+
+    background: #fff;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+.card-actions button:active {
+    transform: scale(.95);
+}
+
+
+/* BIG TELEGRAM */
+
+.telegram-main-btn {
+    min-width: 0;
+
+    padding: 0 16px;
+
+    gap: 10px;
+
+    background: #ff4b0b !important;
+
+    border: none !important;
+
+    color: #fff;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.telegram-main-btn:hover {
+    background: #ed4308 !important;
+
+    box-shadow:
+        0 5px 15px rgba(255,75,11,.25);
+}
+
+
+/* TELEGRAM ICON */
+
+.telegram-main-icon {
+    font-size: 28px;
+
+    line-height: 1;
+
+    transform: rotate(-12deg);
+}
+
+
+/* SHARE */
+
+.share-btn {
+    color: #111 !important;
+
+    background: #fff !important;
+}
+
+.share-btn:hover {
+    background: #f5f5f5 !important;
+}
+
+
+/* LOCATION */
+
+.location-btn {
+    color: #19a84a !important;
+
+    background: #fff !important;
+}
+
+.location-btn:hover {
+    background: #ecfff2 !important;
+
+    border-color: #19a84a !important;
+}
+
+
+/* TELEGRAM BLUE */
+
+.telegram-btn {
+    color: #229ed9 !important;
+
+    background: #fff !important;
+}
+
+.telegram-btn:hover {
+    background: #eef9ff !important;
+
+    border-color: #229ed9 !important;
+}
+
+
+/* SVG */
+
+.action-svg {
+    width: 30px;
+    height: 30px;
+
+    display: block;
+}
+
+.location-svg {
+    width: 34px;
+    height: 34px;
+}
+
+.telegram-svg {
+    width: 32px;
+    height: 32px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .card {
+        border-radius: 18px;
+    }
+
+    .card-slider {
+        height: 220px;
+    }
+
+    .card-image {
+        height: 220px !important;
+    }
+
+    .price-date-row {
+        padding: 16px 15px 7px;
+    }
+
+    .property-price {
+        font-size: 32px;
+    }
+
+    .property-date {
+        font-size: 13px;
+    }
+
+    .property-info {
+        padding: 0 15px;
+    }
+
+    .property-info-item {
+        min-height: 60px;
+    }
+
+    .property-icon {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+
+        margin-right: 11px;
+
+        font-size: 20px;
+    }
+
+    .property-text {
+        gap: 5px;
+    }
+
+    .property-text strong,
+    .property-text span {
+        font-size: 16px;
+    }
+
+    .district-item .property-text strong {
+        font-size: 17px;
+    }
+
+    .card-actions {
+        grid-template-columns:
+            minmax(0, 1fr)
+            52px
+            52px
+            52px;
+
+        gap: 8px;
+
+        padding: 14px 15px 16px;
+    }
+
+    .card-actions button {
+        height: 50px;
+    }
+
+    .telegram-main-btn {
+        font-size: 14px;
+
+        padding: 0 8px;
+
+        gap: 6px;
+    }
+
+    .telegram-main-icon {
+        font-size: 24px;
+    }
+
+}

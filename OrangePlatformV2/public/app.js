@@ -1508,459 +1508,572 @@ function setupFavoritesFilter() {
 /* =========================================================
    CATALOG
 ========================================================= */
-
-function renderPosts(
-    posts
-) {
+function renderPosts(posts) {
 
     const container =
-        document.getElementById(
-            "posts"
-        );
+        document.getElementById("posts");
 
+    if (!container) return;
 
-    if (!container) {
-
-        return;
-
-    }
-
-
-    container.innerHTML =
-        "";
-
+    container.innerHTML = "";
 
     if (!posts.length) {
 
         container.innerHTML = `
-
-            <h2
-                style="
-                    text-align:center;
-                    padding:40px;
-                "
-            >
+            <h2 style="
+                text-align:center;
+                padding:40px;
+            ">
                 Объявления не найдены
             </h2>
-
         `;
 
         return;
-
     }
 
+    posts.forEach(post => {
 
-    posts.forEach(
-        post => {
-
-            const images =
-    Array.isArray(post.images) && post.images.length
-        ? post.images
-        : [
-            "https://via.placeholder.com/600x400?text=No+Photo"
-        ];
-
-
-            if (
-                currentCardImage[
-                    post.id
-                ] === undefined
-            ) {
-
-                currentCardImage[
-                    post.id
-                ] = 0;
-
-            }
-
-
-            let imageIndex =
-                currentCardImage[
-                    post.id
-                ] || 0;
-
-
-            if (
-                imageIndex >=
-                images.length
-            ) {
-
-                imageIndex =
-                    0;
-
-                currentCardImage[
-                    post.id
-                ] = 0;
-
-            }
-
-
-            const image =
-                images[
-                    imageIndex
+        const images =
+            Array.isArray(post.images) &&
+            post.images.length
+                ? post.images
+                : [
+                    "https://via.placeholder.com/600x400?text=No+Photo"
                 ];
 
+        if (
+            currentCardImage[post.id] === undefined
+        ) {
+            currentCardImage[post.id] = 0;
+        }
 
-            const imageSrc =
-                image.startsWith(
-                    "http"
+        let imageIndex =
+            currentCardImage[post.id] || 0;
+
+        if (imageIndex >= images.length) {
+
+            imageIndex = 0;
+
+            currentCardImage[post.id] = 0;
+        }
+
+        const image =
+            images[imageIndex];
+
+        const imageSrc =
+            image.startsWith("http")
+                ? image
+                : "/" + image;
+
+        const district =
+            post.district || "-";
+
+        const price =
+            post.price || "-";
+
+        const rooms =
+            post.rooms || "-";
+
+        const bedrooms =
+            post.bedrooms || "-";
+
+        const bathrooms =
+            post.bathrooms || "-";
+
+        const area =
+            post.area || "-";
+
+        const floor =
+            post.floor || "-";
+
+        const date =
+            post.date
+                ? new Date(post.date).toLocaleDateString(
+                    "ru-RU",
+                    {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                    }
                 )
-                    ? image
-                    : "/" + image;
+                : "";
 
+        const card =
+            document.createElement("div");
 
-            const district =
-                post.district ||
-                "-";
+        card.className = "card";
 
+        card.innerHTML = `
 
-            const card =
-                document.createElement(
-                    "div"
-                );
+            <!-- PHOTO -->
+            <div class="card-slider">
 
+                <!-- FAVORITE -->
+                <button
+                    type="button"
+                    class="favorite-btn"
+                    data-post-id="${post.id}"
+                >
+                    ${
+                        favoritePostIds.has(
+                            String(post.id)
+                        )
+                            ? "❤️"
+                            : "🤍"
+                    }
+                </button>
 
-            card.className =
-                "card";
+                <!-- PREVIOUS -->
+                <button
+                    type="button"
+                    class="prev-btn"
+                >
+                    ◀
+                </button>
 
-
-            card.innerHTML = `
-
-                <div
-                    class="card-slider"
-                    style="
-                        position:relative;
-                    "
+                <!-- IMAGE -->
+                <img
+                    id="card-image-${post.id}"
+                    src="${imageSrc}"
+                    class="card-image"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
                 >
 
-                    <button
-                        type="button"
-                        class="favorite-btn"
-                        data-post-id="${post.id}"
-                        style="
-                            position:absolute;
-                            top:10px;
-                            right:10px;
-                            z-index:20;
-                            width:42px;
-                            height:42px;
-                            border:0;
-                            border-radius:50%;
-                            background:white;
-                            font-size:23px;
-                        "
-                    >
-                        ${
-                            favoritePostIds.has(
-                                String(post.id)
-                            )
-                                ? "❤️"
-                                : "🤍"
-                        }
-                    </button>
+                <!-- NEXT -->
+                <button
+                    type="button"
+                    class="next-btn"
+                >
+                    ▶
+                </button>
+
+                <!-- PHOTO COUNTER -->
+                <div
+                    id="card-counter-${post.id}"
+                    class="photo-counter"
+                >
+                    ${imageIndex + 1}/${images.length}
+                </div>
+
+            </div>
 
 
-                    <button
-                        type="button"
-                        class="prev-btn"
-                    >
-                        ◀
-                    </button>
+            <!-- PRICE + DATE -->
+            <div class="price-date-row">
+
+                <div class="property-price">
+                    ${price}$
+                </div>
+
+                <div class="property-date">
+                    ${date}
+                </div>
+
+            </div>
 
 
-                    <img
-    id="card-image-${post.id}"
-    src="${imageSrc}"
-    class="card-image"
-    alt=""
-    loading="lazy"
-    decoding="async"
-    fetchpriority="low"
->
+            <!-- PROPERTY INFORMATION -->
+            <div class="property-info">
 
 
-                    <button
-                        type="button"
-                        class="next-btn"
-                    >
-                        ▶
-                    </button>
+                <!-- DISTRICT -->
+                <div class="property-info-item district-item">
 
+                    <span class="property-icon">
+                        📍
+                    </span>
 
-                    <div
-                        id="card-counter-${post.id}"
-                        style="
-                            position:absolute;
-                            right:10px;
-                            bottom:10px;
-                            background:rgba(0,0,0,.65);
-                            color:white;
-                            padding:4px 8px;
-                            border-radius:12px;
-                            font-size:12px;
-                        "
-                    >
-                        ${imageIndex + 1}
-                        /
-                        ${images.length}
+                    <div class="property-text">
+                        <strong>Район:</strong>
+                        <span>${district}</span>
                     </div>
 
                 </div>
 
 
-                
-<div class="price-date-row">
+                <!-- ROOMS -->
+                <div class="property-info-item rooms-item">
 
-    <div class="property-price">
-        ${post.price || "-"}$
-    </div>
+                    <span class="property-icon">
+                        🛋️
+                    </span>
 
-    <div class="property-date">
-        ${post.date
-            ? new Date(post.date).toLocaleDateString(
-                "ru-RU",
-                {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric"
+                    <div class="property-text">
+                        <strong>Комнат:</strong>
+                        <span>${rooms}</span>
+                    </div>
+
+                </div>
+
+
+                <!-- BEDROOMS -->
+                <div class="property-info-item bedroom-item">
+
+                    <span class="property-icon">
+                        🛏️
+                    </span>
+
+                    <div class="property-text">
+                        <strong>Спальни:</strong>
+                        <span>${bedrooms}</span>
+                    </div>
+
+                </div>
+
+
+                <!-- BATHROOMS -->
+                <div class="property-info-item bathroom-item">
+
+                    <span class="property-icon">
+                        🛁
+                    </span>
+
+                    <div class="property-text">
+                        <strong>Ванные:</strong>
+                        <span>${bathrooms}</span>
+                    </div>
+
+                </div>
+
+
+                <!-- AREA -->
+                <div class="property-info-item area-item">
+
+                    <span class="property-icon">
+                        📐
+                    </span>
+
+                    <div class="property-text">
+                        <strong>Площадь:</strong>
+                        <span>${area} м²</span>
+                    </div>
+
+                </div>
+
+
+                <!-- FLOOR -->
+                <div class="property-info-item floor-item">
+
+                    <span class="property-icon">
+                        🏢
+                    </span>
+
+                    <div class="property-text">
+                        <strong>Этаж:</strong>
+                        <span>${floor}</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+            <div class="card-actions">
+
+
+                <!-- TELEGRAM LARGE -->
+                <button
+                    type="button"
+                    class="telegram-main-btn"
+                >
+                    <span class="telegram-main-icon">
+                        ➤
+                    </span>
+
+                    Смотреть в Telegram
+                </button>
+
+
+                <!-- SHARE -->
+                <button
+                    type="button"
+                    class="share-btn"
+                    title="Поделиться"
+                    aria-label="Поделиться"
+                >
+                    <svg
+                        class="action-svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                    >
+                        <path
+                            d="M14 3h7v7"
+                        />
+                        <path
+                            d="M10 14L21 3"
+                        />
+                        <path
+                            d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"
+                        />
+                    </svg>
+                </button>
+
+
+                <!-- LOCATION -->
+                <button
+                    type="button"
+                    class="location-btn"
+                    title="Открыть карту"
+                    aria-label="Открыть карту"
+                >
+                    <svg
+                        class="action-svg location-svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                    >
+                        <path
+                            d="M12 21s7-6.2 7-12A7 7 0 0 0 5 9c0 5.8 7 12 7 12Z"
+                        />
+                        <circle
+                            cx="12"
+                            cy="9"
+                            r="2.5"
+                        />
+                    </svg>
+                </button>
+
+
+                <!-- TELEGRAM ICON -->
+                <button
+                    type="button"
+                    class="telegram-btn"
+                    title="Telegram"
+                    aria-label="Telegram"
+                >
+                    <svg
+                        class="action-svg telegram-svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                    >
+                        <path
+                            d="M21.5 3.5 2.8 10.8c-.9.35-.9 1.6.02 1.93l4.7 1.7 1.75 5.1c.3.88 1.43 1.12 2.08.43l2.65-2.82 4.6 3.38c.76.56 1.85.15 2.05-.78l2.5-14.7c.17-1-.78-1.83-1.65-1.54Z"
+                        />
+                    </svg>
+                </button>
+
+            </div>
+
+        `;
+
+
+        container.appendChild(card);
+
+
+        /* =========================
+           LOCATION
+        ========================= */
+
+        card.querySelector(
+            ".location-btn"
+        )?.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                if (
+                    post.lat &&
+                    post.lng
+                ) {
+
+                    window.open(
+                        `https://yandex.com/maps/?ll=${post.lng},${post.lat}&z=16&pt=${post.lng},${post.lat},pm2rdm`,
+                        "_blank"
+                    );
+
                 }
-            )
-            : ""}
-    </div>
 
-</div>
-                    <div class="property-info">
-
-    <div class="property-info-item">
-        <span class="property-icon district-icon">📍</span>
-        <div>
-            <strong>${district}</strong>
-            <small>Район</small>
-        </div>
-    </div>
-
-    <div class="property-info-item">
-        <span class="property-icon">🛋️</span>
-        <div>
-            <strong>${post.rooms || "-"}</strong>
-            <small>Комнаты</small>
-        </div>
-    </div>
-
-    <div class="property-info-item">
-        <span class="property-icon">🛏️</span>
-        <div>
-            <strong>${post.bedrooms || "-"}</strong>
-            <small>Спальни</small>
-        </div>
-    </div>
-
-    <div class="property-info-item">
-        <span class="property-icon">🛁</span>
-        <div>
-            <strong>${post.bathrooms || "-"}</strong>
-            <small>Ванные</small>
-        </div>
-    </div>
-
-    <div class="property-info-item">
-        <span class="property-icon">📐</span>
-        <div>
-            <strong>${post.area || "-"} м²</strong>
-            <small>Площадь</small>
-        </div>
-    </div>
-
-    <div class="property-info-item">
-        <span class="property-icon">🏢</span>
-        <div>
-            <strong>${post.floor || "-"}</strong>
-            <small>Этаж</small>
-        </div>
-    </div>
-
-</div>
-
-
-                    <div class="card-actions">
-
-    <button
-        type="button"
-        class="details-btn"
-    >
-        Подробнее
-    </button>
-
-    <<button
-    type="button"
-    class="location-btn"
-    title="Открыть карту"
-    aria-label="Открыть карту"
->
-    <svg
-        class="action-icon location-icon"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-    >
-        <path
-            d="M12 21s7-6.2 7-12A7 7 0 0 0 5 9c0 5.8 7 12 7 12Z"
-        />
-        <circle
-            cx="12"
-            cy="9"
-            r="2.5"
-        />
-    </svg>
-</button>
-
-<button
-    type="button"
-    class="telegram-btn"
-    title="Написать"
-    aria-label="Написать"
->
-    <svg
-        class="action-icon telegram-icon"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-    >
-        <path
-            d="M21.5 3.5 2.8 10.8c-.9.35-.9 1.6.02 1.93l4.7 1.7 1.75 5.1c.3.88 1.43 1.12 2.08.43l2.65-2.82 4.6 3.38c.76.56 1.85.15 2.05-.78l2.5-14.7c.17-1-.78-1.83-1.65-1.54Z"
-        />
-        <path
-            d="m8 14.4 10.3-7.2-7.5 8.4"
-        />
-    </svg>
-</button>
-
-</div>
-
-            `;
-
-
-            container.appendChild(
-                card
-            );
-card.querySelector(
-    ".location-btn"
-)?.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        if (
-            post.lat &&
-            post.lng
-        ) {
-
-            window.open(
-    `https://yandex.com/maps/?ll=${post.lng},${post.lat}&z=16&pt=${post.lng},${post.lat},pm2rdm`,
-    "_blank"
-);
-
-        }
-
-    }
-);
-
-
-card.querySelector(
-    ".telegram-btn"
-)?.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        window.open(
-            "https://t.me/Orangerealestatetbilisi",
-            "_blank"
+            }
         );
 
-    }
-);
 
-            card.querySelector(
-                ".favorite-btn"
-            )?.addEventListener(
-                "click",
-                event => {
+        /* =========================
+           TELEGRAM MAIN
+        ========================= */
 
-                    event.stopPropagation();
+        card.querySelector(
+            ".telegram-main-btn"
+        )?.addEventListener(
+            "click",
+            event => {
 
-                    toggleFavorite(
-                        post.id
+                event.stopPropagation();
+
+                window.open(
+                    "https://t.me/Orangerealestatetbilisi",
+                    "_blank"
+                );
+
+            }
+        );
+
+
+        /* =========================
+           TELEGRAM ICON
+        ========================= */
+
+        card.querySelector(
+            ".telegram-btn"
+        )?.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                window.open(
+                    "https://t.me/Orangerealestatetbilisi",
+                    "_blank"
+                );
+
+            }
+        );
+
+
+        /* =========================
+           SHARE
+        ========================= */
+
+        card.querySelector(
+            ".share-btn"
+        )?.addEventListener(
+            "click",
+            async event => {
+
+                event.stopPropagation();
+
+                const shareUrl =
+                    `${window.location.origin}/details.html?id=${post.id}`;
+
+                try {
+
+                    if (
+                        navigator.share
+                    ) {
+
+                        await navigator.share({
+
+                            title:
+                                `${price}$ — ${district}`,
+
+                            text:
+                                `🏠 ${district}\n💰 ${price}$`,
+
+                            url:
+                                shareUrl
+
+                        });
+
+                    } else {
+
+                        await navigator.clipboard.writeText(
+                            shareUrl
+                        );
+
+                        alert(
+                            "Ссылка скопирована"
+                        );
+
+                    }
+
+                } catch (error) {
+
+                    console.log(
+                        "Share cancelled"
                     );
 
                 }
-            );
+
+            }
+        );
 
 
-            card.querySelector(
-                ".prev-btn"
-            )?.addEventListener(
-                "click",
-                event => {
+        /* =========================
+           FAVORITE
+        ========================= */
 
-                    event.stopPropagation();
+        card.querySelector(
+            ".favorite-btn"
+        )?.addEventListener(
+            "click",
+            event => {
 
-                    prevCardImage(
-                        post.id
-                    );
+                event.stopPropagation();
 
-                }
-            );
+                toggleFavorite(
+                    post.id
+                );
 
-
-            card.querySelector(
-                ".next-btn"
-            )?.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-                    nextCardImage(
-                        post.id
-                    );
-
-                }
-            );
+            }
+        );
 
 
-            card.querySelector(
-                ".card-image"
-            )?.addEventListener(
-                "click",
-                event => {
+        /* =========================
+           PREVIOUS IMAGE
+        ========================= */
 
-                    event.stopPropagation();
+        card.querySelector(
+            ".prev-btn"
+        )?.addEventListener(
+            "click",
+            event => {
 
-                    openGallery(
-                        post.id
-                    );
+                event.stopPropagation();
 
-                }
-            );
+                prevCardImage(
+                    post.id
+                );
+
+            }
+        );
 
 
-            card.querySelector(
-                ".details-btn"
-            )?.addEventListener(
-                "click",
-                event => {
+        /* =========================
+           NEXT IMAGE
+        ========================= */
 
-                    event.stopPropagation();
+        card.querySelector(
+            ".next-btn"
+        )?.addEventListener(
+            "click",
+            event => {
 
-                    window.location.href =
-                        `details.html?id=${post.id}`;
+                event.stopPropagation();
 
-                }
-            );
+                nextCardImage(
+                    post.id
+                );
 
-        }
-    );
+            }
+        );
+
+
+        /* =========================
+           OPEN GALLERY
+        ========================= */
+
+        card.querySelector(
+            ".card-image"
+        )?.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                openGallery(
+                    post.id
+                );
+
+            }
+        );
+
+    });
 
 }
 /* =========================================================
