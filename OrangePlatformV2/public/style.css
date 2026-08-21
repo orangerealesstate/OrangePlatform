@@ -2072,29 +2072,29 @@ body:not(.map-mode) #mapBackButton {
 .property-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 7px;
 }
 
 .property-info-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 8px;
+    gap: 8.5px;
+    padding: 8.5px 7px;
     border: 1px solid #eeeeee;
-    border-radius: 12px;
+    border-radius: 10px;
     background: #ffffff;
 }
 
 .property-icon {
-    font-size: 21px;
-    width: 28px;
-    min-width: 28px;
+    font-size: 18px;
+    width: 24px;
+    min-width: 24px;
     text-align: center;
 }
 
 .property-info-item strong {
     display: block;
-    font-size: 14px;
+    font-size: 12px;
     color: #333333;
     font-weight: 700;
 }
@@ -2102,7 +2102,7 @@ body:not(.map-mode) #mapBackButton {
 .property-info-item small {
     display: block;
     margin-top: 2px;
-    font-size: 10px;
+    font-size: 8.5px;
     color: #999999;
 }
 /* =========================================================
