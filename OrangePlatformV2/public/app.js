@@ -1708,34 +1708,59 @@ function renderPosts(
                 </div>
 
 
-                <div class="info">
+                
 
-                    <div class="price">
-                        $${post.price || "-"}
-                    </div>
+                    <div class="property-info">
 
+    <div class="property-info-item">
+        <span class="property-icon district-icon">📍</span>
+        <div>
+            <strong>${district}</strong>
+            <small>Район</small>
+        </div>
+    </div>
 
-                    <div class="details">
+    <div class="property-info-item">
+        <span class="property-icon">🛋️</span>
+        <div>
+            <strong>${post.rooms || "-"}</strong>
+            <small>Комнаты</small>
+        </div>
+    </div>
 
-                        📍 <b>Район:</b>
-                        ${district}
+    <div class="property-info-item">
+        <span class="property-icon">🛏️</span>
+        <div>
+            <strong>${post.bedrooms || "-"}</strong>
+            <small>Спальни</small>
+        </div>
+    </div>
 
-                        <br><br>
+    <div class="property-info-item">
+        <span class="property-icon">🛁</span>
+        <div>
+            <strong>${post.bathrooms || "-"}</strong>
+            <small>Ванные</small>
+        </div>
+    </div>
 
-                        📌 <b>Адрес:</b>
-                        ${post.street || "-"}
+    <div class="property-info-item">
+        <span class="property-icon">📐</span>
+        <div>
+            <strong>${post.area || "-"} м²</strong>
+            <small>Площадь</small>
+        </div>
+    </div>
 
-                        <br><br>
+    <div class="property-info-item">
+        <span class="property-icon">🏢</span>
+        <div>
+            <strong>${post.floor || "-"}</strong>
+            <small>Этаж</small>
+        </div>
+    </div>
 
-                        🛏 <b>Комнат:</b>
-                        ${post.rooms || "-"}
-
-                        <br><br>
-
-                        📐 <b>Площадь:</b>
-                        ${post.area || "-"} м²
-
-                    </div>
+</div>
 
 
                     <div class="card-actions">
