@@ -1877,33 +1877,21 @@ card.querySelector(
 
         event.stopPropagation();
 
-        const lat = Number(
-            post.latitude ??
-            post.lat ??
-            post.location?.latitude ??
-            post.location?.lat
-        );
-
-        const lng = Number(
-            post.longitude ??
-            post.lng ??
-            post.lon ??
-            post.location?.longitude ??
-            post.location?.lng
-        );
+        const lat = Number(post.lat);
+        const lng = Number(post.lng);
 
         if (
             !Number.isFinite(lat) ||
             !Number.isFinite(lng)
         ) {
             alert(
-                "ამ ბინისთვის ზუსტი ლოკაცია ვერ მოიძებნა"
+                "ამ ბინისთვის ლოკაცია ვერ მოიძებნა"
             );
             return;
         }
 
         const yandexUrl =
-            `https://yandex.com/maps/?ll=${lng},${lat}&z=17&pt=${lng},${lat},pm2rdm`;
+            `https://yandex.com/maps/?ll=${lng}%2C${lat}&z=17&pt=${lng}%2C${lat}%2Cpm2rdm`;
 
         window.open(
             yandexUrl,
