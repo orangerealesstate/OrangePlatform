@@ -1874,7 +1874,7 @@ card.querySelector(
 
         event.stopPropagation();
 
-        editPost(post);
+        alert("EDIT მუშაობს");
 
     }
 );
@@ -2000,7 +2000,7 @@ card.querySelector(
 
         event.stopPropagation();
 
-        deletePost(post);
+        alert("DELETE მუშაობს");
 
     }
 );
