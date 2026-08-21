@@ -1866,7 +1866,6 @@ const date = post.date
 /* =========================
    LOCATION
 ========================= */
-
 card.querySelector(
     ".location-btn"
 )?.addEventListener(
@@ -1875,26 +1874,28 @@ card.querySelector(
 
         event.stopPropagation();
 
-        const lat = Number(post.lat);
-        const lng = Number(post.lng);
-
         if (
-            !Number.isFinite(lat) ||
-            !Number.isFinite(lng)
+            post.lat &&
+            post.lng
         ) {
-            alert(
-                "ამ ბინისთვის ლოკაცია ვერ მოიძებნა"
+
+            const lat = Number(post.lat);
+            const lng = Number(post.lng);
+
+            const yandexUrl =
+                `https://yandex.com/maps/?ll=${lng},${lat}&z=17&pt=${lng},${lat},pm2rdm`;
+
+            window.open(
+                yandexUrl,
+                "_blank"
             );
-            return;
+
+        } else {
+
+            alert("Локация для этой квартиры не указана");
+
         }
 
-        const yandexUrl =
-            `https://yandex.com/maps/?ll=${lng}%2C${lat}&z=17&pt=${lng}%2C${lat}%2Cpm2rdm`;
-
-        window.open(
-            yandexUrl,
-            "_blank"
-        );
     }
 );
 /* =========================
