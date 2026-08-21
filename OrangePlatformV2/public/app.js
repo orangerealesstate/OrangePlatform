@@ -1756,12 +1756,12 @@ function renderPosts(
     </button>
 
     <button
-        type="button"
-        class="telegram-btn"
-        title="Написать"
-    >
-        ✉️
-    </button>
+    type="button"
+    class="telegram-btn"
+    title="Написать"
+>
+    <span class="telegram-icon">➤</span>
+</button>
 
 </div>
 
@@ -1785,9 +1785,9 @@ card.querySelector(
         ) {
 
             window.open(
-                `https://www.google.com/maps?q=${post.lat},${post.lng}`,
-                "_blank"
-            );
+    `https://yandex.com/maps/?ll=${post.lng},${post.lat}&z=16&pt=${post.lng},${post.lat},pm2rdm`,
+    "_blank"
+);
 
         }
 

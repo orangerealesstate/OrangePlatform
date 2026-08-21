@@ -1857,4 +1857,12 @@ body:not(.map-mode) #mapBackButton {
     height: 40px;
     padding: 0;
     flex: 0 0 40px;
+}.telegram-icon {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-45deg);
 }
