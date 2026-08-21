@@ -1862,6 +1862,40 @@ const date = post.date
 
 
         container.appendChild(card);
+        /* =========================
+   ADMIN EDIT
+========================= */
+
+card.querySelector(
+    ".admin-edit-btn"
+)?.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        editPost(post);
+
+    }
+);
+
+
+/* =========================
+   ADMIN DELETE
+========================= */
+
+card.querySelector(
+    ".admin-delete-btn"
+)?.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        deletePost(post);
+
+    }
+);
 
 /* =========================
    LOCATION
@@ -2082,6 +2116,190 @@ card.querySelector(
 
     });
 
+}
+/* =========================
+   ADMIN EDIT POST
+========================= */
+
+async function editPost(post) {
+
+    if (telegramUserId !== "5172653731") {
+        return;
+    }
+
+    const price = prompt(
+        "Цена:",
+        post.price || ""
+    );
+
+    if (price === null) return;
+
+    const district = prompt(
+        "Район:",
+        post.district || ""
+    );
+
+    if (district === null) return;
+
+    const rooms = prompt(
+        "Комнат:",
+        post.rooms || ""
+    );
+
+    if (rooms === null) return;
+
+    const bedrooms = prompt(
+        "Спальни:",
+        post.bedrooms || ""
+    );
+
+    if (bedrooms === null) return;
+
+    const bathrooms = prompt(
+        "Ванные:",
+        post.bathrooms || ""
+    );
+
+    if (bathrooms === null) return;
+
+    const area = prompt(
+        "Площадь:",
+        post.area || ""
+    );
+
+    if (area === null) return;
+
+    const floor = prompt(
+        "Этаж:",
+        post.floor || ""
+    );
+
+    if (floor === null) return;
+
+    const updatedPost = {
+        ...post,
+
+        userId: telegramUserId,
+
+        price: price.trim(),
+        district: district.trim(),
+        rooms: rooms.trim(),
+        bedrooms: bedrooms.trim(),
+        bathrooms: bathrooms.trim(),
+        area: area.trim(),
+        floor: floor.trim()
+    };
+
+    try {
+
+        const response = await fetch(
+            "/api/post/update",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify(
+                    updatedPost
+                )
+            }
+        );
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.error ||
+                "Ошибка редактирования"
+            );
+        }
+
+        alert(
+            "✅ Объявление обновлено"
+        );
+
+        await loadPosts();
+
+    } catch (error) {
+
+        console.error(
+            "EDIT POST ERROR:",
+            error
+        );
+
+        alert(
+            "❌ Не удалось изменить объявление"
+        );
+    }
+}
+
+
+/* =========================
+   ADMIN DELETE POST
+========================= */
+
+async function deletePost(post) {
+
+    if (telegramUserId !== "5172653731") {
+        return;
+    }
+
+    const confirmed = confirm(
+        `Удалить объявление №${post.id}?\n\nЭто действие нельзя отменить.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+
+        const response = await fetch(
+            "/api/post/delete",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    id: post.id,
+                    userId: telegramUserId
+                })
+            }
+        );
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.error ||
+                "Ошибка удаления"
+            );
+        }
+
+        alert(
+            "🗑️ Объявление удалено"
+        );
+
+        await loadPosts();
+
+    } catch (error) {
+
+        console.error(
+            "DELETE POST ERROR:",
+            error
+        );
+
+        alert(
+            "❌ Не удалось удалить объявление"
+        );
+    }
 }
 /* =========================================================
    CARD IMAGE

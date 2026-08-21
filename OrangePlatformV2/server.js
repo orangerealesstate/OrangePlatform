@@ -1128,6 +1128,30 @@ app.get(
 app.post(
     "/api/post/update",
     (req, res) => {
+        const adminId =
+            "5172653731";
+
+        const userId =
+            String(
+                req.body.userId || ""
+            );
+
+        if (
+            userId !== adminId
+        ) {
+
+            return res
+                .status(403)
+                .json({
+
+                    success: false,
+
+                    error:
+                        "Access denied"
+
+                });
+
+        }
 
         try {
 
@@ -1242,6 +1266,30 @@ app.post(
 app.post(
     "/api/post/delete",
     (req, res) => {
+        const adminId =
+            "5172653731";
+
+        const userId =
+            String(
+                req.body.userId || ""
+            );
+
+        if (
+            userId !== adminId
+        ) {
+
+            return res
+                .status(403)
+                .json({
+
+                    success: false,
+
+                    error:
+                        "Access denied"
+
+                });
+
+        }
 
         try {
 
