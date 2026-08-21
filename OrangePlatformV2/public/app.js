@@ -1664,7 +1664,7 @@ const date = post.date
                 <div class="property-price">
                     ${price}$
                 </div>
-
+<div class="admin-price-actions"></div>
                 <div class="property-date">
                     ${date}
                 </div>
