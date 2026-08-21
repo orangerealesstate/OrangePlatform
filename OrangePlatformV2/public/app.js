@@ -1747,20 +1747,46 @@ function renderPosts(
         Подробнее
     </button>
 
-    <button
-        type="button"
-        class="location-btn"
-        title="Открыть карту"
+    <<button
+    type="button"
+    class="location-btn"
+    title="Открыть карту"
+    aria-label="Открыть карту"
+>
+    <svg
+        class="action-icon location-icon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
     >
-        📍
-    </button>
+        <path
+            d="M12 21s7-6.2 7-12A7 7 0 0 0 5 9c0 5.8 7 12 7 12Z"
+        />
+        <circle
+            cx="12"
+            cy="9"
+            r="2.5"
+        />
+    </svg>
+</button>
 
-    <button
+<button
     type="button"
     class="telegram-btn"
     title="Написать"
+    aria-label="Написать"
 >
-    <span class="telegram-icon">➤</span>
+    <svg
+        class="action-icon telegram-icon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+    >
+        <path
+            d="M21.5 3.5 2.8 10.8c-.9.35-.9 1.6.02 1.93l4.7 1.7 1.75 5.1c.3.88 1.43 1.12 2.08.43l2.65-2.82 4.6 3.38c.76.56 1.85.15 2.05-.78l2.5-14.7c.17-1-.78-1.83-1.65-1.54Z"
+        />
+        <path
+            d="m8 14.4 10.3-7.2-7.5 8.4"
+        />
+    </svg>
 </button>
 
 </div>

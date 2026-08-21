@@ -1857,12 +1857,66 @@ body:not(.map-mode) #mapBackButton {
     height: 40px;
     padding: 0;
     flex: 0 0 40px;
-}.telegram-icon {
-    font-size: 20px;
-    font-weight: bold;
-    line-height: 1;
+}.action-icon {
+    width: 21px;
+    height: 21px;
+    display: block;
+    fill: none;
+    stroke: #444;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: all 0.2s ease;
+}
+
+.telegram-icon {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: #444;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.card-actions .location-btn,
+.card-actions .telegram-btn {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    padding: 0;
+    flex: 0 0 42px;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: rotate(-45deg);
+
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.card-actions .location-btn:hover,
+.card-actions .telegram-btn:hover {
+    background: #fff4ed;
+    border-color: #ff6b35;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.card-actions .location-btn:hover .action-icon,
+.card-actions .telegram-btn:hover .action-icon {
+    stroke: #ff6b35;
+}
+
+.card-actions .location-btn:active,
+.card-actions .telegram-btn:active {
+    transform: scale(0.95);
 }
