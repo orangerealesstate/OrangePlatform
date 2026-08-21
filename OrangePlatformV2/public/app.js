@@ -1957,7 +1957,7 @@ card.querySelector(
                 event.stopPropagation();
 
                 const shareUrl =
-                    `${window.location.origin}/details.html?id=${post.id}`;
+    https://t.me/kvartiri_tbilisi2023/${post.id};
 
                 try {
 
