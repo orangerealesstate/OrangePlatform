@@ -1909,7 +1909,7 @@ card.addEventListener(
 if (telegramUserId === "5172653731") {
 
     const actions =
-        card.querySelector(".card-actions");
+    card.querySelector(".card-actions");
 
     if (actions) {
 
