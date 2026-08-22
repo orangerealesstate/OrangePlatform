@@ -1659,7 +1659,15 @@ const date = post.date
 
 
             <!-- PRICE + DATE -->
-            <div class="price-date-row">
+            <div
+    class="price-date-row"
+    style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+    "
+>
 
                 <div class="property-price">
                     ${price}$
@@ -1668,8 +1676,7 @@ const date = post.date
                 <div class="property-date">
                     ${date}
                 </div>
-
-            </div>
+</div>
 
 
             <!-- PROPERTY INFORMATION -->
@@ -1901,15 +1908,14 @@ card.addEventListener(
 
     }
 );
-
 /* =========================
-   ADMIN ICONS
+   ADMIN EDIT + DELETE
 ========================= */
 
 if (telegramUserId === "5172653731") {
 
     const actions =
-    card.querySelector(".card-actions");
+        card.querySelector(".card-actions");
 
     if (actions) {
 
@@ -1917,8 +1923,12 @@ if (telegramUserId === "5172653731") {
             document.createElement("button");
 
         editBtn.type = "button";
-        editBtn.className = "admin-edit-btn";
-        editBtn.title = "Редактировать";
+        editBtn.className =
+            "admin-edit-btn";
+
+        editBtn.title =
+            "Редактировать";
+
         editBtn.setAttribute(
             "aria-label",
             "Редактировать"
@@ -1959,8 +1969,12 @@ if (telegramUserId === "5172653731") {
             document.createElement("button");
 
         deleteBtn.type = "button";
-        deleteBtn.className = "admin-delete-btn";
-        deleteBtn.title = "Удалить";
+        deleteBtn.className =
+            "admin-delete-btn";
+
+        deleteBtn.title =
+            "Удалить";
+
         deleteBtn.setAttribute(
             "aria-label",
             "Удалить"
@@ -2000,6 +2014,8 @@ if (telegramUserId === "5172653731") {
         `;
 
 
+        /* ღილაკების დამატება */
+
         actions.prepend(
             deleteBtn
         );
@@ -2008,10 +2024,37 @@ if (telegramUserId === "5172653731") {
             editBtn
         );
 
+
+        /* რედაქტირება */
+
+        editBtn.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                editPost(post);
+
+            }
+        );
+
+
+        /* წაშლა */
+
+        deleteBtn.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                deletePost(post);
+
+            }
+        );
+
     }
 
 }
-
 
 /* =========================
    LOCATION
