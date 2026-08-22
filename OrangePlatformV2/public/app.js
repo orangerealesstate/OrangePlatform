@@ -1956,8 +1956,8 @@ if (
         `;
 
         editBtn.style.cssText = `
-            width:46px;
-            height:46px;
+            width:37px;
+            height:37px;
             border:none;
             border-radius:14px;
             background:#fff3e8;
@@ -2005,8 +2005,8 @@ if (
         `;
 
         deleteBtn.style.cssText = `
-            width:46px;
-            height:46px;
+            width:37px;
+            height:37px;
             border:none;
             border-radius:14px;
             background:#ffeaea;
@@ -2020,6 +2020,13 @@ if (
 
 
         /* ღილაკების დამატება */
+        adminPriceActions.style.cssText = `
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    flex-shrink:0;
+`;
 
         adminPriceActions.append(
     deleteBtn
