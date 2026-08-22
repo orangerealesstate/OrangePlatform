@@ -49,7 +49,11 @@ const POSTS_FILE =
         __dirname,
         "posts.json"
     );
-
+const DELETED_POSTS_FILE =
+    path.join(
+        __dirname,
+        "deleted_posts.json"
+    );
 const DOWNLOADS =
     path.join(
         __dirname,
@@ -2919,7 +2923,26 @@ function saveNewPostImmediately(
         return null;
 
     }
+/*
+   თუ განცხადება ადმინისტრატორმა წაშალა,
+   Telegram-ის ავტომატურმა sync-მა
+   აღარ უნდა დააბრუნოს.
+*/
 
+if (
+    isPostDeleted(
+        post.id
+    )
+) {
+
+    console.log(
+        "🗑️ SKIPPED DELETED TELEGRAM POST:",
+        post.id
+    );
+
+    return null;
+
+}
 
     /*
        ყველა ძირითადი ველი მაინც არსებობდეს.
@@ -3040,15 +3063,51 @@ function saveNewPostImmediately(
             existingIndex
         ];
 
+const manualEdits =
+    oldPost.manualEdits || {};
 
-    const merged = {
+const merged = {
 
-        ...oldPost,
+    ...oldPost,
 
-        ...post
+    ...post
 
-    };
+};
 
+
+const editableFields = [
+
+    "district",
+    "street",
+    "rooms",
+    "bedrooms",
+    "area",
+    "floor",
+    "price",
+    "text"
+
+];
+
+
+for (
+    const field of
+    editableFields
+) {
+
+    if (
+        manualEdits[field] === true
+    ) {
+
+        merged[field] =
+            oldPost[field];
+
+    }
+
+}
+
+
+merged.manualEdits =
+    manualEdits;
 
     /*
        თუ ახალი Telegram message-ის დროს
@@ -3130,7 +3189,69 @@ function saveNewPostImmediately(
     return merged;
 
 }
+/* =========================================================
+   DELETED POSTS
+========================================================= */
 
+function loadDeletedPostIds() {
+
+    if (
+        !fs.existsSync(
+            DELETED_POSTS_FILE
+        )
+    ) {
+
+        return [];
+
+    }
+
+    try {
+
+        const raw =
+            fs.readFileSync(
+                DELETED_POSTS_FILE,
+                "utf8"
+            );
+
+        const ids =
+            JSON.parse(
+                raw
+            );
+
+        return Array.isArray(ids)
+
+            ? ids.map(
+                id => String(id)
+            )
+
+            : [];
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "⚠️ deleted_posts.json read error:",
+            error.message
+        );
+
+        return [];
+
+    }
+
+}
+
+
+function isPostDeleted(
+    postId
+) {
+
+    return loadDeletedPostIds()
+        .includes(
+            String(postId)
+        );
+
+}
 
 /* =========================================================
    SAVE ALBUM IMMEDIATELY

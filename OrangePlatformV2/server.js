@@ -39,7 +39,11 @@ const POSTS_FILE =
         __dirname,
         "posts.json"
     );
-
+const DELETED_POSTS_FILE =
+    path.join(
+        __dirname,
+        "deleted_posts.json"
+    );
 const FAVORITES_FILE =
     path.join(
         __dirname,
@@ -1120,7 +1124,6 @@ app.get(
     }
 );
 
-
 // =========================================================
 // UPDATE POST
 // =========================================================
@@ -1128,6 +1131,7 @@ app.get(
 app.post(
     "/api/post/update",
     (req, res) => {
+
         const adminId =
             "5172653731";
 
@@ -1143,12 +1147,9 @@ app.post(
             return res
                 .status(403)
                 .json({
-
                     success: false,
-
                     error:
                         "Access denied"
-
                 });
 
         }
@@ -1158,23 +1159,15 @@ app.post(
             const posts =
                 getPosts();
 
-
             const updated =
                 req.body;
 
-
             const index =
                 posts.findIndex(
-
                     p =>
-                        String(p.id)
-                        ===
-                        String(
-                            updated.id
-                        )
-
+                        String(p.id) ===
+                        String(updated.id)
                 );
-
 
             if (
                 index === -1
@@ -1183,16 +1176,44 @@ app.post(
                 return res
                     .status(404)
                     .json({
-
                         success: false,
-
                         error:
                             "Apartment not found"
-
                     });
 
             }
 
+            const manualEdits =
+                posts[index].manualEdits || {};
+
+            const editableFields = [
+                "district",
+                "street",
+                "rooms",
+                "bedrooms",
+                "area",
+                "floor",
+                "price",
+                "text"
+            ];
+
+            for (
+                const field of
+                editableFields
+            ) {
+
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        updated,
+                        field
+                    )
+                ) {
+
+                    manualEdits[field] = true;
+
+                }
+
+            }
 
             posts[index] = {
 
@@ -1220,20 +1241,19 @@ app.post(
                     updated.price,
 
                 text:
-                    updated.text
+                    updated.text,
+
+                manualEdits:
+                    manualEdits
 
             };
-
 
             savePosts(
                 posts
             );
 
-
             res.json({
-
                 success: true
-
             });
 
         }
@@ -1241,24 +1261,20 @@ app.post(
         catch (err) {
 
             console.error(
+                "Update post error:",
                 err
             );
-
 
             res
                 .status(500)
                 .json({
-
                     success: false
-
                 });
 
         }
 
     }
 );
-
-
 // =========================================================
 // DELETE POST
 // =========================================================
@@ -1266,6 +1282,7 @@ app.post(
 app.post(
     "/api/post/delete",
     (req, res) => {
+
         const adminId =
             "5172653731";
 
@@ -1281,12 +1298,9 @@ app.post(
             return res
                 .status(403)
                 .json({
-
                     success: false,
-
                     error:
                         "Access denied"
-
                 });
 
         }
@@ -1296,23 +1310,111 @@ app.post(
             const posts =
                 getPosts();
 
+            const postId =
+                String(
+                    req.body.id
+                );
+
+
+            // წავშალოთ განცხადება posts.json-იდან
 
             const filtered =
                 posts.filter(
-
                     p =>
-
                         String(p.id)
                         !==
-                        String(
-                            req.body.id
-                        )
-
+                        postId
                 );
 
 
             savePosts(
                 filtered
+            );
+
+
+            // =========================================
+            // დავიმახსოვროთ წაშლილი Telegram ID
+            // =========================================
+
+            let deletedIds = [];
+
+
+            if (
+                fs.existsSync(
+                    DELETED_POSTS_FILE
+                )
+            ) {
+
+                try {
+
+                    const parsed =
+                        JSON.parse(
+                            fs.readFileSync(
+                                DELETED_POSTS_FILE,
+                                "utf8"
+                            )
+                        );
+
+
+                    if (
+                        Array.isArray(
+                            parsed
+                        )
+                    ) {
+
+                        deletedIds =
+                            parsed.map(
+                                id =>
+                                    String(id)
+                            );
+
+                    }
+
+                }
+
+                catch (readError) {
+
+                    console.error(
+                        "Deleted posts read error:",
+                        readError
+                    );
+
+                }
+
+            }
+
+
+            if (
+                !deletedIds.includes(
+                    postId
+                )
+            ) {
+
+                deletedIds.push(
+                    postId
+                );
+
+            }
+
+
+            fs.writeFileSync(
+
+                DELETED_POSTS_FILE,
+
+                JSON.stringify(
+                    deletedIds,
+                    null,
+                    2
+                ),
+
+                "utf8"
+
+            );
+
+
+            console.log(
+                "🗑️ POST DELETED:",
+                postId
             );
 
 
@@ -1327,6 +1429,7 @@ app.post(
         catch (err) {
 
             console.error(
+                "Delete post error:",
                 err
             );
 
@@ -1343,7 +1446,6 @@ app.post(
 
     }
 );
-
 
 // =========================================================
 // START SERVER
