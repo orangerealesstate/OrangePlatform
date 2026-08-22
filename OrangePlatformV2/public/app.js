@@ -2016,13 +2016,13 @@ if (telegramUserId === "5172653731") {
 
         /* ღილაკების დამატება */
 
-        actions.prepend(
-            deleteBtn
-        );
+        adminPriceActions.append(
+    deleteBtn
+);
 
-        actions.prepend(
-            editBtn
-        );
+        adminPriceActions.append(
+    editBtn
+);
 
 
         /* რედაქტირება */
