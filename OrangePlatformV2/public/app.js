@@ -4040,10 +4040,9 @@ function getPostCoordinates(
 
 }
 
-
 /* =========================================================
-   NEW MAP MARKER
-   🔵 HOUSE ICON + PRICE
+   MAP MARKER
+   🔵 BLUE CIRCLE + PRICE
 ========================================================= */
 
 function createPriceMarker(
@@ -4056,7 +4055,6 @@ function createPriceMarker(
         price
             ? `$${price}`
             : "Цена";
-
 
     return L.marker(
         [
@@ -4076,70 +4074,39 @@ function createPriceMarker(
 
                         <div
                             style="
+                                width:29px;
+                                height:29px;
+
+                                border-radius:50%;
+
+                                background:#1769ff;
+
                                 display:flex;
                                 align-items:center;
-                                gap:6px;
+                                justify-content:center;
+
+                                box-shadow:
+                                    0 2px 6px
+                                    rgba(0,0,0,.30);
+
+                                color:white;
+
+                                font-size:8px;
+                                font-weight:700;
+
                                 white-space:nowrap;
                             "
                         >
-
-                            <div
-                                style="
-                                    width:34px;
-                                    height:34px;
-
-                                    border-radius:50%;
-
-                                    background:#1769ff;
-
-                                    display:flex;
-                                    align-items:center;
-                                    justify-content:center;
-
-                                    box-shadow:
-                                        0 2px 7px
-                                        rgba(0,0,0,.30);
-
-                                    color:white;
-
-                                    font-size:18px;
-                                "
-                            >
-                                🏠
-                            </div>
-
-
-                            <div
-                                style="
-                                    background:white;
-
-                                    border-radius:8px;
-
-                                    padding:5px 8px;
-
-                                    font-size:14px;
-
-                                    font-weight:700;
-
-                                    color:#111;
-
-                                    box-shadow:
-                                        0 2px 7px
-                                        rgba(0,0,0,.25);
-                                "
-                            >
-                                ${displayPrice}
-                            </div>
-
+                            ${displayPrice}
                         </div>
 
                     `,
 
                     iconSize:
-                        [120, 38],
+                        [29, 29],
 
                     iconAnchor:
-                        [17, 19]
+                        [14.5, 14.5]
 
                 })
 
