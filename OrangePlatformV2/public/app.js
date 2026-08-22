@@ -1913,11 +1913,16 @@ card.addEventListener(
 ========================= */
 
 if (telegramUserId === "5172653731") {
+const actions =
+    card.querySelector(".card-actions");
 
-    const actions =
-        card.querySelector(".card-actions");
+const adminPriceActions =
+    card.querySelector(".admin-price-actions");
 
-    if (actions) {
+if (
+    actions &&
+    adminPriceActions
+) {
 
         const editBtn =
             document.createElement("button");
