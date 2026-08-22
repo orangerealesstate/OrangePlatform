@@ -4074,8 +4074,8 @@ function createPriceMarker(
 
                         <div
                             style="
-                                width:29px;
-                                height:29px;
+                                width:38px;
+                                height:38px;
 
                                 border-radius:50%;
 
@@ -4091,7 +4091,7 @@ function createPriceMarker(
 
                                 color:white;
 
-                                font-size:8px;
+                                font-size:12px;
                                 font-weight:700;
 
                                 white-space:nowrap;
@@ -4103,10 +4103,10 @@ function createPriceMarker(
                     `,
 
                     iconSize:
-                        [29, 29],
+                        [38, 38],
 
                     iconAnchor:
-                        [14.5, 14.5]
+                        [19, 19]
 
                 })
 
