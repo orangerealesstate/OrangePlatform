@@ -2628,3 +2628,39 @@ body:not(.map-mode) #mapBackButton {
     }
 
 }
+/* =========================
+   LANGUAGE SWITCHER
+========================= */
+
+.language-switcher {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-left: 12px;
+    z-index: 9999;
+}
+
+.language-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.language-btn.active {
+    background: #ff5a00;
+    color: #fff;
+    border-color: #ff5a00;
+}
