@@ -4115,7 +4115,848 @@ function createPriceMarker(
 
 }
 
+/* =========================================================
+   MAP DETAILS MODAL
+========================================================= */
 
+function openMapDetails(postId) {
+
+    const post = allPosts.find(
+        item => String(item.id) === String(postId)
+    );
+
+    if (!post) {
+        console.error("Post not found:", postId);
+        return;
+    }
+
+    // თუ ძველი ფანჯარა არსებობს — წავშალოთ
+    document.getElementById("mapDetailsModal")?.remove();
+
+    const price =
+        getPostPrice(post) ||
+        post.price ||
+        "-";
+
+    const district =
+        post.district ||
+        "-";
+
+    const address =
+        post.address ||
+        post.street ||
+        post.location ||
+        "-";
+
+    const rooms =
+        post.rooms ||
+        "-";
+
+    const bedrooms =
+        post.bedrooms ||
+        "-";
+
+    const bathrooms =
+        post.bathrooms ||
+        "-";
+
+    const area =
+        post.area ||
+        "-";
+
+    const floor =
+        post.floor ||
+        "-";
+
+    const description =
+        post.description ||
+        post.text ||
+        "";
+
+    const images =
+        Array.isArray(post.images)
+            ? post.images.filter(Boolean)
+            : [];
+
+    let imageHTML = "";
+
+    if (images.length > 0) {
+
+        let imageUrl = images[0];
+
+        if (
+            !imageUrl.startsWith("http") &&
+            !imageUrl.startsWith("/")
+        ) {
+            imageUrl = "/" + imageUrl;
+        }
+
+        imageHTML = `
+            <div class="orange-modal-photo">
+                <img
+                    src="${imageUrl}"
+                    alt="Фото квартиры"
+                >
+            </div>
+        `;
+    }
+
+
+    const modal =
+        document.createElement("div");
+
+    modal.id =
+        "mapDetailsModal";
+
+    modal.className =
+        "orange-map-modal";
+
+
+    modal.innerHTML = `
+
+        <div
+            class="orange-modal-overlay"
+            onclick="closeMapDetails(event)"
+        >
+
+            <div
+                class="orange-modal-window"
+                onclick="event.stopPropagation()"
+            >
+
+                <!-- CLOSE -->
+
+                <button
+                    type="button"
+                    class="orange-modal-close"
+                    onclick="closeMapDetails()"
+                >
+                    ×
+                </button>
+
+
+                <!-- PHOTO -->
+
+                ${imageHTML}
+
+
+                <!-- PRICE -->
+
+                <div class="orange-modal-price">
+                    💰 $${price}
+                </div>
+
+
+                <!-- INFORMATION -->
+
+                <div class="orange-modal-info">
+
+
+                    <div class="orange-info-item">
+                        <span>📍</span>
+                        <div>
+                            <b>Район</b>
+                            <strong>${district}</strong>
+                        </div>
+                    </div>
+
+
+                    <div class="orange-info-item">
+                        <span>🏠</span>
+                        <div>
+                            <b>Адрес</b>
+                            <strong>${address}</strong>
+                        </div>
+                    </div>
+
+
+                    <div class="orange-info-grid">
+
+
+                        <div class="orange-info-card">
+                            <span>🚪</span>
+                            <b>${rooms}</b>
+                            <small>Комнат</small>
+                        </div>
+
+
+                        <div class="orange-info-card">
+                            <span>🛏️</span>
+                            <b>${bedrooms}</b>
+                            <small>Спальни</small>
+                        </div>
+
+
+                        <div class="orange-info-card">
+                            <span>📐</span>
+                            <b>${area}</b>
+                            <small>м²</small>
+                        </div>
+
+
+                        <div class="orange-info-card">
+                            <span>🏢</span>
+                            <b>${floor}</b>
+                            <small>Этаж</small>
+                        </div>
+
+
+                    </div>
+
+
+                    ${
+                        bathrooms !== "-"
+                            ? `
+                                <div class="orange-info-item">
+                                    <span>🛁</span>
+                                    <div>
+                                        <b>Ванные</b>
+                                        <strong>${bathrooms}</strong>
+                                    </div>
+                                </div>
+                            `
+                            : ""
+                    }
+
+
+                </div>
+
+
+                ${
+                    description
+                        ? `
+                            <div class="orange-modal-description">
+
+                                <div class="orange-description-title">
+                                    📝 Описание
+                                </div>
+
+                                <div class="orange-description-text">
+                                    ${description}
+                                </div>
+
+                            </div>
+                        `
+                        : ""
+                }
+
+
+                <!-- BUTTONS -->
+
+                <div class="orange-modal-buttons">
+
+
+                    <!-- SHARE -->
+
+                    <button
+                        type="button"
+                        class="orange-share-btn"
+                        onclick="
+                            shareMapPost(
+                                ${JSON.stringify(String(post.id))}
+                            )
+                        "
+                    >
+                        ↗️
+                        <span>Поделиться</span>
+                    </button>
+
+
+                    <!-- TELEGRAM -->
+
+                    <button
+                        type="button"
+                        class="orange-telegram-btn"
+                        onclick="writeToTelegram()"
+                    >
+                        ✈️
+                        <span>Написать</span>
+                    </button>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    document.body.style.overflow =
+        "hidden";
+
+
+    setTimeout(
+        () => {
+
+            modal.classList.add(
+                "show"
+            );
+
+        },
+        10
+    );
+}
+
+
+/* =========================================================
+   CLOSE MODAL
+========================================================= */
+
+function closeMapDetails(event) {
+
+    if (
+        event &&
+        event.target &&
+        !event.target.classList.contains(
+            "orange-modal-overlay"
+        )
+    ) {
+        return;
+    }
+
+
+    const modal =
+        document.getElementById(
+            "mapDetailsModal"
+        );
+
+
+    if (modal) {
+
+        modal.classList.remove(
+            "show"
+        );
+
+        setTimeout(
+            () => {
+
+                modal.remove();
+
+                document.body.style.overflow = "";
+
+            },
+            200
+        );
+
+    } else {
+
+        document.body.style.overflow = "";
+
+    }
+}
+
+
+/* =========================================================
+   SHARE
+========================================================= */
+
+async function shareMapPost(postId) {
+
+    const shareUrl =
+        window.location.origin +
+        "/details.html?id=" +
+        encodeURIComponent(postId);
+
+
+    try {
+
+        if (
+            navigator.share
+        ) {
+
+            await navigator.share({
+
+                title:
+                    "Orange Real Estate",
+
+                text:
+                    "🏠 Квартира",
+
+                url:
+                    shareUrl
+
+            });
+
+        } else {
+
+            await navigator.clipboard.writeText(
+                shareUrl
+            );
+
+            alert(
+                "Ссылка скопирована"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Share cancelled"
+        );
+
+    }
+}
+
+
+/* =========================================================
+   TELEGRAM
+========================================================= */
+
+function writeToTelegram() {
+
+    window.open(
+        "https://t.me/Orangerealestatetbilisi",
+        "_blank"
+    );
+
+}
+
+
+/* =========================================================
+   ESC
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeMapDetails();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   MODAL CSS
+========================================================= */
+
+if (
+    !document.getElementById(
+        "orangeMapModalStyle"
+    )
+) {
+
+    const style =
+        document.createElement(
+            "style"
+        );
+
+    style.id =
+        "orangeMapModalStyle";
+
+
+    style.textContent = `
+
+        .orange-map-modal {
+
+            position:fixed;
+
+            inset:0;
+
+            z-index:999999;
+
+            opacity:0;
+
+            transition:
+                opacity .2s ease;
+
+        }
+
+
+        .orange-map-modal.show {
+
+            opacity:1;
+
+        }
+
+
+        .orange-modal-overlay {
+
+            position:absolute;
+
+            inset:0;
+
+            background:
+                rgba(0,0,0,.48);
+
+            display:flex;
+
+            align-items:flex-end;
+
+            justify-content:center;
+
+        }
+
+
+        .orange-modal-window {
+
+            position:relative;
+
+            width:100%;
+
+            max-width:620px;
+
+            max-height:92vh;
+
+            overflow-y:auto;
+
+            background:white;
+
+            border-radius:
+                28px 28px 0 0;
+
+            padding:
+                16px 18px 24px;
+
+            box-shadow:
+                0 -10px 40px
+                rgba(0,0,0,.25);
+
+            transform:
+                translateY(100%);
+
+            transition:
+                transform .25s ease;
+
+        }
+
+
+        .orange-map-modal.show
+        .orange-modal-window {
+
+            transform:
+                translateY(0);
+
+        }
+
+
+        .orange-modal-close {
+
+            position:absolute;
+
+            top:12px;
+
+            right:12px;
+
+            z-index:10;
+
+            width:40px;
+
+            height:40px;
+
+            border:0;
+
+            border-radius:50%;
+
+            background:
+                rgba(0,0,0,.55);
+
+            color:white;
+
+            font-size:28px;
+
+            line-height:40px;
+
+            cursor:pointer;
+
+        }
+
+
+        .orange-modal-photo {
+
+            width:100%;
+
+            height:260px;
+
+            overflow:hidden;
+
+            border-radius:20px;
+
+            background:#eee;
+
+        }
+
+
+        .orange-modal-photo img {
+
+            width:100%;
+
+            height:100%;
+
+            object-fit:cover;
+
+            display:block;
+
+        }
+
+
+        .orange-modal-price {
+
+            font-size:30px;
+
+            font-weight:900;
+
+            margin:
+                18px 4px;
+
+        }
+
+
+        .orange-modal-info {
+
+            display:flex;
+
+            flex-direction:column;
+
+            gap:12px;
+
+        }
+
+
+        .orange-info-item {
+
+            display:flex;
+
+            gap:12px;
+
+            align-items:flex-start;
+
+            font-size:16px;
+
+        }
+
+
+        .orange-info-item > span {
+
+            font-size:22px;
+
+            width:28px;
+
+            flex-shrink:0;
+
+        }
+
+
+        .orange-info-item div {
+
+            display:flex;
+
+            flex-direction:column;
+
+            gap:2px;
+
+        }
+
+
+        .orange-info-item b {
+
+            color:#888;
+
+            font-size:13px;
+
+        }
+
+
+        .orange-info-item strong {
+
+            color:#111;
+
+            font-size:17px;
+
+        }
+
+
+        .orange-info-grid {
+
+            display:grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap:10px;
+
+            margin-top:4px;
+
+        }
+
+
+        .orange-info-card {
+
+            display:flex;
+
+            flex-direction:column;
+
+            align-items:center;
+
+            justify-content:center;
+
+            min-height:90px;
+
+            border:
+                1px solid #eee;
+
+            border-radius:16px;
+
+            background:#fafafa;
+
+        }
+
+
+        .orange-info-card span {
+
+            font-size:22px;
+
+        }
+
+
+        .orange-info-card b {
+
+            font-size:21px;
+
+            margin-top:3px;
+
+        }
+
+
+        .orange-info-card small {
+
+            color:#999;
+
+            font-size:13px;
+
+        }
+
+
+        .orange-modal-description {
+
+            margin-top:18px;
+
+            padding-top:16px;
+
+            border-top:
+                1px solid #eee;
+
+        }
+
+
+        .orange-description-title {
+
+            font-size:18px;
+
+            font-weight:800;
+
+            margin-bottom:8px;
+
+        }
+
+
+        .orange-description-text {
+
+            font-size:15px;
+
+            line-height:1.5;
+
+            white-space:pre-wrap;
+
+        }
+
+
+        .orange-modal-buttons {
+
+            display:flex;
+
+            gap:10px;
+
+            margin-top:22px;
+
+        }
+
+
+        .orange-share-btn,
+        .orange-telegram-btn {
+
+            flex:1;
+
+            min-height:56px;
+
+            border:0;
+
+            border-radius:17px;
+
+            font-size:16px;
+
+            font-weight:800;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            gap:8px;
+
+            cursor:pointer;
+
+        }
+
+
+        .orange-share-btn {
+
+            background:#f1f1f1;
+
+            color:#111;
+
+        }
+
+
+        .orange-telegram-btn {
+
+            background:#229ED9;
+
+            color:white;
+
+        }
+
+
+        @media (max-width:480px) {
+
+            .orange-modal-photo {
+
+                height:220px;
+
+            }
+
+            .orange-modal-window {
+
+                padding:
+                    14px 14px 22px;
+
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(
+        style
+    );
+
+}
 /* =========================================================
    RENDER MAP
 ========================================================= */
@@ -4440,12 +5281,9 @@ function renderMap(
                     <button
                         type="button"
 
-                        onclick="
-                            location.href =
-                            'details.html?id=${encodeURIComponent(
-                                post.id
-                            )}'
-                        "
+                       onclick="
+    openMapDetails(${JSON.stringify(String(post.id))})
+"
 
                         style="
                             margin-top:10px;
