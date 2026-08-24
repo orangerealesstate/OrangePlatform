@@ -4234,7 +4234,10 @@ const description = "";
                 <!-- PHOTO -->
 
                 ${imageHTML}
-
+<!-- TITLE -->
+<div class="orange-modal-title">
+    🏠 Сдается ${rooms}-комнатная квартира в районе ${district}
+</div>
 
                 <!-- PRICE -->
 
