@@ -4168,10 +4168,28 @@ function openMapDetails(postId) {
         post.floor ||
         "-";
 
-    const description =
-        post.description ||
-        post.text ||
-        "";
+    const descriptionSource =
+    post.description ||
+    post.text ||
+    "";
+
+const description =
+    descriptionSource
+        .replace(/Код\s*:\s*[^\n]*/gi, "")
+        .replace(/Адрес\s*:\s*https?:\/\/\S+/gi, "")
+        .replace(/#Комнат\d+/gi, "")
+        .replace(/#Спален\d+/gi, "")
+        .replace(/#Санузел\d+/gi, "")
+        .replace(/#Площадь\s*:\s*\d+/gi, "")
+        .replace(/#Этаж\s*:\s*\d+/gi, "")
+        .replace(/Бытовая техника\s*:[\s\S]*?(?=\n\n|\nОписание|\n#Цена|$)/gi, "")
+        .replace(/#Цена[_\s]*\d+/gi, "")
+        .replace(/По всем вопросам:[^\n]*/gi, "")
+        .replace(/Отзывы[^\n]*/gi, "")
+        .replace(/Поиск с фильтрами:[^\n]*/gi, "")
+        .replace(/#[А-Яа-яA-Za-z0-9_]+/g, "")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
 
     const images =
         Array.isArray(post.images)
