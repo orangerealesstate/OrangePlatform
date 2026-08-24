@@ -5282,7 +5282,7 @@ function renderMap(
                         type="button"
 
                        onclick="
-    openMapDetails(${JSON.stringify(String(post.id))})
+    openMapDetails('${String(post.id)}')
 "
 
                         style="
