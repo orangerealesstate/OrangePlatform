@@ -1,5 +1,205 @@
 alert("NEW APP.JS");
 let allPosts = [];
+/* =========================
+   LANGUAGE SYSTEM
+   🇬🇪 ქართული
+   🇷🇺 Русский
+   🇬🇧 English
+========================= */
+
+const translations = {
+
+    ru: {
+        catalog: "Каталог",
+        filter: "Фильтр",
+        map: "Карта",
+        allDistricts: "Все районы",
+        rooms: "Комнаты",
+        minPrice: "Цена от",
+        maxPrice: "Цена до",
+        find: "Найти",
+        clear: "Очистить",
+
+        district: "Район:",
+        address: "Адрес:",
+        roomsLabel: "Комнат:",
+        area: "Площадь:",
+        details: "Подробнее",
+        telegram: "📲 Оригинал поста в Telegram",
+
+        loading: "Загрузка...",
+        notFound: "Объявления не найдены",
+        error: "❌ Ошибка загрузки объявлений"
+    },
+
+    ka: {
+        catalog: "კატალოგი",
+        filter: "ფილტრი",
+        map: "რუკა",
+        allDistricts: "ყველა უბანი",
+        rooms: "ოთახები",
+        minPrice: "ფასი მინ.",
+        maxPrice: "ფასი მაქს.",
+        find: "ძებნა",
+        clear: "გასუფთავება",
+
+        district: "უბანი:",
+        address: "მისამართი:",
+        roomsLabel: "ოთახი:",
+        area: "ფართობი:",
+        details: "დეტალურად",
+        telegram: "📲 ორიგინალი პოსტი Telegram-ში",
+
+        loading: "იტვირთება...",
+        notFound: "განცხადებები ვერ მოიძებნა",
+        error: "❌ განცხადებების ჩატვირთვის შეცდომა"
+    },
+
+    en: {
+        catalog: "Catalog",
+        filter: "Filter",
+        map: "Map",
+        allDistricts: "All districts",
+        rooms: "Rooms",
+        minPrice: "Price from",
+        maxPrice: "Price to",
+        find: "Search",
+        clear: "Clear",
+
+        district: "District:",
+        address: "Address:",
+        roomsLabel: "Rooms:",
+        area: "Area:",
+        details: "Details",
+        telegram: "📲 Original post on Telegram",
+
+        loading: "Loading...",
+        notFound: "No listings found",
+        error: "❌ Error loading listings"
+    }
+
+};
+
+
+/* =========================
+   CURRENT LANGUAGE
+========================= */
+
+let currentLanguage =
+    localStorage.getItem("orangeLanguage") || "ru";
+
+
+/* =========================
+   TRANSLATION FUNCTION
+========================= */
+
+function t(key) {
+
+    return (
+        translations[currentLanguage]?.[key] ||
+        translations.ru[key] ||
+        key
+    );
+
+}
+
+
+/* =========================
+   CHANGE LANGUAGE
+========================= */
+
+function setLanguage(lang) {
+
+    if (!translations[lang]) {
+        return;
+    }
+
+    currentLanguage = lang;
+
+    localStorage.setItem(
+        "orangeLanguage",
+        lang
+    );
+
+    document.documentElement.lang = lang;
+
+
+    /* ACTIVE FLAG */
+
+    document
+        .querySelectorAll(".language-btn")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.lang === lang
+            );
+
+        });
+
+
+    /* CHANGE HTML TEXTS */
+
+    const elements =
+        document.querySelectorAll("[data-i18n]");
+
+    elements.forEach(element => {
+
+        const key =
+            element.dataset.i18n;
+
+        if (translations[lang][key]) {
+
+            element.textContent =
+                translations[lang][key];
+
+        }
+
+    });
+
+
+    /* CHANGE PLACEHOLDERS */
+
+    document
+        .querySelectorAll("[data-i18n-placeholder]")
+        .forEach(element => {
+
+            const key =
+                element.dataset.i18nPlaceholder;
+
+            if (translations[lang][key]) {
+
+                element.placeholder =
+                    translations[lang][key];
+
+            }
+
+        });
+
+
+    /* RE-DRAW APARTMENT CARDS */
+
+    if (typeof allPosts !== "undefined") {
+
+        renderPosts(allPosts);
+
+    }
+
+}
+
+
+/* =========================
+   LOAD SAVED LANGUAGE
+========================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        setLanguage(currentLanguage);
+
+    }
+);
 
 async function loadPosts() {
 
@@ -34,8 +234,7 @@ renderPosts(allPosts);
             </h2>
         `;
 
-    }
-function renderPosts(posts) {
+    }function renderPosts(posts) {
 
     const container = document.getElementById("posts");
 
@@ -45,7 +244,7 @@ function renderPosts(posts) {
 
         container.innerHTML = `
             <h2 style="text-align:center;padding:40px;">
-                Объявления не найдены
+                ${t("notFound")}
             </h2>
         `;
 
@@ -59,59 +258,65 @@ function renderPosts(posts) {
                 ? "/" + post.images[0]
                 : "https://via.placeholder.com/600x400?text=No+Photo";
 
-        const district = post.district || "-";
+        const district =
+            post.district || "-";
 
         container.innerHTML += `
 
-<div class="card">
+            <div class="card">
 
-    <img
-        src="${image}"
-        class="card-image"
-        onclick="openGallery('${post.id}')"
-    >
+                <img
+                    src="${image}"
+                    class="card-image"
+                    onclick="openGallery('${post.id}')"
+                >
 
-    <div class="info">
+                <div class="info">
 
-        <div class="price">
-            $${post.price || "-"}
-        </div>
+                    <div class="price">
+                        $${post.price || "-"}
+                    </div>
 
-        <div class="details">
+                    <div class="details">
 
-            📍 <b>Район:</b> ${district}<br><br>
+                        📍 <b>${t("district")}</b>
+                        ${district}
+                        <br><br>
 
-            📌 <b>Адрес:</b> ${post.street || "-"}<br><br>
+                        📌 <b>${t("address")}</b>
+                        ${post.street || "-"}
+                        <br><br>
 
-            🛏 <b>Комнат:</b> ${post.rooms || "-"}<br><br>
+                        🛏 <b>${t("roomsLabel")}</b>
+                        ${post.rooms || "-"}
+                        <br><br>
 
-            📐 <b>Площадь:</b> ${post.area || "-"} м²
+                        📐 <b>${t("area")}</b>
+                        ${post.area || "-"} მ²
 
-        </div>
+                    </div>
 
-        <button
-            class="details-btn"
-            onclick="location.href='details.html?id=${post.id}'">
+                    <button
+                        class="details-btn"
+                        onclick="location.href='details.html?id=${post.id}'"
+                    >
+                        ${t("details")}
+                    </button>
 
-            Подробнее
+                    <a
+                        class="telegram-btn"
+                        href="${post.telegramLink || '#'}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        ${t("telegram")}
+                    </a>
 
-        </button>
+                </div>
 
-        <a
-            class="telegram-btn"
-            href="${post.telegramLink || '#'}"
-            target="_blank"
-            rel="noopener noreferrer">
+            </div>
 
-            📲 Оригинал поста в Telegram
-
-        </a>
-
-    </div>
-
-</div>
-
-`;
+        `;
 
     });
 

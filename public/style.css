@@ -349,3 +349,54 @@ header{
 .telegram-btn:hover{
     background:#1b8ac2;
 }
+.language-switcher {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.language-btn {
+    width: 36px;
+    height: 34px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    font-size: 20px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.language-btn.active {
+    border: 2px solid #ff7a00;
+    background: #fff3e8;
+}
+/* =========================
+   LANGUAGE SWITCHER
+========================= */
+
+.language-switcher {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.language-btn {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    padding: 4px;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: 0.2s;
+}
+
+.language-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.language-btn.active {
+    opacity: 1;
+    transform: scale(1.15);
+}

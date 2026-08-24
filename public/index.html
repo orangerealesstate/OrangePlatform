@@ -22,15 +22,83 @@
 </head>
 
 <body>
-
 <header>
 
-    <h1>
-        🍊 Orange Real Estate
-    </h1>
+    <div style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        width:100%;
+    ">
+
+        <h1 style="margin:0;">
+            🍊 Orange Real Estate
+        </h1>
+        <div class="language-switcher">
+
+    <button
+        type="button"
+        class="language-btn"
+        data-lang="ka"
+        onclick="setLanguage('ka')"
+    >
+        🇬🇪
+    </button>
+
+    <button
+        type="button"
+        class="language-btn"
+        data-lang="ru"
+        onclick="setLanguage('ru')"
+    >
+        🇷🇺
+    </button>
+
+    <button
+        type="button"
+        class="language-btn"
+        data-lang="en"
+        onclick="setLanguage('en')"
+    >
+        🇬🇧
+    </button>
+
+</div>
+
+        <div class="language-switcher">
+
+            <button
+                type="button"
+                class="language-btn"
+                data-lang="ka"
+                onclick="setLanguage('ka')"
+            >
+                🇬🇪
+            </button>
+
+            <button
+                type="button"
+                class="language-btn"
+                data-lang="ru"
+                onclick="setLanguage('ru')"
+            >
+                🇷🇺
+            </button>
+
+            <button
+                type="button"
+                class="language-btn"
+                data-lang="en"
+                onclick="setLanguage('en')"
+            >
+                🇬🇧
+            </button>
+
+        </div>
+
+    </div>
 
 </header>
-
 
 <!-- =========================
      VIEW SWITCHER
@@ -39,22 +107,25 @@
 <div class="view-switcher">
 
     <button
-        class="view-btn active"
-        onclick="showCatalog()">
-        🏠 Каталог
-    </button>
+    class="view-btn active"
+    onclick="showCatalog()"
+>
+    🏠 <span data-i18n="catalog">Каталог</span>
+</button>
+
+    <<button
+    class="view-btn"
+    onclick="openFilters()"
+>
+    🔎 <span data-i18n="filter">Фильтр</span>
+</button>
 
     <button
-        class="view-btn"
-        onclick="openFilters()">
-        🔎 Фильтр
-    </button>
-
-    <button
-        class="view-btn"
-        onclick="showMap()">
-        🗺️ Карта
-    </button>
+    class="view-btn"
+    onclick="showMap()"
+>
+    🗺️ <span data-i18n="map">Карта</span>
+</button>
 
 </div>
 
@@ -76,8 +147,8 @@
         <div class="filter-header">
 
             <h2>
-                🔎 Фильтр
-            </h2>
+    🔎 <span data-i18n="filter">Фильтр</span>
+</h2>
 
             <button
                 type="button"
@@ -110,9 +181,9 @@
                 onchange="filterPosts()"
             >
 
-                <option value="">
-                    🏙 Все районы
-                </option>
+                <option value="" data-i18n="allDistricts">
+    Все районы
+</option>
 
                 <option>
                     Сабуртало
@@ -160,9 +231,9 @@
                 onchange="filterPosts()"
             >
 
-                <option value="">
-                    🛏 Комнаты
-                </option>
+                <option value="" data-i18n="rooms">
+    Комнаты
+</option>
 
                 <option value="1">
                     1
@@ -193,6 +264,7 @@
                 type="number"
                 id="minPrice"
                 placeholder="Цена от $"
+                data-i18n-placeholder="minPrice"
                 onkeyup="filterPosts()"
             >
 
@@ -200,30 +272,31 @@
             <!-- MAX PRICE -->
 
             <input
-                type="number"
-                id="maxPrice"
-                placeholder="Цена до $"
-                onkeyup="filterPosts()"
-            >
+    type="number"
+    id="maxPrice"
+    placeholder="Цена до $"
+    data-i18n-placeholder="maxPrice"
+    onkeyup="filterPosts()"
+>
 
 
             <!-- FILTER ACTIONS -->
 
             <div class="filter-actions">
 
-                <button
-                    type="button"
-                    onclick="clearFilters()"
-                >
-                    🗑 Очистить
-                </button>
+              <button
+    type="button"
+    onclick="clearFilters()"
+>
+    🗑 <span data-i18n="clear">Очистить</span>
+</button>
 
                 <button
-                    type="button"
-                    onclick="closeFilters()"
-                >
-                    ✓ Готово
-                </button>
+    type="button"
+    onclick="closeFilters()"
+>
+    ✓ <span data-i18n="done">Готово</span>
+</button>
 
             </div>
 
