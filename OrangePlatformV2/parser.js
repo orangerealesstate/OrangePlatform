@@ -93,7 +93,7 @@ if (
 
 const SYNC_MESSAGES_LIMIT =
     Number(
-        process.env.SYNC_MESSAGES_LIMIT || 200
+        process.env.SYNC_MESSAGES_LIMIT || 600
     );
 
 
