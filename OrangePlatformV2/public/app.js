@@ -1076,9 +1076,28 @@ const selectedDistricts =
                 district !== "ყველა რაიონი"
         )
         : [];
-        const allDistrictsSelected =
-    districtInput?.querySelector(
-        'input[type="checkbox"][value="all"]:checked'
+        const checkedDistrictInputs =
+    districtInput
+        ? Array.from(
+            districtInput.querySelectorAll(
+                'input[type="checkbox"]:checked'
+            )
+        )
+        : [];
+
+const allDistrictsSelected =
+    checkedDistrictInputs.some(
+        input => {
+            const value =
+                normalizeSearchText(input.value);
+
+            return (
+                value === "all" ||
+                value === "all districts" ||
+                value === "все районы" ||
+                value === "ყველა რაიონი"
+            );
+        }
     );
 
 
