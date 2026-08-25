@@ -2664,3 +2664,45 @@ body:not(.map-mode) #mapBackButton {
     color: #fff;
     border-color: #ff5a00;
 }
+/* ===== DISTRICT FILTER FIX ===== */
+
+#districtFilter {
+    display: block !important;
+    width: 100%;
+    max-height: 320px;
+    overflow-y: auto;
+    background: #fff;
+    padding: 10px;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+#districtFilter label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-height: 38px !important;
+    padding: 5px 8px !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+#districtFilter label input[type="checkbox"] {
+    flex: 0 0 auto !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 !important;
+}
+
+#districtFilter label span {
+    flex: 1 !important;
+    text-align: left !important;
+}
+
+#districtFilter input[type="checkbox"]:checked {
+    accent-color: #ff6b35;
+}
