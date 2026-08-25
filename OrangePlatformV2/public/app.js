@@ -1196,6 +1196,7 @@ const allDistrictsSelected =
 const postDistrict = getPostDistrict(post);
 
 if (
+    !allDistrictsSelected &&
     selectedDistricts.length > 0 &&
     !selectedDistricts.includes(
         normalizeDistrict(postDistrict)
@@ -1351,7 +1352,7 @@ function clearFilters() {
 
     [
         "search",
-        "districtFilter",
+        "filterDistrict",
         "roomsFilter",
         "minPrice",
         "maxPrice"
@@ -1375,7 +1376,22 @@ function clearFilters() {
             }
         );
 
+const districtContainer =
+        document.getElementById("filterDistrict");
 
+    if (districtContainer) {
+
+        districtContainer
+            .querySelectorAll(
+                'input[type="checkbox"]'
+            )
+            .forEach(
+                checkbox => {
+                    checkbox.checked = false;
+                }
+            );
+
+    }
     favoritesOnly =
         false;
 
