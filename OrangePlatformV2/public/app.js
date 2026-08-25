@@ -4339,7 +4339,7 @@ const description = "";
                     <button
     type="button"
     class="orange-share-btn"
-    onclick="shareTelegramPost('${String(post.id)}')"
+    data-share-post-id="${String(post.id)}"
 >
     📤
     <span>Поделиться</span>
@@ -5762,10 +5762,10 @@ if (telegramWebApp) {
 console.log(
     "🍊 ORANGE APP.JS READY"
 );
+
 // აქ არის app.js-ის ბოლო არსებული კოდი
-...
-...
-}   // ბოლო ფუნქციის დახურვა
+
+   // ბოლო ფუნქციის დახურვა
 
 
 /* =========================================================
