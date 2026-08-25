@@ -2796,3 +2796,28 @@ body:not(.map-mode) #mapBackButton {
 #districtFilter input[type="checkbox"]:checked {
     accent-color: #ff6b35;
 }
+@media (max-width: 600px) {
+
+    #filterDistrict {
+        max-height: 260px !important;
+        overflow-y: auto !important;
+        padding: 6px !important;
+        gap: 5px 8px !important;
+    }
+
+    #filterDistrict .district-option {
+        min-height: 32px !important;
+        padding: 4px 7px !important;
+        gap: 6px !important;
+    }
+
+    #filterDistrict .district-option input {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    #filterDistrict .district-option span {
+        font-size: 13px !important;
+    }
+
+}
