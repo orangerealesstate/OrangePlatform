@@ -119,7 +119,150 @@ async function loadDetails() {
             );
 
         }
+/* =====================================================
+   FAVORITES ❤️
+===================================================== */
 
+async function loadFavoriteState(postId) {
+
+    const favoriteBtn =
+        document.getElementById("favoriteBtn");
+
+    if (!favoriteBtn) return;
+
+    if (!telegramUserId) {
+        favoriteBtn.textContent = "♡ Избранное";
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `/api/favorites/${telegramUserId}?t=${Date.now()}`,
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (!response.ok) return;
+
+        const favorites = await response.json();
+
+        const isFavorite =
+            Array.isArray(favorites) &&
+            favorites.some(
+                item => String(item) === String(postId)
+            );
+
+        favoriteBtn.textContent =
+            isFavorite
+                ? "❤️ В избранном"
+                : "♡ Избранное";
+
+        favoriteBtn.dataset.favorite =
+            isFavorite ? "true" : "false";
+
+    } catch (error) {
+
+        console.error(
+            "Favorite state error:",
+            error
+        );
+
+    }
+}
+
+
+async function toggleFavorite(postId) {
+
+    const favoriteBtn =
+        document.getElementById("favoriteBtn");
+
+    if (!favoriteBtn) return;
+
+    if (!telegramUserId) {
+
+        alert(
+            "Откройте приложение через Telegram"
+        );
+
+        return;
+    }
+
+    const isFavorite =
+        favoriteBtn.dataset.favorite === "true";
+
+    try {
+
+        if (!isFavorite) {
+
+            const response = await fetch(
+                "/api/favorites",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        userId:
+                            String(telegramUserId),
+
+                        postId:
+                            String(postId)
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Favorite save failed"
+                );
+            }
+
+            favoriteBtn.textContent =
+                "❤️ В избранном";
+
+            favoriteBtn.dataset.favorite =
+                "true";
+
+        } else {
+
+            const response = await fetch(
+                `/api/favorites/${telegramUserId}/${postId}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Favorite delete failed"
+                );
+            }
+
+            favoriteBtn.textContent =
+                "♡ Избранное";
+
+            favoriteBtn.dataset.favorite =
+                "false";
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Favorite error:",
+            error
+        );
+
+        alert(
+            "❌ Не удалось изменить избранное"
+        );
+
+    }
+}
 
         /* =====================================================
            TELEGRAM BUTTON
@@ -492,7 +635,20 @@ async function loadDetails() {
 
         `;
 
+/* =====================================================
+   FAVORITE BUTTON ❤️
+===================================================== */
 
+const favoriteBtn =
+    document.getElementById("favoriteBtn");
+
+if (favoriteBtn) {
+
+    favoriteBtn.onclick =
+        () => toggleFavorite(post.id);
+
+    loadFavoriteState(post.id);
+}
         /* =====================================================
            SHARE
         ===================================================== */
