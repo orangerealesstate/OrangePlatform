@@ -1085,20 +1085,7 @@ const selectedDistricts =
         )
         : [];
 const allDistrictsSelected =
-    checkedDistrictInputs.some(input => {
-        const value = normalizeSearchText(
-            input.value
-        );
-
-        return (
-            value === "all" ||
-            value === "all districts" ||
-            value === "все районы" ||
-            value === "ყველა რაიონი" ||
-            value.includes("все районы") ||
-            value.includes("ყველა რაიონი")
-        );
-    });
+    document.getElementById("allDistricts")?.checked === true;
 
 
     const selectedRooms =
@@ -1194,13 +1181,10 @@ const allDistrictsSelected =
                DISTRICT
             ========================================= */
 const postDistrict = getPostDistrict(post);
-
 if (allDistrictsSelected) {
-    // Все районы — показываем все объявления
-} else if (
-    selectedDistricts.length === 0
-) {
-    // Ни один район не выбран — ничего не показываем
+    // ყველა რაიონი — ყველა განცხადება ჩანს
+} else if (selectedDistricts.length === 0) {
+    // არცერთი რაიონი — არცერთი განცხადება
     return false;
 } else if (
     !selectedDistricts.includes(
