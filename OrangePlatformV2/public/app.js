@@ -2147,63 +2147,52 @@ card.querySelector(
             }
         );
 
+/* =========================
+   SHARE — TELEGRAM ORIGINAL LINK
+========================= */
 
-        /* =========================
-           SHARE
-        ========================= */
+card.querySelector(
+    ".share-btn"
+)?.addEventListener(
+    "click",
+    event => {
 
-        card.querySelector(
-            ".share-btn"
-        )?.addEventListener(
-            "click",
-            async event => {
+        event.preventDefault();
+        event.stopPropagation();
 
-                event.stopPropagation();
+        const telegramPostUrl =
+            `https://t.me/kvartiri_tbilisi2023/${post.id}`;
 
-               const shareUrl =
-    `https://t.me/kvartiri_tbilisi2023/${post.id}`;
+        const shareText =
+            `🏠 ${district}\n💰 ${price}$`;
 
-                try {
+        const telegramShareUrl =
+            `https://t.me/share/url?url=${encodeURIComponent(
+                telegramPostUrl
+            )}&text=${encodeURIComponent(
+                shareText
+            )}`;
 
-                    if (
-                        navigator.share
-                    ) {
+        if (
+            telegramWebApp &&
+            typeof telegramWebApp.openTelegramLink ===
+            "function"
+        ) {
 
-                        await navigator.share({
+            telegramWebApp.openTelegramLink(
+                telegramShareUrl
+            );
 
-                            title:
-                                `${price}$ — ${district}`,
+            return;
+        }
 
-                            text:
-                                `🏠 ${district}\n💰 ${price}$`,
-
-                            url:
-                                shareUrl
-
-                        });
-
-                    } else {
-
-                        await navigator.clipboard.writeText(
-                            shareUrl
-                        );
-
-                        alert(
-                            "Ссылка скопирована"
-                        );
-
-                    }
-
-                } catch (error) {
-
-                    console.log(
-                        "Share cancelled"
-                    );
-
-                }
-
-            }
+        window.open(
+            telegramShareUrl,
+            "_blank"
         );
+
+    }
+);
 
 
         /* =========================
