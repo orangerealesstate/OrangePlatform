@@ -1195,9 +1195,14 @@ const allDistrictsSelected =
             ========================================= */
 const postDistrict = getPostDistrict(post);
 
-if (
-    !allDistrictsSelected &&
-    selectedDistricts.length > 0 &&
+if (allDistrictsSelected) {
+    // Все районы — показываем все объявления
+} else if (
+    selectedDistricts.length === 0
+) {
+    // Ни один район не выбран — ничего не показываем
+    return false;
+} else if (
     !selectedDistricts.includes(
         normalizeDistrict(postDistrict)
     )
