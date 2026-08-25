@@ -4339,7 +4339,7 @@ const description = "";
                     <button
     type="button"
     class="orange-share-btn"
-    data-share-post-id="${String(post.id)}"
+    onclick="shareTelegramPost('${String(post.id)}')"
 >
     📤
     <span>Поделиться</span>
@@ -4366,14 +4366,62 @@ const description = "";
 
     `;
 
+document.body.appendChild(
+    modal
+);
 
-    document.body.appendChild(
-        modal
+
+/* =========================================================
+   MAP SHARE BUTTON
+========================================================= */
+
+const shareButton =
+    modal.querySelector(".orange-share-btn");
+
+if (shareButton) {
+
+    shareButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const telegramLink =
+                `https://t.me/kvartiri_tbilisi2023/${String(post.id)}`;
+
+            console.log(
+                "TELEGRAM LINK:",
+                telegramLink
+            );
+
+            if (
+                window.Telegram &&
+                window.Telegram.WebApp &&
+                typeof window.Telegram.WebApp.openTelegramLink === "function"
+            ) {
+
+                window.Telegram.WebApp.openTelegramLink(
+                    telegramLink
+                );
+
+            } else {
+
+                window.open(
+                    telegramLink,
+                    "_blank"
+                );
+
+            }
+
+        }
     );
 
+}
 
-    document.body.style.overflow =
-        "hidden";
+
+document.body.style.overflow =
+    "hidden";
 
 
     setTimeout(
