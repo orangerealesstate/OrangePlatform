@@ -4178,29 +4178,105 @@ const description = "";
         Array.isArray(post.images)
             ? post.images.filter(Boolean)
             : [];
+let imageHTML = "";
 
-    let imageHTML = "";
+if (images.length > 0) {
 
-    if (images.length > 0) {
+    let firstImage = images[0];
 
-        let imageUrl = images[0];
-
-        if (
-            !imageUrl.startsWith("http") &&
-            !imageUrl.startsWith("/")
-        ) {
-            imageUrl = "/" + imageUrl;
-        }
-
-        imageHTML = `
-            <div class="orange-modal-photo">
-                <img
-                    src="${imageUrl}"
-                    alt="Фото квартиры"
-                >
-            </div>
-        `;
+    if (
+        !firstImage.startsWith("http") &&
+        !firstImage.startsWith("/")
+    ) {
+        firstImage = "/" + firstImage;
     }
+
+    imageHTML = `
+        <div
+            class="orange-modal-photo"
+            style="
+                position:relative;
+                width:100%;
+            "
+        >
+
+            <img
+                id="mapModalImage"
+                src="${firstImage}"
+                alt="Фото квартиры"
+                style="
+                    width:100%;
+                    max-height:420px;
+                    object-fit:cover;
+                    border-radius:14px;
+                    display:block;
+                "
+            >
+
+            ${
+                images.length > 1
+                    ? `
+                        <button
+                            type="button"
+                            id="mapModalPrev"
+                            style="
+                                position:absolute;
+                                left:12px;
+                                top:50%;
+                                transform:translateY(-50%);
+                                width:44px;
+                                height:44px;
+                                border:0;
+                                border-radius:50%;
+                                background:rgba(0,0,0,.55);
+                                color:white;
+                                font-size:28px;
+                                cursor:pointer;
+                            "
+                        >‹</button>
+
+                        <button
+                            type="button"
+                            id="mapModalNext"
+                            style="
+                                position:absolute;
+                                right:12px;
+                                top:50%;
+                                transform:translateY(-50%);
+                                width:44px;
+                                height:44px;
+                                border:0;
+                                border-radius:50%;
+                                background:rgba(0,0,0,.55);
+                                color:white;
+                                font-size:28px;
+                                cursor:pointer;
+                            "
+                        >›</button>
+
+                        <div
+                            id="mapModalCounter"
+                            style="
+                                position:absolute;
+                                bottom:10px;
+                                left:50%;
+                                transform:translateX(-50%);
+                                background:rgba(0,0,0,.6);
+                                color:white;
+                                padding:5px 12px;
+                                border-radius:20px;
+                                font-size:14px;
+                            "
+                        >
+                            1 / ${images.length}
+                        </div>
+                    `
+                    : ""
+            }
+
+        </div>
+    `;
+}
 
 
     const modal =
@@ -4386,7 +4462,81 @@ document.body.appendChild(
     modal
 );
 
+/* =========================================================
+   MAP MODAL PHOTO GALLERY
+========================================================= */
 
+if (images.length > 1) {
+
+    let currentImageIndex = 0;
+
+    const modalImage =
+        modal.querySelector("#mapModalImage");
+
+    const counter =
+        modal.querySelector("#mapModalCounter");
+
+    const prevButton =
+        modal.querySelector("#mapModalPrev");
+
+    const nextButton =
+        modal.querySelector("#mapModalNext");
+
+    function updateModalImage() {
+
+        let imageUrl =
+            images[currentImageIndex];
+
+        if (
+            !imageUrl.startsWith("http") &&
+            !imageUrl.startsWith("/")
+        ) {
+            imageUrl = "/" + imageUrl;
+        }
+
+        modalImage.src =
+            imageUrl;
+
+        counter.textContent =
+            `${currentImageIndex + 1} / ${images.length}`;
+    }
+
+    nextButton.onclick =
+        function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            currentImageIndex++;
+
+            if (
+                currentImageIndex >=
+                images.length
+            ) {
+                currentImageIndex = 0;
+            }
+
+            updateModalImage();
+        };
+
+    prevButton.onclick =
+        function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            currentImageIndex--;
+
+            if (
+                currentImageIndex < 0
+            ) {
+                currentImageIndex =
+                    images.length - 1;
+            }
+
+            updateModalImage();
+        };
+}
 /* =========================================================
    MAP SHARE BUTTON
 ========================================================= */
