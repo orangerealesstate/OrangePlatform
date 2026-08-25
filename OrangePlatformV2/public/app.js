@@ -1057,20 +1057,20 @@ function getFilteredPosts() {
             searchInput?.value
         );
 
-
-    const districtValue =
-        String(
-            districtInput?.value || ""
-        )
-            .trim();
-
-
-    const selectedDistrict =
-        districtValue
-            ? normalizeDistrict(
-                districtValue
+const selectedDistricts =
+    districtInput
+        ? Array.from(
+            districtInput.querySelectorAll(
+                'input[type="checkbox"]:checked'
             )
-            : "";
+        )
+        .map(input =>
+            normalizeDistrict(
+                input.value
+            )
+        )
+        .filter(Boolean)
+        : [];
 
 
     const selectedRooms =
@@ -1192,13 +1192,13 @@ function getFilteredPosts() {
 
 
                 if (
-                    postDistrict !==
-                    selectedDistrict
-                ) {
-
-                    return false;
-
-                }
+    selectedDistricts.length > 0 &&
+    !selectedDistricts.includes(
+        normalizeDistrict(postDistrict)
+    )
+) {
+    return false;
+}
 
             }
 
