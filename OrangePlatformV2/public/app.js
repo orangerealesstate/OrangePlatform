@@ -1030,7 +1030,7 @@ function getFilteredPosts() {
 
     const districtInput =
         document.getElementById(
-            "districtFilter"
+            "filterDistrict"
         );
 
 
@@ -1376,16 +1376,15 @@ function clearFilters() {
 ========================================================= */
 
 function setupFilterEvents() {
+const ids = [
 
-    const ids = [
+    "search",
+    "filterDistrict",
+    "roomsFilter",
+    "minPrice",
+    "maxPrice"
 
-        "search",
-        "districtFilter",
-        "roomsFilter",
-        "minPrice",
-        "maxPrice"
-
-    ];
+];
 
 
     ids.forEach(
