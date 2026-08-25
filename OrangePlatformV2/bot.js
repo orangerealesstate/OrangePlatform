@@ -12,91 +12,155 @@ if (!token) {
 const bot = new TelegramBot(token, {
     polling: true
 });
+
+const WEBAPP =
+    "https://orangeplatform.onrender.com/";
+
+const API_URL =
+    "https://orangeplatform.onrender.com";
+
+console.log("🤖 Bot started successfully");
+
 bot.getMe().then(me => {
-    console.log(me);
+    console.log("Bot:", me);
 });
 
 bot.on("polling_error", console.error);
 bot.on("error", console.error);
 
-const WEBAPP = "https://orangeplatform.onrender.com/";
-const API_URL = "https://orangeplatform.onrender.com";
-console.log("Bot started successfully");
-bot.onText(/\/start/, (msg) => {
-    bot.sendMessage(
-        msg.chat.id,
-        "🍊 Добро пожаловать в Orange Real Estate!\n\nВыберите действие:",
-        {
-            reply_markup: {
-                inline_keyboard: [
-                    [
-                        {
-                            text: "🏠 Открыть каталог",
-                            web_app: {
-                                url: WEBAPP
-                            }
-                        }
-                    ],
-                    [
-                        {
-                            text: "🆕 Новые объявления",
-                            callback_data: "new_posts"
-                        }
-                    ],
-                    [
-                        {
-                            text: "❤️ Избранное",
-                            callback_data: "favorites"
-                        }
-                    ],
-                    [
-                        {
-                            text: "📞 Связаться с нами",
-                            callback_data: "contact"
-                        }
-                    ]
-                ]
-            }
-        }
-    );
-});
-bot.on("callback_query", async (query) => {
-    const chatId = query.message.chat.id;
 
-    if (query.data === "new_posts") {
-        bot.sendMessage(
-            chatId,
-            "Откройте каталог и используйте сортировку по новым объявлениям."
-        );
-    }
+/* =====================================================
+   START
+===================================================== */
 
-    if (query.data === "favorites") {
+bot.onText(/\/start/, async (msg) => {
 
     try {
 
-        const userId = String(query.from.id);
+        await bot.sendMessage(
+            msg.chat.id,
 
-        const response = await fetch(
-            `${API_URL}/api/favorites/${userId}?t=${Date.now()}`
+            "🍊 Добро пожаловать в Orange Real Estate!\n\nВыберите действие:",
+
+            {
+                reply_markup: {
+
+                    inline_keyboard: [
+
+                        [
+                            {
+                                text: "🆕 Новые объявления",
+                                callback_data: "new_posts"
+                            }
+                        ],
+
+                        [
+                            {
+                                text: "❤️ Избранное",
+                                callback_data: "favorites"
+                            }
+                        ],
+
+                        [
+                            {
+                                text: "📞 Связаться с нами",
+                                callback_data: "contact"
+                            }
+                        ]
+
+                    ]
+                }
+            }
         );
 
-        if (!response.ok) {
-            throw new Error("Failed to load favorites");
-        }
+    } catch (error) {
 
-        const favorites = await response.json();
-        console.log(
-    "❤️ BOT FAVORITES:",
-    {
-        userId,
-        favorites
+        console.error(
+            "Start error:",
+            error
+        );
+
     }
-);
 
-        if (
-            !Array.isArray(favorites) ||
-            favorites.length === 0
-        ) {
+});
+
+
+/* =====================================================
+   LOAD FAVORITES
+===================================================== */
+
+async function loadFavorites(userId) {
+
+    const response = await fetch(
+        `${API_URL}/api/favorites/${userId}?t=${Date.now()}`
+    );
+
+    if (!response.ok) {
+
+        throw new Error(
+            `Favorites API error: ${response.status}`
+        );
+
+    }
+
+    const favorites =
+        await response.json();
+
+    console.log(
+        "❤️ FAVORITES:",
+        {
+            userId,
+            favorites
+        }
+    );
+
+    return Array.isArray(favorites)
+        ? favorites
+        : [];
+}
+
+
+/* =====================================================
+   LOAD POST
+===================================================== */
+
+async function loadPost(postId) {
+
+    const response = await fetch(
+        `${API_URL}/api/post/${encodeURIComponent(postId)}?t=${Date.now()}`
+    );
+
+    if (!response.ok) {
+
+        throw new Error(
+            `Post ${postId} error: ${response.status}`
+        );
+
+    }
+
+    const data =
+        await response.json();
+
+    return data.post || data;
+}
+
+
+/* =====================================================
+   SHOW FAVORITES
+===================================================== */
+
+async function showFavorites(chatId, userId) {
+
+    try {
+
+        const favorites =
+            await loadFavorites(userId);
+
+        /* ---------------------------------------------
+           EMPTY
+        --------------------------------------------- */
+
+        if (favorites.length === 0) {
 
             await bot.sendMessage(
                 chatId,
@@ -104,17 +168,92 @@ bot.on("callback_query", async (query) => {
             );
 
             return;
+
         }
+
 
         let message =
             "❤️ <b>Ваше избранное:</b>\n\n";
 
-        favorites.forEach((postId, index) => {
 
-            message +=
-                `${index + 1}. 🏠 Объявление #${postId}\n`;
+        /* ---------------------------------------------
+           LOAD EACH FAVORITE
+        --------------------------------------------- */
 
-        });
+        for (
+            let index = 0;
+            index < favorites.length;
+            index++
+        ) {
+
+            const postId =
+                String(favorites[index]);
+
+
+            try {
+
+                const post =
+                    await loadPost(postId);
+
+
+                const district =
+                    post?.district ||
+                    post?.area ||
+                    "-";
+
+
+                const rooms =
+                    post?.rooms ||
+                    post?.roomCount ||
+                    "-";
+
+
+                const price =
+                    post?.price
+                        ? `${post.price} $`
+                        : "-";
+
+
+                const address =
+                    post?.address ||
+                    post?.street ||
+                    post?.location ||
+                    "-";
+
+
+                message +=
+                    `<b>${index + 1}. 🏠 Объявление #${postId}</b>\n` +
+                    `📍 Район: ${district}\n` +
+                    `🏢 Адрес: ${address}\n` +
+                    `🚪 Комнат: ${rooms}\n` +
+                    `💰 Цена: ${price}\n\n`;
+
+
+            } catch (postError) {
+
+                console.error(
+                    `❌ Ошибка загрузки объявления ${postId}:`,
+                    postError
+                );
+
+
+                /*
+                   თუ კონკრეტული ბინა წაშლილია,
+                   მაინც ვაჩვენებთ მის ID-ს
+                */
+
+                message +=
+                    `<b>${index + 1}. 🏠 Объявление #${postId}</b>\n` +
+                    `⚠️ Объявление недоступно.\n\n`;
+
+            }
+
+        }
+
+
+        /* ---------------------------------------------
+           SEND
+        --------------------------------------------- */
 
         await bot.sendMessage(
             chatId,
@@ -124,53 +263,195 @@ bot.on("callback_query", async (query) => {
             }
         );
 
+
     } catch (error) {
 
         console.error(
-            "Favorites bot error:",
+            "❌ Favorites error:",
             error
         );
+
 
         await bot.sendMessage(
             chatId,
             "❌ Не удалось загрузить избранное."
         );
-    }
-    }
 
-    if (query.data === "contact") {
-        bot.sendMessage(
-            chatId,
-            "📲 Telegram: @Orangerealestatetbilisi"
-        );
     }
 
-    bot.answerCallbackQuery(query.id);
-});
+}
 
-bot.on("message", (msg) => {
 
-    if (msg.text === "🆕 Новые объявления") {
-        bot.sendMessage(
-            msg.chat.id,
-            "Откройте каталог и используйте сортировку по новым объявлениям."
-        );
+/* =====================================================
+   CALLBACK BUTTONS
+===================================================== */
+
+bot.on(
+    "callback_query",
+    async (query) => {
+
+        const chatId =
+            query.message.chat.id;
+
+        try {
+
+            /* -----------------------------------------
+               NEW POSTS
+            ----------------------------------------- */
+
+            if (
+                query.data === "new_posts"
+            ) {
+
+                await bot.sendMessage(
+                    chatId,
+
+                    "🆕 Откройте каталог и используйте сортировку по новым объявлениям."
+                );
+
+            }
+
+
+            /* -----------------------------------------
+               FAVORITES
+            ----------------------------------------- */
+
+            else if (
+                query.data === "favorites"
+            ) {
+
+                const userId =
+                    String(query.from.id);
+
+                await showFavorites(
+                    chatId,
+                    userId
+                );
+
+            }
+
+
+            /* -----------------------------------------
+               CONTACT
+            ----------------------------------------- */
+
+            else if (
+                query.data === "contact"
+            ) {
+
+                await bot.sendMessage(
+                    chatId,
+
+                    "📲 Telegram: @Orangerealestatetbilisi"
+                );
+
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                "Callback error:",
+                error
+            );
+
+        }
+
+
+        /* ---------------------------------------------
+           REMOVE LOADING FROM BUTTON
+        --------------------------------------------- */
+
+        try {
+
+            await bot.answerCallbackQuery(
+                query.id
+            );
+
+        } catch (error) {
+
+            console.error(
+                "answerCallbackQuery error:",
+                error
+            );
+
+        }
+
     }
+);
 
-    if (msg.text === "❤️ Избранное") {
-        bot.sendMessage(
-            msg.chat.id,
-            "❤️ Ваше избранное пока пусто."
-        );
+
+/* =====================================================
+   TEXT BUTTONS
+===================================================== */
+
+bot.on(
+    "message",
+    async (msg) => {
+
+        if (!msg.text) return;
+
+
+        /* -----------------------------------------
+           NEW POSTS
+        ----------------------------------------- */
+
+        if (
+            msg.text === "🆕 Новые объявления"
+        ) {
+
+            await bot.sendMessage(
+                msg.chat.id,
+
+                "🆕 Откройте каталог и используйте сортировку по новым объявлениям."
+            );
+
+            return;
+
+        }
+
+
+        /* -----------------------------------------
+           FAVORITES
+        ----------------------------------------- */
+
+        if (
+            msg.text === "❤️ Избранное"
+        ) {
+
+            const userId =
+                String(msg.from.id);
+
+            await showFavorites(
+                msg.chat.id,
+                userId
+            );
+
+            return;
+
+        }
+
+
+        /* -----------------------------------------
+           CONTACT
+        ----------------------------------------- */
+
+        if (
+            msg.text === "📞 Связаться с нами"
+        ) {
+
+            await bot.sendMessage(
+                msg.chat.id,
+
+                "📲 Telegram: @Orangerealestatetbilisi"
+            );
+
+            return;
+
+        }
+
     }
+);
 
-    if (msg.text === "📞 Связаться с нами") {
-        bot.sendMessage(
-            msg.chat.id,
-            "📲 Telegram: @Orangerealestatetbilisi"
-        );
-    }
 
-});
-
-console.log("🤖 Bot started...");
+console.log("🤖 Orange Real Estate Bot is running...");
