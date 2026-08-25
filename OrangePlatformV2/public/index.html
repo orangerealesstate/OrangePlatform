@@ -351,9 +351,9 @@
         <!-- DISTRICT -->
 
         <select
-            id="districtFilter"
-            onchange="filterPosts()"
-        >
+    id="legacyDistrictFilter"
+    onchange="filterPosts()"
+>
 
             <option value="">
                 Все районы
@@ -529,7 +529,7 @@
     <span>Можно выбрать несколько</span>
 </div>
 
-<div id="districtFilter" class="district-checkboxes">
+<div id="filterDistrict" class="district-checkboxes">
 
     <label class="district-option select-all">
         <input type="checkbox" id="allDistricts" checked>
@@ -845,12 +845,6 @@ function applyFilters() {
             "filterMaxPrice"
         );
 
-
-    const mainDistrict =
-        document.getElementById(
-            "districtFilter"
-        );
-
     const mainRooms =
         document.getElementById(
             "roomsFilter"
@@ -865,21 +859,6 @@ function applyFilters() {
         document.getElementById(
             "maxPrice"
         );
-
-
-    /*
-       OVERLAY → MAIN FILTERS
-    */
-
-    if (
-        district &&
-        mainDistrict
-    ) {
-
-        mainDistrict.value =
-            district.value;
-
-    }
 
 
     if (

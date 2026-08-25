@@ -5762,3 +5762,62 @@ if (telegramWebApp) {
 console.log(
     "🍊 ORANGE APP.JS READY"
 );
+// აქ არის app.js-ის ბოლო არსებული კოდი
+...
+...
+}   // ბოლო ფუნქციის დახურვა
+
+
+/* =========================================================
+   MAP SHARE — TELEGRAM ORIGINAL POST
+========================================================= */
+
+document.addEventListener("click", function (event) {
+
+    const shareButton =
+        event.target.closest(".orange-share-btn");
+
+    if (!shareButton) {
+        return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const postId =
+        shareButton.getAttribute("data-share-post-id");
+
+    if (!postId) {
+        console.error("Share: post ID not found");
+        return;
+    }
+
+    const telegramPostUrl =
+        `https://t.me/kvartiri_tbilisi2023/${postId}`;
+
+    const shareUrl =
+        `https://t.me/share/url?url=${encodeURIComponent(telegramPostUrl)}`;
+
+    console.log(
+        "SHARE BUTTON WORKING:",
+        shareUrl
+    );
+
+    if (
+        window.Telegram &&
+        window.Telegram.WebApp &&
+        typeof window.Telegram.WebApp.openTelegramLink === "function"
+    ) {
+        window.Telegram.WebApp.openTelegramLink(
+            shareUrl
+        );
+
+        return;
+    }
+
+    window.open(
+        shareUrl,
+        "_blank"
+    );
+
+});
