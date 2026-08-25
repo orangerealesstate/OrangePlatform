@@ -4946,6 +4946,88 @@ if (
 
 }
 /* =========================================================
+   MAP SHARE — ORIGINAL TELEGRAM POST
+========================================================= */
+
+function shareMapPost(postId) {
+
+    const telegramUrl =
+        `https://t.me/kvartiri_tbilisi2023/${postId}`;
+
+    const shareText =
+        "🏠 Смотреть объявление";
+
+    try {
+
+        if (
+            window.Telegram &&
+            window.Telegram.WebApp &&
+            window.Telegram.WebApp.openTelegramLink
+        ) {
+
+            const telegramShareUrl =
+                `https://t.me/share/url?url=${encodeURIComponent(telegramUrl)}&text=${encodeURIComponent(shareText)}`;
+
+            window.Telegram.WebApp.openTelegramLink(
+                telegramShareUrl
+            );
+
+            return;
+        }
+
+        if (
+            navigator.share
+        ) {
+
+            navigator.share({
+
+                title:
+                    "Orange Real Estate",
+
+                text:
+                    shareText,
+
+                url:
+                    telegramUrl
+
+            }).catch(
+                error => {
+
+                    console.log(
+                        "Share cancelled:",
+                        error
+                    );
+
+                }
+            );
+
+            return;
+        }
+
+        window.open(
+            `https://t.me/share/url?url=${encodeURIComponent(telegramUrl)}&text=${encodeURIComponent(shareText)}`,
+            "_blank"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "MAP SHARE ERROR:",
+            error
+        );
+
+        window.open(
+            `https://t.me/share/url?url=${encodeURIComponent(telegramUrl)}`,
+            "_blank"
+        );
+
+    }
+
+}
+
+/* =========================================================
    RENDER MAP
 ========================================================= */
 
