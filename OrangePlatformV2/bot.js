@@ -13,9 +13,6 @@ const bot = new TelegramBot(token, {
     polling: true
 });
 
-const WEBAPP =
-    "https://orangeplatform.onrender.com/";
-
 const API_URL =
     "https://orangeplatform.onrender.com";
 
@@ -92,7 +89,7 @@ bot.onText(/\/start/, async (msg) => {
 async function loadFavorites(userId) {
 
     const response = await fetch(
-        `${API_URL}/api/favorites/${userId}?t=${Date.now()}`
+        `${API_URL}/api/favorites/${encodeURIComponent(userId)}?t=${Date.now()}`
     );
 
     if (!response.ok) {
@@ -146,6 +143,21 @@ async function loadPost(postId) {
 
 
 /* =====================================================
+   HTML SAFE TEXT
+===================================================== */
+
+function escapeHtml(value) {
+
+    return String(value ?? "-")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =====================================================
    SHOW FAVORITES
 ===================================================== */
 
@@ -155,6 +167,7 @@ async function showFavorites(chatId, userId) {
 
         const favorites =
             await loadFavorites(userId);
+
 
         /* ---------------------------------------------
            EMPTY
@@ -174,6 +187,14 @@ async function showFavorites(chatId, userId) {
 
         let message =
             "❤️ <b>Ваше избранное:</b>\n\n";
+
+
+        /*
+           აქ ვინახავთ Telegram-ის ორიგინალი
+           პოსტების ღილაკებს
+        */
+
+        const buttons = [];
 
 
         /* ---------------------------------------------
@@ -209,7 +230,9 @@ async function showFavorites(chatId, userId) {
 
 
                 const price =
-                    post?.price
+                    post?.price !== undefined &&
+                    post?.price !== null &&
+                    post?.price !== ""
                         ? `${post.price} $`
                         : "-";
 
@@ -221,12 +244,40 @@ async function showFavorites(chatId, userId) {
                     "-";
 
 
+                /* -------------------------------------
+                   FAVORITE TEXT
+                ------------------------------------- */
+
                 message +=
-                    `<b>${index + 1}. 🏠 Объявление #${postId}</b>\n` +
-                    `📍 Район: ${district}\n` +
-                    `🏢 Адрес: ${address}\n` +
-                    `🚪 Комнат: ${rooms}\n` +
-                    `💰 Цена: ${price}\n\n`;
+                    `<b>${index + 1}. 🏠 Объявление #${escapeHtml(postId)}</b>\n` +
+                    `📍 Район: ${escapeHtml(district)}\n` +
+                    `🏢 Адрес: ${escapeHtml(address)}\n` +
+                    `🚪 Комнат: ${escapeHtml(rooms)}\n` +
+                    `💰 Цена: ${escapeHtml(price)}\n\n`;
+
+
+                /* -------------------------------------
+                   ORIGINAL TELEGRAM LINK
+                ------------------------------------- */
+
+                const telegramLink =
+                    post?.telegramLink;
+
+
+                if (
+                    telegramLink &&
+                    typeof telegramLink === "string" &&
+                    /^https:\/\/t\.me\//i.test(telegramLink)
+                ) {
+
+                    buttons.push([
+                        {
+                            text: `🔗 Оригинал объявления #${postId}`,
+                            url: telegramLink
+                        }
+                    ]);
+
+                }
 
 
             } catch (postError) {
@@ -243,7 +294,7 @@ async function showFavorites(chatId, userId) {
                 */
 
                 message +=
-                    `<b>${index + 1}. 🏠 Объявление #${postId}</b>\n` +
+                    `<b>${index + 1}. 🏠 Объявление #${escapeHtml(postId)}</b>\n` +
                     `⚠️ Объявление недоступно.\n\n`;
 
             }
@@ -252,14 +303,21 @@ async function showFavorites(chatId, userId) {
 
 
         /* ---------------------------------------------
-           SEND
+           SEND FAVORITES
         --------------------------------------------- */
 
         await bot.sendMessage(
             chatId,
             message,
             {
-                parse_mode: "HTML"
+                parse_mode: "HTML",
+
+                reply_markup:
+                    buttons.length > 0
+                        ? {
+                            inline_keyboard: buttons
+                        }
+                        : undefined
             }
         );
 
@@ -293,6 +351,7 @@ bot.on(
         const chatId =
             query.message.chat.id;
 
+
         try {
 
             /* -----------------------------------------
@@ -322,6 +381,13 @@ bot.on(
 
                 const userId =
                     String(query.from.id);
+
+
+                console.log(
+                    "❤️ Telegram user ID:",
+                    userId
+                );
+
 
                 await showFavorites(
                     chatId,
@@ -392,6 +458,17 @@ bot.on(
         if (!msg.text) return;
 
 
+        /*
+           /start უკვე დამუშავებულია ზემოთ
+        */
+
+        if (
+            msg.text === "/start"
+        ) {
+            return;
+        }
+
+
         /* -----------------------------------------
            NEW POSTS
         ----------------------------------------- */
@@ -421,6 +498,13 @@ bot.on(
 
             const userId =
                 String(msg.from.id);
+
+
+            console.log(
+                "❤️ TEXT FAVORITES USER:",
+                userId
+            );
+
 
             await showFavorites(
                 msg.chat.id,
@@ -454,4 +538,6 @@ bot.on(
 );
 
 
-console.log("🤖 Orange Real Estate Bot is running...");
+console.log(
+    "🤖 Orange Real Estate Bot is running..."
+);
