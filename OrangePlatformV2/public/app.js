@@ -1102,7 +1102,7 @@ const selectedDistricts =
         "🔎 FILTER:",
         {
             search,
-            selectedDistrict,
+            selectedDistricts,
             selectedRooms,
             minPrice,
             maxPrice
@@ -1165,33 +1165,9 @@ const selectedDistricts =
             /* =========================================
                DISTRICT
             ========================================= */
+const postDistrict = getPostDistrict(post);
 
-            if (
-                selectedDistrict
-            ) {
-
-                const postDistrict =
-                    getPostDistrict(
-                        post
-                    );
-
-
-                console.log(
-                    "📍 DISTRICT:",
-                    {
-                        post:
-                            post.id,
-
-                        selected:
-                            selectedDistrict,
-
-                        actual:
-                            postDistrict
-                    }
-                );
-
-
-                if (
+if (
     selectedDistricts.length > 0 &&
     !selectedDistricts.includes(
         normalizeDistrict(postDistrict)
@@ -1199,9 +1175,6 @@ const selectedDistricts =
 ) {
     return false;
 }
-
-            }
-
 
             /* =========================================
                ROOMS
