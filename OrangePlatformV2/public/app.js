@@ -3881,9 +3881,9 @@ satelliteButton.onclick =
         mapInstance.invalidateSize();
     };
 
-controls.appendChild(
-    satelliteButton
-);
+if (mapInstance && satelliteButton) {
+    mapInstance.getContainer().appendChild(satelliteButton);
+}
     }
 
 
