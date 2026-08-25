@@ -1069,8 +1069,17 @@ const selectedDistricts =
                 input.value
             )
         )
-        .filter(Boolean)
+        .filter(
+            district =>
+                district &&
+                district !== "all" &&
+                district !== "ყველა რაიონი"
+        )
         : [];
+        const allDistrictsSelected =
+    districtInput?.querySelector(
+        'input[type="checkbox"][value="all"]:checked'
+    );
 
 
     const selectedRooms =
