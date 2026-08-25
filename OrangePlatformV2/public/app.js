@@ -1084,21 +1084,21 @@ const selectedDistricts =
             )
         )
         : [];
-
 const allDistrictsSelected =
-    checkedDistrictInputs.some(
-        input => {
-            const value =
-                normalizeSearchText(input.value);
+    checkedDistrictInputs.some(input => {
+        const value = normalizeSearchText(
+            input.value
+        );
 
-            return (
-                value === "all" ||
-                value === "all districts" ||
-                value === "все районы" ||
-                value === "ყველა რაიონი"
-            );
-        }
-    );
+        return (
+            value === "all" ||
+            value === "all districts" ||
+            value === "все районы" ||
+            value === "ყველა რაიონი" ||
+            value.includes("все районы") ||
+            value.includes("ყველა რაიონი")
+        );
+    });
 
 
     const selectedRooms =
