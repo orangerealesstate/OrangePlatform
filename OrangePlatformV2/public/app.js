@@ -4461,9 +4461,8 @@ if (images.length > 0) {
 document.body.appendChild(
     modal
 );
-
 /* =========================================================
-   MAP MODAL PHOTO GALLERY
+   MAP PHOTO GALLERY
 ========================================================= */
 
 if (images.length > 1) {
@@ -4482,7 +4481,8 @@ if (images.length > 1) {
     const nextButton =
         modal.querySelector("#mapModalNext");
 
-    function updateModalImage() {
+
+    function updateMapPhoto() {
 
         let imageUrl =
             images[currentImageIndex];
@@ -4494,15 +4494,37 @@ if (images.length > 1) {
             imageUrl = "/" + imageUrl;
         }
 
-        modalImage.src =
-            imageUrl;
+        modalImage.src = imageUrl;
 
-        counter.textContent =
-            `${currentImageIndex + 1} / ${images.length}`;
+        if (counter) {
+            counter.textContent =
+                `${currentImageIndex + 1} / ${images.length}`;
+        }
     }
 
-    nextButton.onclick =
-        function (event) {
+
+    if (prevButton) {
+
+        prevButton.onclick = function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            currentImageIndex--;
+
+            if (currentImageIndex < 0) {
+                currentImageIndex =
+                    images.length - 1;
+            }
+
+            updateMapPhoto();
+        };
+    }
+
+
+    if (nextButton) {
+
+        nextButton.onclick = function (event) {
 
             event.preventDefault();
             event.stopPropagation();
@@ -4516,26 +4538,29 @@ if (images.length > 1) {
                 currentImageIndex = 0;
             }
 
-            updateModalImage();
+            updateMapPhoto();
         };
+    }
 
-    prevButton.onclick =
-        function (event) {
+
+    /* ფოტოზე დაჭერით დიდი ფოტოს გახსნა */
+
+    if (modalImage) {
+
+        modalImage.style.cursor = "zoom-in";
+
+        modalImage.onclick = function (event) {
 
             event.preventDefault();
             event.stopPropagation();
 
-            currentImageIndex--;
-
-            if (
-                currentImageIndex < 0
-            ) {
-                currentImageIndex =
-                    images.length - 1;
-            }
-
-            updateModalImage();
+            window.open(
+                modalImage.src,
+                "_blank"
+            );
         };
+    }
+
 }
 /* =========================================================
    MAP SHARE BUTTON
@@ -4543,7 +4568,6 @@ if (images.length > 1) {
 
 const shareButton =
     modal.querySelector(".orange-share-btn");
-
 if (shareButton) {
 
     shareButton.addEventListener(
@@ -4551,40 +4575,26 @@ if (shareButton) {
         function (event) {
 
             event.preventDefault();
-            event.stopPropagation();
+            event.stopImmediatePropagation();
 
             const telegramLink =
-                `https://t.me/kvartiri_tbilisi2023/${String(post.id)}`;
+                `https://t.me/s/kvartiri_tbilisi2023/${String(post.id)}`;
 
             console.log(
-                "TELEGRAM LINK:",
+                "OPEN TELEGRAM POST:",
                 telegramLink
             );
 
-            if (
-                window.Telegram &&
-                window.Telegram.WebApp &&
-                typeof window.Telegram.WebApp.openTelegramLink === "function"
-            ) {
-
-                window.Telegram.WebApp.openTelegramLink(
-                    telegramLink
-                );
-
-            } else {
-
-                window.open(
-                    telegramLink,
-                    "_blank"
-                );
-
-            }
+            window.open(
+                telegramLink,
+                "_blank",
+                "noopener,noreferrer"
+            );
 
         }
     );
 
 }
-
 
 document.body.style.overflow =
     "hidden";
