@@ -4337,17 +4337,13 @@ const description = "";
                     <!-- SHARE -->
 
                     <button
-                        type="button"
-                        class="orange-share-btn"
-                        onclick="
-                            shareMapPost(
-                                ${JSON.stringify(String(post.id))}
-                            )
-                        "
-                    >
-                        ↗️
-                        <span>Поделиться</span>
-                    </button>
+    type="button"
+    class="orange-share-btn"
+    data-share-post-id="${String(post.id)}"
+>
+    📤
+    <span>Поделиться</span>
+</button>
 
 
                     <!-- TELEGRAM -->
@@ -4391,7 +4387,26 @@ const description = "";
         10
     );
 }
+document.addEventListener("click", function (event) {
 
+    const shareButton =
+        event.target.closest(".orange-share-btn");
+
+    if (!shareButton) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const postId =
+        shareButton.dataset.sharePostId;
+
+    if (!postId) {
+        console.error("Share: post ID not found");
+        return;
+    }
+
+    shareMapPost(String(postId));
+});
 
 /* =========================================================
    CLOSE MODAL
