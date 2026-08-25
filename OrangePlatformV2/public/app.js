@@ -4542,25 +4542,267 @@ if (images.length > 1) {
         };
     }
 
+/* =========================================================
+   FULLSCREEN PHOTO GALLERY
+========================================================= */
 
-    /* ფოტოზე დაჭერით დიდი ფოტოს გახსნა */
+if (modalImage) {
 
-    if (modalImage) {
+    modalImage.style.cursor = "zoom-in";
 
-        modalImage.style.cursor = "zoom-in";
+    modalImage.onclick = function (event) {
 
-        modalImage.onclick = function (event) {
+        event.preventDefault();
+        event.stopPropagation();
 
-            event.preventDefault();
-            event.stopPropagation();
+        let fullIndex = currentImageIndex;
 
-            window.open(
-                modalImage.src,
-                "_blank"
+        const viewer =
+            document.createElement("div");
+
+        viewer.id = "orangeFullPhotoViewer";
+
+        viewer.innerHTML = `
+            <div
+                style="
+                    position:fixed;
+                    inset:0;
+                    background:rgba(0,0,0,0.94);
+                    z-index:999999;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                "
+            >
+
+                <!-- CLOSE -->
+                <button
+                    id="orangeFullClose"
+                    type="button"
+                    style="
+                        position:absolute;
+                        top:20px;
+                        right:25px;
+                        width:48px;
+                        height:48px;
+                        border:0;
+                        border-radius:50%;
+                        background:rgba(255,255,255,0.85);
+                        color:#222;
+                        font-size:30px;
+                        cursor:pointer;
+                        z-index:3;
+                    "
+                >
+                    ×
+                </button>
+
+
+                <!-- PREVIOUS -->
+                <button
+                    id="orangeFullPrev"
+                    type="button"
+                    style="
+                        position:absolute;
+                        left:20px;
+                        top:50%;
+                        transform:translateY(-50%);
+                        width:52px;
+                        height:52px;
+                        border:0;
+                        border-radius:50%;
+                        background:rgba(255,255,255,0.85);
+                        color:#222;
+                        font-size:32px;
+                        cursor:pointer;
+                        z-index:3;
+                    "
+                >
+                    ‹
+                </button>
+
+
+                <!-- PHOTO -->
+                <img
+                    id="orangeFullImage"
+                    src=""
+                    alt="Фото квартиры"
+                    style="
+                        max-width:90vw;
+                        max-height:90vh;
+                        object-fit:contain;
+                        border-radius:8px;
+                        display:block;
+                    "
+                >
+
+
+                <!-- NEXT -->
+                <button
+                    id="orangeFullNext"
+                    type="button"
+                    style="
+                        position:absolute;
+                        right:20px;
+                        top:50%;
+                        transform:translateY(-50%);
+                        width:52px;
+                        height:52px;
+                        border:0;
+                        border-radius:50%;
+                        background:rgba(255,255,255,0.85);
+                        color:#222;
+                        font-size:32px;
+                        cursor:pointer;
+                        z-index:3;
+                    "
+                >
+                    ›
+                </button>
+
+
+                <!-- COUNTER -->
+                <div
+                    id="orangeFullCounter"
+                    style="
+                        position:absolute;
+                        bottom:25px;
+                        left:50%;
+                        transform:translateX(-50%);
+                        background:rgba(0,0,0,0.65);
+                        color:white;
+                        padding:7px 15px;
+                        border-radius:20px;
+                        font-size:16px;
+                        z-index:3;
+                    "
+                >
+                </div>
+
+            </div>
+        `;
+
+        document.body.appendChild(viewer);
+
+        const fullImage =
+            viewer.querySelector(
+                "#orangeFullImage"
             );
-        };
-    }
 
+        const fullCounter =
+            viewer.querySelector(
+                "#orangeFullCounter"
+            );
+
+        function updateFullPhoto() {
+
+            let url =
+                images[fullIndex];
+
+            if (
+                !url.startsWith("http") &&
+                !url.startsWith("/")
+            ) {
+                url = "/" + url;
+            }
+
+            fullImage.src = url;
+
+            fullCounter.textContent =
+                `${fullIndex + 1} / ${images.length}`;
+        }
+
+
+        /* PREVIOUS */
+
+        viewer
+            .querySelector("#orangeFullPrev")
+            .onclick = function (e) {
+
+                e.stopPropagation();
+
+                fullIndex--;
+
+                if (fullIndex < 0) {
+                    fullIndex =
+                        images.length - 1;
+                }
+
+                updateFullPhoto();
+            };
+
+
+        /* NEXT */
+
+        viewer
+            .querySelector("#orangeFullNext")
+            .onclick = function (e) {
+
+                e.stopPropagation();
+
+                fullIndex++;
+
+                if (
+                    fullIndex >=
+                    images.length
+                ) {
+                    fullIndex = 0;
+                }
+
+                updateFullPhoto();
+            };
+
+
+        /* CLOSE */
+
+        viewer
+            .querySelector("#orangeFullClose")
+            .onclick = function (e) {
+
+                e.stopPropagation();
+
+                viewer.remove();
+            };
+
+
+        /* CLICK OUTSIDE */
+
+        viewer.firstElementChild.onclick =
+            function (e) {
+
+                if (
+                    e.target ===
+                    viewer.firstElementChild
+                ) {
+                    viewer.remove();
+                }
+            };
+
+
+        /* ESC */
+
+        function closeWithEsc(e) {
+
+            if (e.key === "Escape") {
+
+                viewer.remove();
+
+                document.removeEventListener(
+                    "keydown",
+                    closeWithEsc
+                );
+            }
+        }
+
+        document.addEventListener(
+            "keydown",
+            closeWithEsc
+        );
+
+
+        updateFullPhoto();
+    };
+}
 }
 /* =========================================================
    MAP SHARE BUTTON
