@@ -1360,6 +1360,7 @@ function clearFilters() {
 
     [
         "search",
+        "filterListingId",
         "filterDistrict",
         "roomsFilter",
         "minPrice",
