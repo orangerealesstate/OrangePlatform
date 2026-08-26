@@ -2831,3 +2831,47 @@ body:not(.map-mode) #mapBackButton {
     color: #555;
     white-space: nowrap;
 }
+/* =====================================================
+   COMPACT DISTRICT FILTER
+===================================================== */
+
+.filter-districts {
+    gap: 6px !important;
+}
+
+.filter-districts label {
+    min-height: 48px !important;
+    height: 48px !important;
+    padding: 6px 12px !important;
+    margin-bottom: 4px !important;
+    font-size: 17px !important;
+}
+
+.filter-districts input[type="checkbox"] {
+    width: 30px !important;
+    height: 30px !important;
+    margin-right: 10px !important;
+}
+/* =====================================================
+   COMPACT DISTRICT FILTER
+===================================================== */
+
+.district-checkboxes {
+    max-height: 280px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.district-option {
+    min-height: 38px;
+    padding: 5px 10px;
+    box-sizing: border-box;
+}
+
+.district-option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
