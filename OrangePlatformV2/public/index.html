@@ -927,41 +927,139 @@ function applyFilters() {
     );
 
 }
-
-
 function clearFilterWindow() {
 
-    const district =
-        document.getElementById("filterDistrict");
+    console.log("🗑 CLEAR FILTERS");
+
+    /* =========================
+       RESET DISTRICTS
+    ========================= */
+
+    const districtContainer =
+        document.getElementById(
+            "filterDistrict"
+        );
+
+    if (districtContainer) {
+
+        const checkboxes =
+            districtContainer.querySelectorAll(
+                'input[type="checkbox"]'
+            );
+
+        checkboxes.forEach(
+            checkbox => {
+                checkbox.checked = false;
+            }
+        );
+
+        const allDistricts =
+            document.getElementById(
+                "allDistricts"
+            );
+
+        if (allDistricts) {
+            allDistricts.checked = true;
+        }
+    }
+
+
+    /* =========================
+       RESET ROOMS
+    ========================= */
 
     const rooms =
-        document.getElementById("filterRooms");
+        document.getElementById(
+            "filterRooms"
+        );
+
+    if (rooms) {
+        rooms.value = "";
+    }
+
+
+    /* =========================
+       RESET PRICE
+    ========================= */
 
     const minPrice =
-        document.getElementById("filterMinPrice");
+        document.getElementById(
+            "filterMinPrice"
+        );
 
     const maxPrice =
-        document.getElementById("filterMaxPrice");
+        document.getElementById(
+            "filterMaxPrice"
+        );
 
-
-    if (district)
-        district.value = "";
-
-    if (rooms)
-        rooms.value = "";
-
-    if (minPrice)
+    if (minPrice) {
         minPrice.value = "";
+    }
 
-    if (maxPrice)
+    if (maxPrice) {
         maxPrice.value = "";
+    }
 
 
-    applyFilters();
+    /* =========================
+       RESET MAIN FILTERS
+    ========================= */
 
+    const mainDistrict =
+        document.getElementById(
+            "legacyDistrictFilter"
+        );
+
+    const mainRooms =
+        document.getElementById(
+            "roomsFilter"
+        );
+
+    const mainMinPrice =
+        document.getElementById(
+            "minPrice"
+        );
+
+    const mainMaxPrice =
+        document.getElementById(
+            "maxPrice"
+        );
+
+    if (mainDistrict) {
+        mainDistrict.value = "";
+    }
+
+    if (mainRooms) {
+        mainRooms.value = "";
+    }
+
+    if (mainMinPrice) {
+        mainMinPrice.value = "";
+    }
+
+    if (mainMaxPrice) {
+        mainMaxPrice.value = "";
+    }
+
+
+    /* =========================
+       SHOW ALL POSTS
+    ========================= */
+
+    if (
+        typeof filterPosts ===
+        "function"
+    ) {
+
+        filterPosts();
+
+    }
+
+
+    console.log(
+        "✅ FILTERS RESET"
+    );
 }
-
-
 document.addEventListener(
     "click",
     function(event) {
