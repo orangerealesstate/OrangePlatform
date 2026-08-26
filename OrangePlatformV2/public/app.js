@@ -1057,6 +1057,7 @@ function getFilteredPosts() {
             searchInput?.value
         );
 
+        
 const selectedDistricts =
     districtInput
         ? Array.from(
@@ -1112,7 +1113,15 @@ const allDistrictsSelected =
             ? maxPriceRaw
             : Infinity;
 
+const listingIdInput =
+    document.getElementById(
+        "filterListingId"
+    );
 
+const listingIdSearch =
+    normalizeSearchText(
+        listingIdInput?.value
+    );
     console.log(
         "🔎 FILTER:",
         {
@@ -1127,6 +1136,13 @@ const allDistrictsSelected =
 
     return allPosts.filter(
         post => {
+            if (
+            listingIdSearch &&
+            String(post.listingId || "")
+                .toLowerCase() !== listingIdSearch
+        ) {
+            return false;
+        }
 
             /* =========================================
                SEARCH
