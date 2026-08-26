@@ -2281,9 +2281,9 @@ card.querySelector(
 
     });
 
-}
-/* =========================
+}/* =========================
    ADMIN EDIT POST
+   SAME PAGE MODAL
 ========================= */
 
 function editPost(post) {
@@ -2293,16 +2293,899 @@ function editPost(post) {
     }
 
     if (!post || !post.id) {
-
-        alert(
-            "❌ Объявление не найдено"
-        );
-
+        alert("❌ Объявление не найдено");
         return;
     }
 
-    window.location.href =
-        `/edit.html?id=${encodeURIComponent(post.id)}&t=${Date.now()}`;
+
+    /* =========================================
+       REMOVE OLD MODAL
+    ========================================= */
+
+    const oldModal =
+        document.getElementById(
+            "adminEditModal"
+        );
+
+    if (oldModal) {
+        oldModal.remove();
+    }
+
+
+    /* =========================================
+       MODAL
+    ========================================= */
+
+    const modal =
+        document.createElement("div");
+
+    modal.id =
+        "adminEditModal";
+
+    modal.style.cssText = `
+        position:fixed;
+        inset:0;
+        z-index:999999;
+
+        background:rgba(0,0,0,.55);
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        padding:15px;
+
+        overflow-y:auto;
+    `;
+
+
+    /* =========================================
+       WINDOW
+    ========================================= */
+
+    const windowBox =
+        document.createElement("div");
+
+    windowBox.style.cssText = `
+        width:100%;
+        max-width:520px;
+
+        max-height:92vh;
+        overflow-y:auto;
+
+        background:#fff;
+
+        border-radius:24px;
+
+        padding:22px;
+
+        box-shadow:
+            0 20px 60px rgba(0,0,0,.35);
+    `;
+
+
+    /* =========================================
+       HEADER
+    ========================================= */
+
+    windowBox.innerHTML = `
+
+        <div style="
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            margin-bottom:18px;
+        ">
+
+            <h2 style="
+                margin:0;
+                font-size:22px;
+                color:#333;
+            ">
+                ✏️ Редактирование квартиры
+            </h2>
+
+            <button
+                id="editCloseBtn"
+                type="button"
+                style="
+                    width:38px;
+                    height:38px;
+                    border:0;
+                    border-radius:50%;
+                    background:#f1f1f1;
+                    font-size:24px;
+                    cursor:pointer;
+                "
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            id="editForm"
+            style="
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:12px;
+            "
+        >
+
+            <!-- РАЙОН -->
+
+            <div style="
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            ">
+
+                <label style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:#777;
+                ">
+                    📍 Район
+                </label>
+
+                <select
+                    id="editDistrict"
+                    style="
+                        width:100%;
+                        padding:12px;
+                        border:1px solid #ddd;
+                        border-radius:14px;
+                        font-size:16px;
+                        background:#fafafa;
+                    "
+                >
+
+                    <option value="">
+                        Не выбран
+                    </option>
+
+                    <option value="Ваке">
+                        Ваке
+                    </option>
+
+                    <option value="Сабуртало">
+                        Сабуртало
+                    </option>
+
+                    <option value="Вера">
+                        Вера
+                    </option>
+
+                    <option value="Мтацминда">
+                        Мтацминда
+                    </option>
+
+                    <option value="Чугурети">
+                        Чугурети
+                    </option>
+
+                    <option value="Дидубе">
+                        Дидубе
+                    </option>
+
+                    <option value="Исани">
+                        Исани
+                    </option>
+
+                    <option value="Самгори">
+                        Самгори
+                    </option>
+
+                    <option value="Крцаниси">
+                        Крцаниси
+                    </option>
+
+                    <option value="Надзаладеви">
+                        Надзаладеви
+                    </option>
+
+                    <option value="Глдани">
+                        Глдани
+                    </option>
+
+                    <option value="Диди Дигоми">
+                        Диди Дигоми
+                    </option>
+
+                    <option value="Ортачала">
+                        Ортачала
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- УЛИЦА -->
+
+            <div style="
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            ">
+
+                <label style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:#777;
+                ">
+                    📌 Улица
+                </label>
+
+                <input
+                    id="editStreet"
+                    type="text"
+                    value="${escapeEditValue(post.street || "")}"
+                    style="
+                        width:100%;
+                        padding:12px;
+                        border:1px solid #ddd;
+                        border-radius:14px;
+                        font-size:16px;
+                    "
+                >
+
+            </div>
+
+
+            <!-- КОМНАТЫ -->
+
+            <div style="
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            ">
+
+                <label style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:#777;
+                ">
+                    🚪 Комнаты
+                </label>
+
+                <input
+                    id="editRooms"
+                    type="number"
+                    value="${escapeEditValue(post.rooms || "")}"
+                    style="
+                        width:100%;
+                        padding:12px;
+                        border:1px solid #ddd;
+                        border-radius:14px;
+                        font-size:16px;
+                    "
+                >
+
+            </div>
+
+
+            <!-- СПАЛЬНИ -->
+
+            <div style="
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            ">
+
+                <label style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:#777;
+                ">
+                    🛏 Спальни
+                </label>
+
+                <input
+                    id="editBedrooms"
+                    type="number"
+                    value="${escapeEditValue(post.bedrooms || "")}"
+                    style="
+                        width:100%;
+                        padding:12px;
+                        border:1px solid #ddd;
+                        border-radius:14px;
+                        font-size:16px;
+                    "
+                >
+
+            </div>
+
+
+            <!-- ВАННЫЕ -->
+
+            <div style="
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            ">
+
+                <label style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:#777;
+                ">
+                    🛁 Ванные
+                </label>
+
+                <input
+                    id="editBathrooms"
+                    type="number"
+                    value="${escapeEditValue(post.bathrooms || "")}"
+                    style="
+                        width:100%;
+                        padding:12px;
+                        border:1px solid #ddd;
+                        border-radius:14px;
+                        font-size:16px;
+                    "
+                >
+
+            </div>
+
+
+            <!-- ПЛОЩАДЬ -->
+
+            <div style="
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            ">
+
+                <label style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:#777;
+                ">
+                    📐 Площадь, м²
+                </label>
+
+                <input
+                    id="editArea"
+                    type="text"
+                    value="${escapeEditValue(post.area || "")}"
+                    style="
+                        width:100%;
+                        padding:12px;
+                        border:1px solid #ddd;
+                        border-radius:14px;
+                        font-size:16px;
+                    "
+                >
+
+            </div>
+
+
+            <!-- ЭТАЖ -->
+
+            <div style="
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            ">
+
+                <label style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:#777;
+                ">
+                    🏢 Этаж
+                </label>
+
+                <input
+                    id="editFloor"
+                    type="text"
+                    value="${escapeEditValue(post.floor || "")}"
+                    style="
+                        width:100%;
+                        padding:12px;
+                        border:1px solid #ddd;
+                        border-radius:14px;
+                        font-size:16px;
+                    "
+                >
+
+            </div>
+
+
+            <!-- ЦЕНА -->
+
+            <div style="
+                grid-column:1 / -1;
+
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            ">
+
+                <label style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:#777;
+                ">
+                    💰 Цена, $
+                </label>
+
+                <input
+                    id="editPrice"
+                    type="text"
+                    value="${escapeEditValue(post.price || "")}"
+                    style="
+                        width:100%;
+                        padding:12px;
+                        border:1px solid #ddd;
+                        border-radius:14px;
+                        font-size:16px;
+                    "
+                >
+
+            </div>
+
+
+            <!-- ОПИСАНИЕ -->
+
+            <div style="
+                grid-column:1 / -1;
+
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            ">
+
+                <label style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:#777;
+                ">
+                    📝 Описание
+                </label>
+
+                <textarea
+                    id="editText"
+                    style="
+                        width:100%;
+                        min-height:100px;
+
+                        padding:12px;
+
+                        border:1px solid #ddd;
+                        border-radius:14px;
+
+                        font-size:16px;
+
+                        resize:vertical;
+                    "
+                >${escapeEditValue(post.text || "")}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- STATUS -->
+
+        <div
+            id="editStatus"
+            style="
+                display:none;
+                margin-top:12px;
+                padding:10px;
+                border-radius:12px;
+                text-align:center;
+                font-size:14px;
+            "
+        ></div>
+
+
+        <!-- BUTTONS -->
+
+        <div style="
+            display:flex;
+            gap:10px;
+            margin-top:20px;
+        ">
+
+            <button
+                id="editCancelBtn"
+                type="button"
+                style="
+                    flex:1;
+
+                    border:0;
+                    border-radius:14px;
+
+                    padding:14px;
+
+                    background:#eee;
+
+                    color:#333;
+
+                    font-size:16px;
+                    font-weight:700;
+
+                    cursor:pointer;
+                "
+            >
+                Отмена
+            </button>
+
+
+            <button
+                id="editSaveBtn"
+                type="button"
+                style="
+                    flex:1;
+
+                    border:0;
+                    border-radius:14px;
+
+                    padding:14px;
+
+                    background:#ff6600;
+
+                    color:#fff;
+
+                    font-size:16px;
+                    font-weight:700;
+
+                    cursor:pointer;
+                "
+            >
+                💾 Сохранить
+            </button>
+
+        </div>
+
+    `;
+
+
+    modal.appendChild(
+        windowBox
+    );
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    /* =========================================
+       ESCAPE HTML
+    ========================================= */
+
+    function escapeEditValue(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    /* =========================================
+       SELECT CURRENT DISTRICT
+    ========================================= */
+
+    const districtSelect =
+        document.getElementById(
+            "editDistrict"
+        );
+
+
+    districtSelect.value =
+        post.district || "";
+
+
+    /*
+       თუ არსებული რაიონი სიაში არ არის,
+       მაინც ვაჩვენოთ.
+    */
+
+    if (
+        post.district &&
+        districtSelect.value !==
+        post.district
+    ) {
+
+        const customOption =
+            document.createElement(
+                "option"
+            );
+
+        customOption.value =
+            post.district;
+
+        customOption.textContent =
+            post.district;
+
+        districtSelect.appendChild(
+            customOption
+        );
+
+        districtSelect.value =
+            post.district;
+    }
+
+
+    /* =========================================
+       CLOSE
+    ========================================= */
+
+    function closeEditModal() {
+
+        modal.remove();
+
+    }
+
+
+    document
+        .getElementById(
+            "editCloseBtn"
+        )
+        .addEventListener(
+            "click",
+            closeEditModal
+        );
+
+
+    document
+        .getElementById(
+            "editCancelBtn"
+        )
+        .addEventListener(
+            "click",
+            closeEditModal
+        );
+
+
+    /* =========================================
+       SAVE
+    ========================================= */
+
+    document
+        .getElementById(
+            "editSaveBtn"
+        )
+        .addEventListener(
+            "click",
+            async () => {
+
+
+                const saveButton =
+                    document.getElementById(
+                        "editSaveBtn"
+                    );
+
+
+                const status =
+                    document.getElementById(
+                        "editStatus"
+                    );
+
+
+                const updatedPost = {
+
+                    ...post,
+
+                    id:
+                        post.id,
+
+                    userId:
+                        telegramUserId,
+
+                    district:
+                        districtSelect.value.trim(),
+
+                    street:
+                        document
+                            .getElementById(
+                                "editStreet"
+                            )
+                            .value
+                            .trim(),
+
+                    rooms:
+                        document
+                            .getElementById(
+                                "editRooms"
+                            )
+                            .value
+                            .trim(),
+
+                    bedrooms:
+                        document
+                            .getElementById(
+                                "editBedrooms"
+                            )
+                            .value
+                            .trim(),
+
+                    bathrooms:
+                        document
+                            .getElementById(
+                                "editBathrooms"
+                            )
+                            .value
+                            .trim(),
+
+                    area:
+                        document
+                            .getElementById(
+                                "editArea"
+                            )
+                            .value
+                            .trim(),
+
+                    floor:
+                        document
+                            .getElementById(
+                                "editFloor"
+                            )
+                            .value
+                            .trim(),
+
+                    price:
+                        document
+                            .getElementById(
+                                "editPrice"
+                            )
+                            .value
+                            .trim(),
+
+                    text:
+                        document
+                            .getElementById(
+                                "editText"
+                            )
+                            .value
+                            .trim()
+                };
+
+
+                saveButton.disabled =
+                    true;
+
+                saveButton.textContent =
+                    "⏳ Сохранение...";
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/api/post/update",
+                            {
+
+                                method:
+                                    "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json"
+
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        updatedPost
+                                    )
+
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    if (
+                        !response.ok ||
+                        !result.success
+                    ) {
+
+                        throw new Error(
+                            result.error ||
+                            "Ошибка сохранения"
+                        );
+
+                    }
+
+
+                    status.style.display =
+                        "block";
+
+                    status.style.background =
+                        "#e9f8ed";
+
+                    status.style.color =
+                        "#218838";
+
+                    status.textContent =
+                        "✅ Изменения сохранены";
+
+
+                    /*
+                       ВАЖНО:
+                       НЕ переходим на edit.html
+                       НЕ переходим на details.html
+
+                       Просто закрываем окно
+                       и обновляем каталог.
+                    */
+
+                    await loadPosts();
+
+
+                    setTimeout(
+                        () => {
+
+                            closeEditModal();
+
+                        },
+                        300
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "EDIT POST ERROR:",
+                        error
+                    );
+
+
+                    status.style.display =
+                        "block";
+
+                    status.style.background =
+                        "#ffe9e9";
+
+                    status.style.color =
+                        "#c62828";
+
+                    status.textContent =
+                        "❌ " +
+                        error.message;
+
+
+                    saveButton.disabled =
+                        false;
+
+                    saveButton.textContent =
+                        "💾 Сохранить";
+                }
+
+            }
+        );
+
+
+    /* =========================================
+       CLICK OUTSIDE
+    ========================================= */
+
+    modal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target === modal
+            ) {
+
+                closeEditModal();
+
+            }
+
+        }
+    );
+
 }
 
 /* =========================
