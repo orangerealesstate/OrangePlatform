@@ -2286,122 +2286,24 @@ card.querySelector(
    ADMIN EDIT POST
 ========================= */
 
-async function editPost(post) {
+function editPost(post) {
 
     if (telegramUserId !== "5172653731") {
         return;
     }
 
-    const price = prompt(
-        "Цена:",
-        post.price || ""
-    );
-
-    if (price === null) return;
-
-    const district = prompt(
-        "Район:",
-        post.district || ""
-    );
-
-    if (district === null) return;
-
-    const rooms = prompt(
-        "Комнат:",
-        post.rooms || ""
-    );
-
-    if (rooms === null) return;
-
-    const bedrooms = prompt(
-        "Спальни:",
-        post.bedrooms || ""
-    );
-
-    if (bedrooms === null) return;
-
-    const bathrooms = prompt(
-        "Ванные:",
-        post.bathrooms || ""
-    );
-
-    if (bathrooms === null) return;
-
-    const area = prompt(
-        "Площадь:",
-        post.area || ""
-    );
-
-    if (area === null) return;
-
-    const floor = prompt(
-        "Этаж:",
-        post.floor || ""
-    );
-
-    if (floor === null) return;
-
-    const updatedPost = {
-        ...post,
-
-        userId: telegramUserId,
-
-        price: price.trim(),
-        district: district.trim(),
-        rooms: rooms.trim(),
-        bedrooms: bedrooms.trim(),
-        bathrooms: bathrooms.trim(),
-        area: area.trim(),
-        floor: floor.trim()
-    };
-
-    try {
-
-        const response = await fetch(
-            "/api/post/update",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body: JSON.stringify(
-                    updatedPost
-                )
-            }
-        );
-
-        const result =
-            await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                result.error ||
-                "Ошибка редактирования"
-            );
-        }
+    if (!post || !post.id) {
 
         alert(
-            "✅ Объявление обновлено"
+            "❌ Объявление не найдено"
         );
 
-        await loadPosts();
-
-    } catch (error) {
-
-        console.error(
-            "EDIT POST ERROR:",
-            error
-        );
-
-        alert(
-            "❌ Не удалось изменить объявление"
-        );
+        return;
     }
-}
 
+    window.location.href =
+        `/edit.html?id=${encodeURIComponent(post.id)}&t=${Date.now()}`;
+}
 
 /* =========================
    ADMIN DELETE POST
