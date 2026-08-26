@@ -266,7 +266,73 @@
             }
 
         }
+/* =========================
+   LISTING ID
+========================= */
 
+.listing-id-box {
+    background: #fff;
+    border: 1.5px solid #ff8a00;
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.listing-id-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.listing-id-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.listing-id-row input {
+    flex: 1;
+    min-width: 0;
+    height: 48px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border: 1px solid #d8d8d8;
+    border-radius: 12px;
+    background: #fff;
+    font-size: 16px;
+    color: #222;
+    outline: none;
+}
+
+.listing-id-row input:focus {
+    border-color: #ff8a00;
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.12);
+}
+
+.listing-id-search {
+    width: 50px;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    background: #ff8a00;
+    color: white;
+    font-size: 21px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.listing-id-search:active {
+    transform: scale(0.96);
+}
+
+.listing-id-hint {
+    margin-top: 7px;
+    font-size: 12px;
+    color: #888;
+}
     </style>
 
 </head>
@@ -522,12 +588,37 @@
             <div class="filter-window-content">
 <!-- LISTING ID -->
 
-<input
-    type="text"
-    id="filterListingId"
-    placeholder="🔎 ID объявления"
-    autocomplete="off"
->
+<div class="listing-id-box">
+
+    <div class="listing-id-title">
+        🆔 Код объявления
+    </div>
+
+    <div class="listing-id-row">
+
+        <input
+            type="text"
+            id="filterListingId"
+            placeholder="Введите код объявления"
+            autocomplete="off"
+            inputmode="numeric"
+        >
+
+        <button
+            type="button"
+            class="listing-id-search"
+            onclick="applyFilters(); document.getElementById('filterListingId').blur();"
+        >
+            🔎
+        </button>
+
+    </div>
+
+    <div class="listing-id-hint">
+        Введите ID и нажмите Enter или 🔎
+    </div>
+
+</div>
 
                 <!-- DISTRICT -->
 
