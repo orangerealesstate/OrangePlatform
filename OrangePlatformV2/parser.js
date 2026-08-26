@@ -247,9 +247,9 @@ function toUnixSeconds(
 
 }
 
-
 /* =========================================================
    SAVE POSTS
+   🔒 PRESERVE ADMIN MANUAL EDITS
 ========================================================= */
 
 function savePosts(
@@ -258,18 +258,156 @@ function savePosts(
 
     try {
 
+        let latestPosts = [];
+
+        if (
+            fs.existsSync(
+                POSTS_FILE
+            )
+        ) {
+
+            try {
+
+                const raw =
+                    fs.readFileSync(
+                        POSTS_FILE,
+                        "utf8"
+                    );
+
+                const parsed =
+                    JSON.parse(
+                        raw
+                    );
+
+                if (
+                    Array.isArray(
+                        parsed
+                    )
+                ) {
+
+                    latestPosts =
+                        parsed;
+
+                }
+
+            }
+            catch (
+                readError
+            ) {
+
+                console.log(
+                    "⚠️ Latest posts read error:",
+                    readError.message
+                );
+
+            }
+
+        }
+
+        const latestById =
+            new Map();
+
+        for (
+            const latestPost of
+            latestPosts
+        ) {
+
+            latestById.set(
+                String(
+                    latestPost.id
+                ),
+                latestPost
+            );
+
+        }
+
+        const editableFields = [
+
+            "district",
+            "street",
+            "rooms",
+            "bedrooms",
+            "area",
+            "floor",
+            "price",
+            "text"
+
+        ];
+
+        const safePosts =
+            posts.map(
+                post => {
+
+                    const latest =
+                        latestById.get(
+                            String(
+                                post.id
+                            )
+                        );
+
+                    if (
+                        !latest
+                    ) {
+
+                        return post;
+
+                    }
+
+                    const manualEdits =
+                        latest.manualEdits
+                        || {};
+
+                    const merged = {
+
+                        ...post
+
+                    };
+
+                    for (
+                        const field of
+                        editableFields
+                    ) {
+
+                        if (
+                            manualEdits[field] === true
+                        ) {
+
+                            merged[field] =
+                                latest[field];
+
+                        }
+
+                    }
+
+                    merged.manualEdits = {
+
+                        ...(post.manualEdits || {}),
+
+                        ...manualEdits
+
+                    };
+
+                    return merged;
+
+                }
+            );
+
         fs.writeFileSync(
 
             POSTS_FILE,
 
             JSON.stringify(
-                posts,
+                safePosts,
                 null,
                 2
             ),
 
             "utf8"
 
+        );
+
+        console.log(
+            "💾 posts.json saved safely"
         );
 
     }
