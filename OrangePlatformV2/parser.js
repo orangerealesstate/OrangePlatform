@@ -2494,6 +2494,13 @@ function processMessage(
 
     const text =
         msg.message || "";
+        const telegramCodeMatch = text.match(
+    /(?:🍊\s*)?Код\s*[:№#-]?\s*(\d+)/i
+);
+
+const telegramCode = telegramCodeMatch
+    ? telegramCodeMatch[1]
+    : "";
 
 
     /*
@@ -2542,6 +2549,8 @@ function processMessage(
 
             telegramLink:
                 `https://t.me/kvartiri_tbilisi2023/${msg.id}`,
+                listingId:
+    telegramCode,
 
             text:
                 text,
@@ -2600,6 +2609,9 @@ function processMessage(
 
     const post =
         albums[albumId];
+        if (telegramCode) {
+    post.listingId = telegramCode;
+}
 
 
     /*
