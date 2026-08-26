@@ -1,44 +1,506 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Edit Apartment</title>
 
-<link rel="stylesheet" href="style.css">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1.0"
+>
+
+<title>Редактирование квартиры</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+
+    margin: 0;
+    padding: 0;
+
+    min-height: 100%;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background: rgba(0,0,0,.55);
+}
+
+body {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 16px;
+}
+
+.edit-overlay {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-modal {
+
+    width: min(520px, 100%);
+
+    max-height: calc(100vh - 32px);
+
+    overflow-y: auto;
+
+    background: #fff;
+
+    border-radius: 24px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.30);
+}
+
+.edit-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.edit-header h2 {
+
+    margin: 0;
+
+    font-size: 22px;
+
+    color: #222;
+}
+
+.close-btn {
+
+    width: 38px;
+    height: 38px;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background: #f2f2f2;
+
+    font-size: 22px;
+
+    cursor: pointer;
+}
+
+.form-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 12px;
+}
+
+.field {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.field.full {
+
+    grid-column: 1 / -1;
+}
+
+.field label {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #777;
+}
+
+.field input,
+.field textarea {
+
+    width: 100%;
+
+    border: 1px solid #ddd;
+
+    border-radius: 14px;
+
+    padding: 12px 13px;
+
+    font-size: 16px;
+
+    outline: none;
+
+    background: #fafafa;
+}
+
+.field input:focus,
+.field textarea:focus {
+
+    border-color: #ff6600;
+
+    background: #fff;
+}
+
+.field textarea {
+
+    min-height: 110px;
+
+    resize: vertical;
+}
+
+.actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+.cancel-btn,
+.save-btn {
+
+    flex: 1;
+
+    border: 0;
+
+    border-radius: 14px;
+
+    padding: 13px 16px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.cancel-btn {
+
+    background: #eee;
+
+    color: #333;
+}
+
+.save-btn {
+
+    background: #ff6600;
+
+    color: #fff;
+}
+
+.save-btn:disabled {
+
+    opacity: .6;
+
+    cursor: wait;
+}
+
+.status {
+
+    display: none;
+
+    margin-top: 12px;
+
+    padding: 10px 12px;
+
+    border-radius: 12px;
+
+    font-size: 14px;
+
+    text-align: center;
+}
+
+.status.error {
+
+    display: block;
+
+    background: #ffe9e9;
+
+    color: #c62828;
+}
+
+.status.success {
+
+    display: block;
+
+    background: #e9f8ed;
+
+    color: #218838;
+}
+
+@media (max-width: 430px) {
+
+    body {
+
+        padding: 8px;
+    }
+
+    .edit-modal {
+
+        max-height:
+            calc(100vh - 16px);
+
+        border-radius: 20px;
+
+        padding: 18px;
+    }
+
+    .form-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .field.full {
+
+        grid-column: auto;
+    }
+
+    .edit-header h2 {
+
+        font-size: 20px;
+    }
+}
+
+</style>
+
 </head>
+
 
 <body>
 
-<div class="edit-container">
 
-<h2>✏️ Редактирование квартиры</h2>
+<div class="edit-overlay">
 
-<input id="district" placeholder="Район">
 
-<input id="street" placeholder="Улица">
+    <div class="edit-modal">
 
-<input id="rooms" type="number" placeholder="Комнаты">
 
-<input id="bedrooms" type="number" placeholder="Спальни">
+        <div class="edit-header">
 
-<input id="area" placeholder="Площадь">
+            <h2>
+                ✏️ Редактирование квартиры
+            </h2>
 
-<input id="floor" placeholder="Этаж">
+            <button
+                class="close-btn"
+                id="closeBtn"
+                type="button"
+            >
+                ×
+            </button>
 
-<input id="price" placeholder="Цена">
+        </div>
 
-<textarea id="description" placeholder="Описание"></textarea>
 
-<button id="saveBtn">
-💾 Сохранить
-</button>
+        <div class="form-grid">
+
+
+            <!-- РАЙОН -->
+
+            <div class="field">
+
+                <label for="district">
+                    📍 Район
+                </label>
+
+                <input
+                    id="district"
+                    type="text"
+                >
+
+            </div>
+
+
+            <!-- УЛИЦА -->
+
+            <div class="field">
+
+                <label for="street">
+                    📌 Улица
+                </label>
+
+                <input
+                    id="street"
+                    type="text"
+                >
+
+            </div>
+
+
+            <!-- КОМНАТЫ -->
+
+            <div class="field">
+
+                <label for="rooms">
+                    🚪 Комнаты
+                </label>
+
+                <input
+                    id="rooms"
+                    type="number"
+                    min="0"
+                >
+
+            </div>
+
+
+            <!-- СПАЛЬНИ -->
+
+            <div class="field">
+
+                <label for="bedrooms">
+                    🛏 Спальни
+                </label>
+
+                <input
+                    id="bedrooms"
+                    type="number"
+                    min="0"
+                >
+
+            </div>
+
+
+            <!-- ПЛОЩАДЬ -->
+
+            <div class="field">
+
+                <label for="area">
+                    📐 Площадь, м²
+                </label>
+
+                <input
+                    id="area"
+                    type="text"
+                >
+
+            </div>
+
+
+            <!-- ЭТАЖ -->
+
+            <div class="field">
+
+                <label for="floor">
+                    🏢 Этаж
+                </label>
+
+                <input
+                    id="floor"
+                    type="text"
+                >
+
+            </div>
+
+
+            <!-- ЦЕНА -->
+
+            <div class="field full">
+
+                <label for="price">
+                    💰 Цена, $
+                </label>
+
+                <input
+                    id="price"
+                    type="text"
+                >
+
+            </div>
+
+
+            <!-- ОПИСАНИЕ -->
+
+            <div class="field full">
+
+                <label for="description">
+                    📝 Описание
+                </label>
+
+                <textarea
+                    id="description"
+                ></textarea>
+
+            </div>
+
+
+        </div>
+
+
+        <div
+            id="status"
+            class="status"
+        ></div>
+
+
+        <div class="actions">
+
+
+            <button
+                class="cancel-btn"
+                id="cancelBtn"
+                type="button"
+            >
+                Отмена
+            </button>
+
+
+            <button
+                class="save-btn"
+                id="saveBtn"
+                type="button"
+            >
+                💾 Сохранить
+            </button>
+
+
+        </div>
+
+
+    </div>
+
 
 </div>
 
+
 <script src="edit.js"></script>
 
+
 </body>
+
 </html>
