@@ -1384,6 +1384,12 @@ function clearFilters() {
 
             }
         );
+        const listingIdInput =
+    document.getElementById("filterListingId");
+
+if (listingIdInput) {
+    listingIdInput.value = "";
+}
 
 const districtContainer =
         document.getElementById("filterDistrict");
