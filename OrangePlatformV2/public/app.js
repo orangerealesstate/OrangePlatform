@@ -1355,81 +1355,75 @@ function filterPosts() {
 /* =========================================================
    CLEAR FILTERS
 ========================================================= */
-
 function clearFilters() {
 
-    [
+    const filterIds = [
         "search",
         "filterListingId",
         "filterDistrict",
         "roomsFilter",
         "minPrice",
         "maxPrice"
-    ]
-        .forEach(
-            id => {
+    ];
 
-                const element =
-                    document.getElementById(
-                        id
-                    );
+    filterIds.forEach(id => {
+
+        const element = document.getElementById(id);
+
+        if (!element) return;
+
+        if (
+            element.type === "checkbox" ||
+            element.type === "radio"
+        ) {
+            element.checked = false;
+        } else {
+            element.value = "";
+        }
+
+    });
 
 
-                if (element) {
+    // ყველა რაიონის checkbox-ის გასუფთავება
+    document
+        .querySelectorAll(
+            '.filter-window input[type="checkbox"]'
+        )
+        .forEach(input => {
+            input.checked = false;
+        });
 
-                    element.value =
-                        "";
 
-                }
+    // "ყველა რაიონი" თავიდან ჩართული
+    const allDistricts =
+        document.getElementById("allDistricts");
 
-            }
-        );
-        const listingIdInput =
-    document.getElementById("filterListingId");
-
-if (listingIdInput) {
-    listingIdInput.value = "";
-}
-
-const districtContainer =
-        document.getElementById("filterDistrict");
-
-    if (districtContainer) {
-
-        districtContainer
-            .querySelectorAll(
-                'input[type="checkbox"]'
-            )
-            .forEach(
-                checkbox => {
-                    checkbox.checked = false;
-                }
-            );
-
+    if (allDistricts) {
+        allDistricts.checked = true;
     }
-    favoritesOnly =
-        false;
 
 
-    renderPosts(
-        getFilteredPosts()
-    );
+    // აუცილებლად გავანულოთ ID-ის ველი
+    const listingIdInput =
+        document.getElementById("filterListingId");
 
-
-    if (
-        currentView ===
-        "map"
-    ) {
-
-        renderMap(
-            getFilteredPosts()
+    if (listingIdInput) {
+        listingIdInput.value = "";
+        listingIdInput.dispatchEvent(
+            new Event("input", { bubbles: true })
         );
+        listingIdInput.dispatchEvent(
+            new Event("change", { bubbles: true })
+        );
+    }
 
+
+    // თავიდან ვაჩვენოთ ყველა განცხადება
+    if (typeof renderPosts === "function") {
+        renderPosts(allPosts);
     }
 
 }
-
-
 /* =========================================================
    FILTER EVENTS
 ========================================================= */
