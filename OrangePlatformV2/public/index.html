@@ -274,6 +274,88 @@
 }
 
         }
+        /* =========================================================
+   DESKTOP FILTER
+========================================================= */
+
+@media (min-width: 601px) {
+
+    .filter-overlay {
+        padding: 20px;
+    }
+
+    .filter-window {
+        width: 560px;
+        max-width: 560px;
+        max-height: 90vh;
+        padding: 18px;
+        border-radius: 22px;
+        overflow: hidden;
+    }
+
+    .filter-window-content {
+        gap: 10px;
+        max-height: calc(90vh - 80px);
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .listing-id-box {
+        padding: 12px 14px;
+        margin-bottom: 2px;
+    }
+
+    .listing-id-title {
+        font-size: 18px;
+        margin-bottom: 7px;
+    }
+
+    .listing-id-row {
+        gap: 8px;
+    }
+
+    .listing-id-row input {
+        min-height: 42px;
+        font-size: 15px;
+    }
+
+    .listing-id-row button {
+        width: 46px;
+        min-width: 46px;
+        height: 42px;
+        font-size: 20px;
+    }
+
+    .listing-id-hint {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .district-checkboxes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px 8px;
+        max-height: 240px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .district-option {
+        min-height: 40px;
+        padding: 7px 9px;
+        font-size: 14px;
+    }
+
+    .filter-window-content select,
+    .filter-window-content input {
+        min-height: 42px;
+        font-size: 15px;
+    }
+
+    .filter-actions {
+        margin-top: 6px;
+    }
+}
 /* =========================
    LISTING ID
 ========================= */
