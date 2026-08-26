@@ -7038,3 +7038,30 @@ document.addEventListener("click", function (event) {
     );
 
 });
+/* =====================================================
+   ENTER — LISTING ID SEARCH
+===================================================== */
+
+document.addEventListener("keydown", function (event) {
+
+    if (
+        event.key === "Enter" &&
+        event.target &&
+        event.target.id === "filterListingId"
+    ) {
+
+        event.preventDefault();
+
+        // კლავიატურის დახურვა ტელეფონზე
+        event.target.blur();
+
+        // ფილტრის გაშვება
+        if (typeof applyFilters === "function") {
+            applyFilters();
+        } else if (typeof getFilteredPosts === "function") {
+            renderPosts(getFilteredPosts());
+        }
+
+    }
+
+});
