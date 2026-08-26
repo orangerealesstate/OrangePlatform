@@ -1682,6 +1682,9 @@ const date = post.date
                 <div class="property-price">
                     ${price}$
                 </div>
+                <div class="listing-id">
+    ID #${listingId}
+</div>
 <div class="admin-price-actions"></div>
                 <div class="property-date">
                     ${date}
