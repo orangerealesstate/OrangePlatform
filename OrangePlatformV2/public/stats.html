@@ -125,10 +125,16 @@
 
         const tg = window.Telegram?.WebApp;
 
-        if (tg) {
-            tg.ready();
-            tg.expand();
-        }
+      if (tg) {
+    tg.ready();
+    tg.expand();
+
+    tg.BackButton.show();
+
+    tg.BackButton.onClick(() => {
+        tg.close();
+    });
+}
 
         const telegramUserId =
             tg?.initDataUnsafe?.user?.id || null;
