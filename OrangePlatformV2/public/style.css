@@ -2095,9 +2095,9 @@ body:not(.map-mode) #mapBackButton {
 }
 
 .property-date {
-    font-size: 13px;
-    color: #999;
-    font-weight: 500;
+    font-size: 16px;
+    color: #777;
+    font-weight: 600;
 }
 
 .property-info {
@@ -2820,4 +2820,14 @@ body:not(.map-mode) #mapBackButton {
         font-size: 13px !important;
     }
 
+}
+/* =====================================================
+   LISTING ID
+===================================================== */
+
+.listing-id {
+    font-size: 16px;
+    font-weight: 600;
+    color: #555;
+    white-space: nowrap;
 }
