@@ -1151,7 +1151,10 @@ const allDistrictsSelected =
                         post
                     );
 
-
+const listingId =
+    normalizeSearchText(
+        post?.listingId || ""
+    );
                 const searchableExtended =
                     normalizeSearchText(
 
@@ -1569,6 +1572,8 @@ function renderPosts(posts) {
             image.startsWith("http")
                 ? image
                 : "/" + image;
+                const listingId =
+    post.listingId || "-";
 
         const district =
             post.district || "-";
@@ -2169,7 +2174,7 @@ card.querySelector(
             `https://t.me/kvartiri_tbilisi2023/${post.id}`;
 
         const shareText =
-            `🏠 ${district}\n💰 ${price}$`;
+    `🏠 ${district}\n💰 ${price}$\n🆔 ID: #${listingId}`;
 
         const telegramShareUrl =
             `https://t.me/share/url?url=${encodeURIComponent(

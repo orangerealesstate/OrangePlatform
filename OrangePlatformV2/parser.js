@@ -2319,7 +2319,100 @@ function makeApartmentKey(
     ].join("|");
 
 }
+/* =========================================================
+   LISTING ID
+   უნიკალური 4-ნიშნა განცხადების ID
+========================================================= */
 
+function getNextListingId(posts) {
+
+    let maxId = 1000;
+
+    for (const post of posts) {
+
+        const id = Number(
+            String(post.listingId || "")
+                .replace(/\D/g, "")
+        );
+
+        if (id > maxId) {
+            maxId = id;
+        }
+    }
+
+    return String(maxId + 1);
+}
+
+
+/* =========================================================
+   ADD LISTING ID TO OLD POSTS
+========================================================= */
+
+function ensureListingIds(posts) {
+
+    let maxId = 1000;
+
+    /* =========================================
+       FIND CURRENT MAX ID
+    ========================================= */
+
+    for (const post of posts) {
+
+        const id =
+            parseInt(
+                post.listingId,
+                10
+            );
+
+        if (
+            Number.isInteger(id) &&
+            id > maxId
+        ) {
+
+            maxId = id;
+
+        }
+    }
+
+
+    /* =========================================
+       ASSIGN UNIQUE IDS
+    ========================================= */
+
+    let changed = false;
+
+    for (const post of posts) {
+
+        if (!post.listingId) {
+
+            maxId++;
+
+            post.listingId =
+                String(maxId);
+
+            changed = true;
+
+        }
+    }
+
+
+    /* =========================================
+       SAVE
+    ========================================= */
+
+    if (changed) {
+
+        savePosts(posts);
+
+        console.log(
+            "🏷️ Listing IDs added to old posts"
+        );
+
+    }
+
+
+    return posts;
+}
 
 /* =========================================================
    LOAD EXISTING POSTS
@@ -3061,6 +3154,20 @@ function saveNewPostImmediately(
         return null;
 
     }
+    /* =====================================================
+   UNIQUE LISTING ID
+===================================================== */
+
+if (!post.listingId) {
+
+    post.listingId =
+        getNextListingId(posts);
+
+    console.log(
+        "🏷️ NEW LISTING ID:",
+        post.listingId
+    );
+}
 /*
    თუ განცხადება ადმინისტრატორმა წაშალა,
    Telegram-ის ავტომატურმა sync-მა
@@ -4229,6 +4336,8 @@ async function start() {
 
     let posts =
         loadPosts();
+        posts =
+    ensureListingIds(posts);
 
 
     console.log(
