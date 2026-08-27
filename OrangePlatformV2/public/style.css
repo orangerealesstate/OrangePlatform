@@ -2875,3 +2875,110 @@ body:not(.map-mode) #mapBackButton {
     height: 20px;
     margin-right: 8px;
 }
+/* =========================================
+   COMPACT MOBILE DESIGN
+   მხოლოდ მობილურის ეკრანის დასაპატარავებლად
+========================================= */
+
+@media (max-width: 600px) {
+
+    .card {
+        border-radius: 16px;
+    }
+
+    /* ფოტო */
+    .card-slider,
+    .card-image {
+        height: 195px !important;
+    }
+
+    /* ფასი / თარიღი */
+    .price-date-row {
+        padding: 12px 13px 5px;
+        margin-bottom: 5px;
+    }
+
+    .property-price {
+        font-size: 27px;
+    }
+
+    .property-date {
+        font-size: 12px;
+    }
+
+    /* ინფორმაციის ბლოკი */
+    .property-info {
+        padding: 0 13px;
+    }
+
+    .property-info-item {
+        min-height: 53px;
+        padding: 7px 0;
+    }
+
+    /* აიქონები */
+    .property-icon {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        margin-right: 9px;
+        font-size: 18px;
+        border-radius: 10px;
+    }
+
+    /* ტექსტი */
+    .property-text {
+        gap: 4px;
+    }
+
+    .property-text strong,
+    .property-text span {
+        font-size: 15px;
+    }
+
+    .district-item .property-text strong {
+        font-size: 16px;
+    }
+
+    /* ქვედა ღილაკები */
+    .card-actions {
+        grid-template-columns:
+            minmax(0, 1fr)
+            46px
+            46px
+            46px;
+
+        gap: 6px;
+        padding: 11px 13px 13px;
+    }
+
+    .card-actions button {
+        height: 44px;
+        border-radius: 11px;
+    }
+
+    .telegram-main-btn {
+        font-size: 13px;
+        padding: 0 7px;
+        gap: 5px;
+    }
+
+    .telegram-main-icon {
+        font-size: 21px;
+    }
+
+    .action-svg {
+        width: 25px;
+        height: 25px;
+    }
+
+    .location-svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .telegram-svg {
+        width: 27px;
+        height: 27px;
+    }
+}
