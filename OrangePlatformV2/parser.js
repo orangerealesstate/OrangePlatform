@@ -330,7 +330,8 @@ function savePosts(
             "area",
             "floor",
             "price",
-            "text"
+            "text",
+            "status"
 
         ];
 
@@ -3109,28 +3110,32 @@ async function downloadPhotosForPost(
 /* =========================================================
    UPDATE POST STATUS
 ========================================================= */
-
 function updateStatus(
     post
 ) {
+
+    // 🔒 თუ ადმინმა ხელით დააყენა "Сдано",
+    // parser-მა სტატუსი აღარ უნდა შეცვალოს
+    if (
+        post.manualEdits &&
+        post.manualEdits.status === true
+    ) {
+        return;
+    }
 
     const timestamp =
         toUnixSeconds(
             post.date
         );
 
-
     if (
         !timestamp
     ) {
-
         post.status =
             "active";
 
         return;
-
     }
-
 
     const days =
         (
@@ -3138,14 +3143,11 @@ function updateStatus(
             timestamp
         ) / 86400;
 
-
     post.status =
         days > 30
             ? "rented"
             : "active";
-
 }
-
 
 /* =========================================================
    MERGE ONE POST IMMEDIATELY
@@ -3331,9 +3333,7 @@ const merged = {
 
 };
 
-
 const editableFields = [
-
     "district",
     "street",
     "rooms",
@@ -3341,8 +3341,8 @@ const editableFields = [
     "area",
     "floor",
     "price",
-    "text"
-
+    "text",
+    "status"
 ];
 
 

@@ -1341,12 +1341,26 @@ app.post(
 
             }
 
-            posts[index].status =
-                status;
+           const manualEdits =
+    posts[index].manualEdits || {};
 
-            savePosts(
-                posts
-            );
+if (
+    status === "sdanо"
+) {
+    manualEdits.status = true;
+} else {
+    delete manualEdits.status;
+}
+
+posts[index].status =
+    status;
+
+posts[index].manualEdits =
+    manualEdits;
+
+savePosts(
+    posts
+);
 
             console.log(
                 "🏠 STATUS UPDATED:",
