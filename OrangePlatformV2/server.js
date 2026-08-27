@@ -1275,6 +1275,110 @@ app.post(
 
     }
 );
+
+// =========================================================
+// UPDATE POST STATUS
+// =========================================================
+
+app.post(
+    "/api/post/status",
+    (req, res) => {
+
+        const adminId =
+            "5172653731";
+
+        const userId =
+            String(
+                req.body.userId || ""
+            );
+
+        if (
+            userId !== adminId
+        ) {
+
+            return res
+                .status(403)
+                .json({
+                    success: false,
+                    error: "Access denied"
+                });
+
+        }
+
+        try {
+
+            const posts =
+                getPosts();
+
+            const postId =
+                String(
+                    req.body.id || ""
+                );
+
+            const status =
+                req.body.status === "sdanо"
+                    ? "sdanо"
+                    : "";
+
+            const index =
+                posts.findIndex(
+                    p =>
+                        String(p.id) ===
+                        postId
+                );
+
+            if (
+                index === -1
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+                        success: false,
+                        error:
+                            "Apartment not found"
+                    });
+
+            }
+
+            posts[index].status =
+                status;
+
+            savePosts(
+                posts
+            );
+
+            console.log(
+                "🏠 STATUS UPDATED:",
+                postId,
+                status
+            );
+
+            res.json({
+                success: true,
+                status: status
+            });
+
+        }
+        catch (err) {
+
+            console.error(
+                "Status update error:",
+                err
+            );
+
+            res
+                .status(500)
+                .json({
+                    success: false,
+                    error:
+                        "Status update failed"
+                });
+
+        }
+
+    }
+);
 // =========================================================
 // DELETE POST
 // =========================================================

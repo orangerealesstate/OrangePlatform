@@ -716,7 +716,114 @@ async function toggleFavorite(
     }
 
 }
+/* =========================================================
+   ADMIN — TOGGLE СДАНО
+========================================================= */
 
+async function togglePostStatus(post) {
+
+    if (
+        telegramUserId !== "5172653731"
+    ) {
+        return;
+    }
+
+    if (
+        !post ||
+        !post.id
+    ) {
+        return;
+    }
+
+    const newStatus =
+        post.status === "sdanо"
+            ? ""
+            : "sdanо";
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/post/status",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            userId:
+                                telegramUserId,
+
+                            id:
+                                post.id,
+
+                            status:
+                                newStatus
+                        })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+            throw new Error(
+                result.error ||
+                "Status update failed"
+            );
+        }
+
+        post.status =
+            newStatus;
+
+        const index =
+            allPosts.findIndex(
+                p =>
+                    String(p.id) ===
+                    String(post.id)
+            );
+
+        if (
+            index !== -1
+        ) {
+            allPosts[index].status =
+                newStatus;
+        }
+
+        renderPosts(
+            getFilteredPosts()
+        );
+
+        if (
+            currentView === "map"
+        ) {
+            renderMap(
+                getFilteredPosts()
+            );
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "STATUS ERROR:",
+            error
+        );
+
+        alert(
+            "❌ Не удалось изменить статус"
+        );
+
+    }
+
+}
 
 /* =========================================================
    FILTERS
@@ -1714,18 +1821,60 @@ const date = post.date
 
 
                 <!-- DISTRICT -->
-                <div class="property-info-item district-item">
 
-                    <span class="property-icon">
-                        📍
-                    </span>
+<div
+    class="property-info-item district-item"
+    style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+    "
+>
 
-                    <div class="property-text">
-                        <strong>Район:</strong>
-                        <span>${district}</span>
-                    </div>
+    <div
+        style="
+            display:flex;
+            align-items:center;
+            gap:12px;
+            min-width:0;
+            flex:1;
+        "
+    >
 
-                </div>
+        <span class="property-icon">
+            📍
+        </span>
+
+        <div class="property-text">
+            <strong>Район:</strong>
+            <span>${district}</span>
+        </div>
+
+    </div>
+
+    ${
+        post.status === "sdanо"
+            ? `
+                <span
+                    style="
+                        flex-shrink:0;
+                        background:#ffe5e5;
+                        color:#d93025;
+                        border-radius:10px;
+                        padding:6px 10px;
+                        font-size:13px;
+                        font-weight:800;
+                        white-space:nowrap;
+                    "
+                >
+                    🔴 Сдано
+                </span>
+            `
+            : ""
+    }
+
+</div>
 
 
                 <!-- ROOMS -->
@@ -2064,6 +2213,78 @@ if (
 
         adminPriceActions.append(
     editBtn
+);
+/* =========================================================
+   STATUS BUTTON — ADMIN ONLY
+========================================================= */
+
+const statusBtn =
+    document.createElement("button");
+
+statusBtn.type = "button";
+
+statusBtn.className =
+    "admin-status-btn";
+
+statusBtn.title =
+    post.status === "sdanо"
+        ? "Снять статус Сдано"
+        : "Пометить как Сдано";
+
+statusBtn.setAttribute(
+    "aria-label",
+    statusBtn.title
+);
+
+statusBtn.innerHTML =
+    post.status === "sdanо"
+        ? "✓"
+        : "🏠";
+
+statusBtn.style.cssText = `
+    width:37px;
+    height:37px;
+    border:none;
+    border-radius:14px;
+
+    background:${
+        post.status === "sdanо"
+            ? "#ffe5e5"
+            : "#e8f7ed"
+    };
+
+    color:${
+        post.status === "sdanо"
+            ? "#d93025"
+            : "#159447"
+    };
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+    flex-shrink:0;
+
+    font-size:18px;
+    font-weight:800;
+`;
+
+adminPriceActions.append(
+    statusBtn
+);
+
+statusBtn.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        togglePostStatus(
+            post
+        );
+
+    }
 );
 
 
