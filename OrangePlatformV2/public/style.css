@@ -1729,6 +1729,7 @@ body:not(.map-mode) #mapBackButton {
     }
 
 }
+
 /* =========================
    CENTERED MAIN BUTTONS
 ========================= */
@@ -3026,4 +3027,93 @@ body:not(.map-mode) #mapBackButton {
     font-size: 11px;
     color: #777;
     margin-top: 4px;
+}
+/* =========================
+   🌙 THEME BUTTON
+========================= */
+
+.theme-btn {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+
+    font-size: 20px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        transform 0.2s ease,
+        box-shadow 0.25s ease;
+}
+
+.theme-btn:hover {
+    background: #fff7f2;
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}
+
+.theme-btn:active {
+    transform: scale(.94);
+}
+
+
+/* =========================
+   🌙 DARK MODE
+========================= */
+
+body.dark-mode {
+    background: #111315;
+    color: #f1f1f1;
+}
+
+body.dark-mode .minimal-header {
+    background: #181a1d;
+    border-color: #292c30;
+}
+
+body.dark-mode .logo-dark-text {
+    color: #f1f1f1;
+}
+
+body.dark-mode .theme-btn {
+    background: #22252a;
+    border-color: #383c42;
+}
+
+body.dark-mode .theme-btn:hover {
+    background: #2b2f35;
+}
+
+body.dark-mode .promo-text,
+body.dark-mode .promo-line {
+    color: #c8c8c8;
+}
+
+
+/* =========================
+   🌙 DARK CARDS
+========================= */
+
+body.dark-mode .property-info-item,
+body.dark-mode .card,
+body.dark-mode .post-card {
+    background: #1b1e22;
+    border-color: #30343a;
+}
+
+body.dark-mode input,
+body.dark-mode select {
+    background: #1b1e22;
+    color: #f1f1f1;
+    border-color: #34383e;
 }

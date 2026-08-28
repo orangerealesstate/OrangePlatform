@@ -7102,6 +7102,54 @@ setInterval(
 
 
 /* =========================================================
+   🌙 DARK / LIGHT MODE
+========================================================= */
+
+function setupTheme() {
+
+    const savedTheme = localStorage.getItem("orange-theme");
+
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+
+    const themeBtn = document.getElementById("themeBtn");
+
+    if (!themeBtn) return;
+
+    updateThemeButton(themeBtn);
+
+    themeBtn.addEventListener("click", () => {
+
+        document.body.classList.toggle("dark-mode");
+
+        const isDark =
+            document.body.classList.contains("dark-mode");
+
+        localStorage.setItem(
+            "orange-theme",
+            isDark ? "dark" : "light"
+        );
+
+        updateThemeButton(themeBtn);
+    });
+}
+
+
+function updateThemeButton(btn) {
+
+    const isDark =
+        document.body.classList.contains("dark-mode");
+
+    btn.innerHTML = isDark ? "☀️" : "🌙";
+
+    btn.setAttribute(
+        "aria-label",
+        isDark ? "Светлая тема" : "Тёмная тема"
+    );
+}
+
+/* =========================================================
    START APP
 ========================================================= */
 
@@ -7119,6 +7167,7 @@ document.addEventListener(
         setupFavoritesFilter();
 
         setupViewButtons();
+        setupTheme();
 
 
         /*
