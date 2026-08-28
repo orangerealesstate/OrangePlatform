@@ -346,6 +346,141 @@
     font-size: 12px;
     color: #888;
 }
+
+/* ===== MINIMAL ORANGE HEADER ===== */
+
+.minimal-header {
+    height: 72px;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 3px 14px rgba(0,0,0,.06);
+
+    position: relative;
+    z-index: 1000;
+}
+
+.minimal-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -.5px;
+    white-space: nowrap;
+}
+
+.logo-orange {
+    font-size: 25px;
+}
+
+.logo-orange-text {
+    color: #ff8a00;
+}
+
+.logo-dark-text {
+    color: #20242a;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.header-stats-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    height: 42px;
+    padding: 0 17px;
+
+    border: 1px solid #ff9a2f;
+    border-radius: 12px;
+
+    background: #fffaf5;
+    color: #ed7900;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.stats-icon {
+    font-size: 21px;
+}
+
+.header-menu {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+
+.header-menu span {
+    width: 24px;
+    height: 2px;
+    margin-left: auto;
+
+    background: #20242a;
+    border-radius: 2px;
+}
+
+
+/* ===== MOBILE ===== */
+
+@media (max-width: 600px) {
+
+    .minimal-header {
+        height: 60px;
+        padding: 0 15px;
+    }
+
+    .minimal-logo {
+        font-size: 19px;
+        gap: 4px;
+    }
+
+    .logo-orange {
+        font-size: 21px;
+    }
+
+    .header-actions {
+        gap: 9px;
+    }
+
+    .header-stats-btn {
+        height: 37px;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-size: 13px;
+    }
+
+    .stats-icon {
+        font-size: 18px;
+    }
+
+    .header-menu {
+        width: 27px;
+    }
+
+    .header-menu span {
+        width: 21px;
+    }
+}
+
     </style>
 
 </head>
@@ -387,14 +522,34 @@
     <!-- =========================
          HEADER
     ========================= -->
+<header class="minimal-header">
 
-    <header>
+    <div class="logo minimal-logo">
+        <span class="logo-orange">🍊</span>
+        <span class="logo-orange-text">Orange</span>
+        <span class="logo-dark-text">Real Estate</span>
+    </div>
 
-        <div class="logo">
-            🍊 Orange Real Estate
+    <div class="header-actions">
+
+        <button
+            id="statsBtn"
+            class="header-stats-btn"
+            onclick="window.location.href='stats.html'"
+        >
+            <span class="stats-icon">▥</span>
+            <span>Статистика</span>
+        </button>
+
+        <div class="header-menu">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
 
-    </header>
+    </div>
+
+</header>
 <!-- =========================
      ANIMATED PROMO TEXT
 ========================= -->
