@@ -3139,3 +3139,15 @@ body.dark-mode .property-info-item strong {
 body.dark-mode .property-info-item small {
     color: #eeeeee !important;
 }
+/* =========================
+   DARK MODE - PROPERTY VALUES
+========================= */
+
+body.dark-mode .property-info-item .property-text span {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+body.dark-mode .property-info-item strong {
+    color: #ff6b35 !important;
+}
