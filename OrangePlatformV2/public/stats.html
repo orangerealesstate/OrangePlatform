@@ -132,7 +132,14 @@
     tg.BackButton.show();
 
     tg.BackButton.onClick(() => {
-        tg.close();
+
+        // სტატისტიკიდან დაბრუნება კატალოგში
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = "index.html";
+        }
+
     });
 }
 
