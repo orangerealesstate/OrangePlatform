@@ -118,7 +118,15 @@
         </div>
 
     </div>
+<div class="daily-section">
 
+    <h2>📅 Ежедневная статистика</h2>
+
+    <div id="dailyStatsList">
+        Загрузка...
+    </div>
+
+</div>
     <div id="error"></div>
 
     <script>
@@ -172,6 +180,70 @@
                 }
 
                 const stats = await response.json();
+                const dailyStats = stats.dailyStats || {};
+
+const dailyList =
+    document.getElementById("dailyStatsList");
+
+dailyList.innerHTML = "";
+
+const dailyEntries =
+    Object.entries(dailyStats)
+        .sort((a, b) => b[0].localeCompare(a[0]));
+
+if (!dailyEntries.length) {
+
+    dailyList.innerHTML =
+        "<p>Пока нет ежедневной статистики</p>";
+
+} else {
+
+    dailyEntries.forEach(([date, data]) => {
+
+        dailyList.innerHTML += `
+            <div class="daily-row">
+
+                <div class="daily-date">
+                    📅 ${date}
+                </div>
+
+                <div class="daily-data">
+
+                    <div class="daily-item">
+                        <div class="daily-number">
+                            ${data.newUsers || 0}
+                        </div>
+                        <div class="daily-title">
+                            👥 Новые
+                        </div>
+                    </div>
+
+                    <div class="daily-item">
+                        <div class="daily-number">
+                            ${data.appViews || 0}
+                        </div>
+                        <div class="daily-title">
+                            👀 Открытия
+                        </div>
+                    </div>
+
+                    <div class="daily-item">
+                        <div class="daily-number">
+                            ${data.postViews || 0}
+                        </div>
+                        <div class="daily-title">
+                            🏠 Квартиры
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+    });
+
+}
 
 
                 document.getElementById("totalUsers").innerText =

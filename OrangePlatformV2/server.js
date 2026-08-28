@@ -70,16 +70,12 @@ function getStats() {
                 STATS_FILE
             )
         ) {
-
-            return {
-
-                users: {},
-
-                appViews: 0,
-
-                postViews: {}
-
-            };
+return {
+    users: {},
+    appViews: 0,
+    postViews: {},
+    dailyStats: {}
+};
 
         }
 
@@ -135,7 +131,47 @@ function saveStats(stats) {
     );
 
 }
+// =========================================================
+// DAILY STATISTICS
+// =========================================================
 
+function getTbilisiDate() {
+
+    return new Intl.DateTimeFormat(
+        "en-CA",
+        {
+            timeZone: "Asia/Tbilisi",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }
+    ).format(new Date());
+
+}
+
+
+function ensureDailyStats(stats) {
+
+    if (!stats.dailyStats) {
+        stats.dailyStats = {};
+    }
+
+    const today =
+        getTbilisiDate();
+
+    if (!stats.dailyStats[today]) {
+
+        stats.dailyStats[today] = {
+            newUsers: 0,
+            appViews: 0,
+            postViews: 0
+        };
+
+    }
+
+    return stats.dailyStats[today];
+
+}
 
 // =========================================================
 // FAVORITES
@@ -834,6 +870,10 @@ app.post(
 
 
             stats.appViews++;
+            const daily =
+    ensureDailyStats(stats);
+
+daily.appViews++;
 
 
             const id =
@@ -859,7 +899,7 @@ app.post(
                             .toISOString()
 
                 };
-
+daily.newUsers++;
             }
 
 
@@ -964,6 +1004,10 @@ app.post(
 
 
             stats.postViews[id]++;
+            const daily =
+    ensureDailyStats(stats);
+
+daily.postViews++;
 
 
             saveStats(
@@ -1088,18 +1132,14 @@ app.get(
 
                 );
 
-
-            res.json({
-
-                totalUsers,
-
-                totalAppViews,
-
-                totalPostViews,
-
-                postViews
-
-            });
+res.json({
+    totalUsers,
+    totalAppViews,
+    totalPostViews,
+    postViews,
+    dailyStats:
+        stats.dailyStats || {}
+});
 
         }
 
