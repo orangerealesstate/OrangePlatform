@@ -1415,20 +1415,15 @@ function toggleDistricts() {
 
     const arrow = button.querySelector(".district-toggle-arrow");
 
-    if (box.style.display === "none") {
-
-        box.style.display = "grid";
-
+    if (box.hidden) {
+        box.hidden = false;
         button.setAttribute("aria-expanded", "true");
 
         if (arrow) {
             arrow.textContent = "⌃";
         }
-
     } else {
-
-        box.style.display = "none";
-
+        box.hidden = true;
         button.setAttribute("aria-expanded", "false");
 
         if (arrow) {
@@ -1437,6 +1432,5 @@ function toggleDistricts() {
     }
 }
 </script>
-
 </body>
 </html>
