@@ -1405,33 +1405,37 @@ document.addEventListener(
     }, 3500);
 
 })();
-
 </script>
+
 <script>
 function toggleDistricts() {
     const box = document.getElementById("filterDistrict");
     const button = document.getElementById("districtToggle");
+
+    if (!box || !button) return;
+
     const arrow = button.querySelector(".district-toggle-arrow");
-
-    if (!box) return;
-
     const isOpen = box.classList.contains("district-open");
 
     if (isOpen) {
         box.classList.remove("district-open");
         box.classList.add("district-closed");
-
         button.setAttribute("aria-expanded", "false");
-        arrow.textContent = "⌄";
+
+        if (arrow) {
+            arrow.textContent = "⌄";
+        }
     } else {
         box.classList.remove("district-closed");
         box.classList.add("district-open");
-
         button.setAttribute("aria-expanded", "true");
-        arrow.textContent = "⌃";
+
+        if (arrow) {
+            arrow.textContent = "⌃";
+        }
     }
 }
 </script>
-</body>
 
+</body>
 </html>
