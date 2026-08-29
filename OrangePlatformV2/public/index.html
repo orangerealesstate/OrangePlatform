@@ -1408,23 +1408,37 @@ document.addEventListener(
 </script>
 <script>
 function toggleDistricts() {
+
     const box = document.getElementById("filterDistrict");
     const button = document.getElementById("districtToggle");
 
-    if (!box || !button) return;
+    if (!box) return;
 
-    const arrow = button.querySelector(".district-toggle-arrow");
+    const arrow = button
+        ? button.querySelector(".district-toggle-arrow")
+        : null;
 
-    if (box.hidden) {
-        box.hidden = false;
-        button.setAttribute("aria-expanded", "true");
+    if (box.classList.contains("district-hidden")) {
+
+        box.classList.remove("district-hidden");
+        box.classList.add("district-visible");
+
+        if (button) {
+            button.setAttribute("aria-expanded", "true");
+        }
 
         if (arrow) {
             arrow.textContent = "⌃";
         }
+
     } else {
-        box.hidden = true;
-        button.setAttribute("aria-expanded", "false");
+
+        box.classList.remove("district-visible");
+        box.classList.add("district-hidden");
+
+        if (button) {
+            button.setAttribute("aria-expanded", "false");
+        }
 
         if (arrow) {
             arrow.textContent = "⌄";

@@ -3151,3 +3151,22 @@ body.dark-mode .property-info-item .property-text span {
 body.dark-mode .property-info-item strong {
     color: #ff6b35 !important;
 }
+/* ===== FINAL DISTRICT OPEN / CLOSE ===== */
+
+#filterDistrict.district-hidden {
+    display: none !important;
+}
+
+#filterDistrict.district-visible {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.district-section {
+    width: 100%;
+}
+
+.district-toggle {
+    width: 100%;
+    cursor: pointer;
+}
