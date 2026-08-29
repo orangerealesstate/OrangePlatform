@@ -1410,14 +1410,25 @@ document.addEventListener(
 <script>
 function toggleDistricts() {
     const box = document.getElementById("filterDistrict");
-    const toggle = document.querySelector(".district-toggle");
+    const button = document.getElementById("districtToggle");
+    const arrow = button.querySelector(".district-toggle-arrow");
 
     if (!box) return;
 
-    box.classList.toggle("district-closed");
+    const isOpen = box.classList.contains("district-open");
 
-    if (toggle) {
-        toggle.classList.toggle("open");
+    if (isOpen) {
+        box.classList.remove("district-open");
+        box.classList.add("district-closed");
+
+        button.setAttribute("aria-expanded", "false");
+        arrow.textContent = "⌄";
+    } else {
+        box.classList.remove("district-closed");
+        box.classList.add("district-open");
+
+        button.setAttribute("aria-expanded", "true");
+        arrow.textContent = "⌃";
     }
 }
 </script>
