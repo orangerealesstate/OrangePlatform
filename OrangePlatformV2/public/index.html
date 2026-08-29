@@ -481,6 +481,49 @@
     }
 }
 
+/* DISTRICT OPEN / CLOSE */
+
+.district-checkboxes {
+    display: block;
+    margin-top: 8px;
+}
+
+.district-checkboxes.district-closed {
+    display: none;
+}
+
+.district-toggle {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    background: #fff;
+    color: #333;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.district-toggle-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.district-toggle-arrow {
+    font-size: 18px;
+    color: #ff8a00;
+    transition: transform 0.2s ease;
+}
+
+.district-toggle.open .district-toggle-arrow {
+    transform: rotate(180deg);
+}
+
     </style>
 
 </head>
@@ -774,7 +817,20 @@
 
                 <!-- DISTRICT -->
 
-<div id="filterDistrict" class="district-checkboxes">
+<div class="district-section">
+
+    <button
+        type="button"
+        class="district-toggle"
+        id="districtToggle"
+        aria-expanded="true"
+        onclick="toggleDistricts()"
+    >
+        <span class="district-toggle-title">📍 Район</span>
+        <span class="district-toggle-arrow">⌃</span>
+    </button>
+
+    <div id="filterDistrict" class="district-checkboxes district-open">
 
     <label class="district-option select-all">
         <input type="checkbox" id="allDistricts" checked>
@@ -881,6 +937,7 @@
         <span>Avlabari</span>
     </label>
 
+</div>
 </div>
 
 
@@ -1349,6 +1406,20 @@ document.addEventListener(
 
 })();
 
+</script>
+<script>
+function toggleDistricts() {
+    const box = document.getElementById("filterDistrict");
+    const toggle = document.querySelector(".district-toggle");
+
+    if (!box) return;
+
+    box.classList.toggle("district-closed");
+
+    if (toggle) {
+        toggle.classList.toggle("open");
+    }
+}
 </script>
 </body>
 
