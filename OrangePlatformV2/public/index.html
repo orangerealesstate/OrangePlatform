@@ -830,7 +830,7 @@
         <span class="district-toggle-arrow">⌃</span>
     </button>
 
-    <div id="filterDistrict" class="district-checkboxes district-open">
+    <div id="filterDistrict" class="district-checkboxes">
 
     <label class="district-option select-all">
         <input type="checkbox" id="allDistricts" checked>
@@ -1406,7 +1406,6 @@ document.addEventListener(
 
 })();
 </script>
-
 <script>
 function toggleDistricts() {
     const box = document.getElementById("filterDistrict");
@@ -1415,23 +1414,25 @@ function toggleDistricts() {
     if (!box || !button) return;
 
     const arrow = button.querySelector(".district-toggle-arrow");
-    const isOpen = box.classList.contains("district-open");
 
-    if (isOpen) {
-        box.classList.remove("district-open");
-        box.classList.add("district-closed");
-        button.setAttribute("aria-expanded", "false");
+    if (box.style.display === "none") {
 
-        if (arrow) {
-            arrow.textContent = "⌄";
-        }
-    } else {
-        box.classList.remove("district-closed");
-        box.classList.add("district-open");
+        box.style.display = "grid";
+
         button.setAttribute("aria-expanded", "true");
 
         if (arrow) {
             arrow.textContent = "⌃";
+        }
+
+    } else {
+
+        box.style.display = "none";
+
+        button.setAttribute("aria-expanded", "false");
+
+        if (arrow) {
+            arrow.textContent = "⌄";
         }
     }
 }
