@@ -2135,10 +2135,10 @@ if (
         `;
 
         editBtn.style.cssText = `
-            width:37px;
-            height:37px;
+            width:30px;
+            height:30px;
             border:none;
-            border-radius:14px;
+            border-radius:9px;
             background:#fff3e8;
             color:#ff6600;
             display:flex;
@@ -2184,10 +2184,10 @@ if (
         `;
 
         deleteBtn.style.cssText = `
-            width:37px;
-            height:37px;
+            width:30px;
+            height:30px;
             border:none;
-            border-radius:14px;
+            border-radius:9px;
             background:#ffeaea;
             color:#e53935;
             display:flex;
@@ -2242,10 +2242,10 @@ statusBtn.innerHTML =
         : "🏠";
 
 statusBtn.style.cssText = `
-    width:37px;
-    height:37px;
+    width:30px;
+    height:30px;
     border:none;
-    border-radius:14px;
+    border-radius:9px;
 
     background:${
         post.status === "sdanо"
