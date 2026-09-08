@@ -574,6 +574,26 @@ bot.on("message", async (msg) => {
 });
 
 /* =====================================================
+   GROUP ID
+===================================================== */
+
+bot.onText(/\/groupid/, async (msg) => {
+
+    const chatId = msg.chat.id;
+
+    await bot.sendMessage(
+        msg.chat.id,
+        `🆔 Group ID: ${chatId}`
+    );
+
+    console.log(
+        "GROUP ID:",
+        chatId
+    );
+
+});
+
+/* =====================================================
    TEXT BUTTONS
 ===================================================== */
 
