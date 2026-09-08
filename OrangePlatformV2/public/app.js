@@ -3981,6 +3981,87 @@ function openGallery(
             "#galleryCounter"
         );
 
+/* =========================
+       SWIPE GALLERY
+    ========================= */
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+
+    viewer.addEventListener(
+        "touchstart",
+        event => {
+
+            touchStartX =
+                event.changedTouches[0].screenX;
+
+            touchStartY =
+                event.changedTouches[0].screenY;
+
+        },
+        { passive: true }
+    );
+
+
+    viewer.addEventListener(
+        "touchend",
+        event => {
+
+            const touchEndX =
+                event.changedTouches[0].screenX;
+
+            const touchEndY =
+                event.changedTouches[0].screenY;
+
+            const diffX =
+                touchEndX - touchStartX;
+
+            const diffY =
+                touchEndY - touchStartY;
+
+
+            // ვერტიკალური სქროლი არ ჩაითვალოს swipe-ად
+            if (
+                Math.abs(diffX) < 40 ||
+                Math.abs(diffX) < Math.abs(diffY)
+            ) {
+                return;
+            }
+
+
+            // მარცხნივ → შემდეგი ფოტო
+            if (diffX < 0) {
+
+                current++;
+
+                if (
+                    current >=
+                    post.images.length
+                ) {
+                    current = 0;
+                }
+
+            }
+
+            // მარჯვნივ → წინა ფოტო
+            else {
+
+                current--;
+
+                if (current < 0) {
+                    current =
+                        post.images.length - 1;
+                }
+
+            }
+
+
+            showImage();
+
+        },
+        { passive: true }
+    );
 
     function showImage() {
 
