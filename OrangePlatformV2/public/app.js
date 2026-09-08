@@ -2563,25 +2563,113 @@ card.querySelector(
             }
         );
 
+        /* =========================
+       SWIPE PHOTOS
+    ========================= */
+
+    const slider = card.querySelector(".card-slider");
+
+    if (slider) {
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        slider.addEventListener(
+            "touchstart",
+            event => {
+
+                touchStartX =
+                    event.changedTouches[0].screenX;
+
+                touchStartY =
+                    event.changedTouches[0].screenY;
+
+            },
+            { passive: true }
+        );
+
+
+        slider.addEventListener(
+            "touchend",
+            event => {
+
+                const touchEndX =
+                    event.changedTouches[0].screenX;
+
+                const touchEndY =
+                    event.changedTouches[0].screenY;
+
+                const diffX =
+                    touchEndX - touchStartX;
+
+                const diffY =
+                    touchEndY - touchStartY;
+
+
+                // ძალიან პატარა მოძრაობა
+                if (
+                    Math.abs(diffX) < 40 ||
+                    Math.abs(diffX) < Math.abs(diffY)
+                ) {
+                    return;
+                }
+
+
+                // მარჯვნივ → წინა ფოტო
+                if (diffX > 0) {
+
+                    prevCardImage(post.id);
+
+                }
+
+                // მარცხნივ → შემდეგი ფოტო
+                else {
+
+                    nextCardImage(post.id);
+
+                }
+
+
+                // ვნიშნავთ რომ swipe მოხდა
+                slider.dataset.swiped = "true";
+
+            },
+            { passive: true }
+        );
+
+    }
 
         /* =========================
            OPEN GALLERY
         ========================= */
 
         card.querySelector(
-            ".card-image"
-        )?.addEventListener(
-            "click",
-            event => {
+    ".card-image"
+)?.addEventListener(
+    "click",
+    event => {
 
-                event.stopPropagation();
+        event.stopPropagation();
 
-                openGallery(
-                    post.id
-                );
+        const slider =
+            card.querySelector(".card-slider");
 
-            }
+        if (
+            slider &&
+            slider.dataset.swiped === "true"
+        ) {
+
+            slider.dataset.swiped = "false";
+
+            return;
+        }
+
+        openGallery(
+            post.id
         );
+
+    }
+);
 
     });
 
