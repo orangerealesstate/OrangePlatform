@@ -25,7 +25,6 @@ bot.getMe().then(me => {
 bot.on("polling_error", console.error);
 bot.on("error", console.error);
 
-
 /* =====================================================
    START
 ===================================================== */
@@ -42,30 +41,25 @@ bot.onText(/\/start/, async (msg) => {
             {
                 reply_markup: {
 
-                    inline_keyboard: [
+                    keyboard: [
 
                         [
-                            {
-                                text: "🆕 Новые объявления",
-                                callback_data: "new_posts"
-                            }
+                            "🆕 Новые объявления"
                         ],
 
                         [
-                            {
-                                text: "❤️ Избранное",
-                                callback_data: "favorites"
-                            }
+                            "❤️ Избранное"
                         ],
 
                         [
-                            {
-                                text: "📞 Связаться с нами",
-                                callback_data: "contact"
-                            }
+                            "📞 Связаться с нами"
                         ]
 
-                    ]
+                    ],
+
+                    resize_keyboard: true,
+                    is_persistent: true
+
                 }
             }
         );
