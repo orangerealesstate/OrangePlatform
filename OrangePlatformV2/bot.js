@@ -48,9 +48,13 @@ bot.onText(/\/start/, async (msg) => {
                         [
                             "❤️ Избранное"
                         ],
-
-                        [
-    "📝 Подать запрос"
+[
+    {
+        text: "📝 Подать запрос",
+        web_app: {
+            url: `${API_URL}/request.html`
+        }
+    }
 ]
 
                     ],
@@ -484,6 +488,92 @@ bot.on("message", async (msg) => {
 
 
 /* =====================================================
+   RECEIVE CLIENT REQUEST
+===================================================== */
+
+bot.on("message", async (msg) => {
+
+    if (!msg.web_app_data?.data) {
+        return;
+    }
+
+    try {
+
+        const data = JSON.parse(msg.web_app_data.data);
+
+        const user = msg.from || {};
+
+        const name =
+            [user.first_name, user.last_name]
+                .filter(Boolean)
+                .join(" ") || "Не указано";
+
+        const username =
+            user.username
+                ? `@${user.username}`
+                : "нет username";
+
+        const escapeHtml = value =>
+            String(value ?? "-")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        const requestMessage =
+
+`📝 <b>НОВАЯ ЗАЯВКА</b>
+
+👤 <b>Клиент:</b> ${escapeHtml(name)}
+📱 <b>Telegram:</b> ${escapeHtml(username)}
+🆔 <b>User ID:</b> ${escapeHtml(user.id)}
+
+📍 <b>Район:</b> ${escapeHtml(data.district)}
+🛋 <b>Комнат:</b> ${escapeHtml(data.rooms)}
+📅 <b>Период:</b> ${escapeHtml(data.period)}
+💰 <b>Цена:</b> ${escapeHtml(data.budget)}
+🐾 <b>Домашнее животное:</b> ${escapeHtml(data.pets)}
+🗓 <b>Дата заселения:</b> ${escapeHtml(data.moveIn)}`;
+
+        await bot.sendMessage(
+            ADMIN_ID,
+            requestMessage,
+            {
+                parse_mode: "HTML"
+            }
+        );
+
+        await bot.sendMessage(
+            msg.chat.id,
+            "✅ Ваша заявка отправлена. Мы свяжемся с вами!"
+        );
+
+        console.log(
+            "📝 NEW CLIENT REQUEST:",
+            {
+                userId: user.id,
+                data
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ REQUEST ERROR:",
+            error
+        );
+
+        await bot.sendMessage(
+            msg.chat.id,
+            "❌ Не удалось отправить заявку. Попробуйте ещё раз."
+        );
+
+    }
+
+});
+
+/* =====================================================
    TEXT BUTTONS
 ===================================================== */
 
@@ -505,24 +595,7 @@ bot.on(
         }
 
 
-        /* -----------------------------------------
-           NEW POSTS
-        ----------------------------------------- */
-
-        if (
-            msg.text === "🆕 Новые объявления"
-        ) {
-
-            await bot.sendMessage(
-                msg.chat.id,
-
-                "🆕 Откройте каталог и используйте сортировку по новым объявлениям."
-            );
-
-            return;
-
-        }
-
+            
 
         /* -----------------------------------------
            FAVORITES
