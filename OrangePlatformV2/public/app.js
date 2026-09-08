@@ -1640,6 +1640,38 @@ function setupFavoritesFilter() {
 /* =========================================================
    CATALOG
 ========================================================= */
+function isPostNew(post) {
+    if (
+        !post ||
+        post.date === undefined ||
+        post.date === null ||
+        post.date === ""
+    ) {
+        return false;
+    }
+
+    const raw = Number(post.date);
+
+    const postDate = new Date(
+        raw < 100000000000
+            ? raw * 1000
+            : raw
+    );
+
+    if (Number.isNaN(postDate.getTime())) {
+        return false;
+    }
+
+    const now = new Date();
+
+    return (
+        postDate.getFullYear() === now.getFullYear() &&
+        postDate.getMonth() === now.getMonth() &&
+        postDate.getDate() === now.getDate()
+    );
+}
+
+
 function renderPosts(posts) {
 
     const container =
@@ -1740,8 +1772,34 @@ const date = post.date
             <!-- PHOTO -->
             <div class="card-slider">
 
-                <!-- FAVORITE -->
-                <button
+    ${
+        isPostNew(post)
+            ? `
+                <div
+                    class="new-post-badge"
+                    style="
+                        position:absolute;
+                        top:12px;
+                        left:12px;
+                        z-index:10;
+                        background:#20b15a;
+                        color:#fff;
+                        padding:6px 10px;
+                        border-radius:9px;
+                        font-size:12px;
+                        font-weight:800;
+                        line-height:1;
+                        box-shadow:0 3px 10px rgba(0,0,0,.20);
+                    "
+                >
+                    НОВОЕ
+                </div>
+            `
+            : ""
+    }
+
+    <!-- FAVORITE -->
+    <button
                     type="button"
                     class="favorite-btn"
                     data-post-id="${post.id}"
