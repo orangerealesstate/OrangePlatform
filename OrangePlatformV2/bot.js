@@ -558,20 +558,44 @@ bot.on(
         /* -----------------------------------------
            CONTACT
         ----------------------------------------- */
+if (
+    msg.text === "📝 Подать запрос"
+) {
 
-        if (
-            msg.text === "📞 Связаться с нами"
-        ) {
+    try {
 
-            await bot.sendMessage(
-                msg.chat.id,
+        await bot.sendMessage(
+            msg.chat.id,
 
-                "📲 Telegram: @Orangerealestatetbilisi"
-            );
+            "📝 Заполните заявку, чтобы мы подобрали подходящую квартиру:",
 
-            return;
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "📝 Заполнить заявку",
+                                web_app: {
+                                    url: `${API_URL}/request.html`
+                                }
+                            }
+                        ]
+                    ]
+                }
+            }
+        );
 
-        }
+    } catch (error) {
+
+        console.error(
+            "❌ Request form error:",
+            error
+        );
+
+    }
+
+    return;
+}
 
     }
 );
