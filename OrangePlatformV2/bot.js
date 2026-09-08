@@ -15,6 +15,7 @@ const bot = new TelegramBot(token, {
 
 const API_URL =
     "https://orangeplatform.onrender.com";
+    const ADMIN_ID = "5172653731";
 
 console.log("🤖 Bot started successfully");
 
@@ -52,8 +53,8 @@ bot.onText(/\/start/, async (msg) => {
                         ],
 
                         [
-                            "📞 Связаться с нами"
-                        ]
+    "📝 Подать запрос"
+]
 
                     ],
 
@@ -439,6 +440,50 @@ bot.on(
 
     }
 );
+
+/* =====================================================
+   REQUEST FORM
+===================================================== */
+
+bot.on("message", async (msg) => {
+
+    if (msg.text !== "📝 Подать запрос") {
+        return;
+    }
+
+    try {
+
+        await bot.sendMessage(
+            msg.chat.id,
+
+            "📝 Заполните заявку, чтобы мы подобрали подходящую квартиру:",
+
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "📝 Заполнить заявку",
+                                web_app: {
+                                    url: `${API_URL}/request.html`
+                                }
+                            }
+                        ]
+                    ]
+                }
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ Request form error:",
+            error
+        );
+
+    }
+
+});
 
 
 /* =====================================================
