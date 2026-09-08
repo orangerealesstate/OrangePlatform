@@ -16,6 +16,7 @@ const bot = new TelegramBot(token, {
 const API_URL =
     "https://orangeplatform.onrender.com";
     const ADMIN_ID = "5172653731";
+    const REQUEST_GROUP_ID = "-5378097330";
 
 console.log("🤖 Bot started successfully");
 
@@ -536,13 +537,13 @@ bot.on("message", async (msg) => {
 🐾 <b>Домашнее животное:</b> ${escapeHtml(data.pets)}
 🗓 <b>Дата заселения:</b> ${escapeHtml(data.moveIn)}`;
 
-        await bot.sendMessage(
-            ADMIN_ID,
-            requestMessage,
-            {
-                parse_mode: "HTML"
-            }
-        );
+await bot.sendMessage(
+    REQUEST_GROUP_ID,
+    requestMessage,
+    {
+        parse_mode: "HTML"
+    }
+);
 
         await bot.sendMessage(
             msg.chat.id,
