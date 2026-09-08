@@ -1864,13 +1864,29 @@ const date = post.date
                 <div class="property-price">
                     ${price}$
                 </div>
-                <div class="listing-id">
+              <div
+    class="listing-id"
+    style="
+        font-size:20px;
+        font-weight:800;
+        color:#555;
+        white-space:nowrap;
+    "
+>
     ID #${listingId}
 </div>
 <div class="admin-price-actions"></div>
-                <div class="property-date">
-                    ${date}
-                </div>
+                <div
+    class="property-date"
+    style="
+        font-size:19px;
+        font-weight:800;
+        color:#555;
+        white-space:nowrap;
+    "
+>
+    ${date}
+</div>
 </div>
 
 
