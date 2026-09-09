@@ -1664,11 +1664,11 @@ function isPostNew(post) {
 
     const now = new Date();
 
-    return (
-        postDate.getFullYear() === now.getFullYear() &&
-        postDate.getMonth() === now.getMonth() &&
-        postDate.getDate() === now.getDate()
-    );
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+
+    const age = now.getTime() - postDate.getTime();
+
+    return age >= 0 && age < twentyFourHours;
 }
 
 
@@ -1792,7 +1792,7 @@ const date = post.date
                         box-shadow:0 3px 10px rgba(0,0,0,.20);
                     "
                 >
-                    НОВОЕ
+                    NEW
                 </div>
             `
             : ""
