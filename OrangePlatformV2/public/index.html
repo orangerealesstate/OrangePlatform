@@ -576,13 +576,42 @@
     <div class="header-actions">
 
         <button
-            id="statsBtn"
-            class="header-stats-btn"
-            onclick="window.location.href='stats.html'"
-        >
-            <span class="stats-icon">▥</span>
-            <span>Статистика</span>
-        </button>
+    id="statsBtn"
+    class="header-stats-btn"
+    type="button"
+    onclick="window.location.href='stats.html'"
+    title="Статистика"
+    aria-label="Статистика"
+style="
+    width:64px;
+    height:64px;
+    min-width:64px;
+    padding:0;
+    border:2px solid #ff8a00;
+    border-radius:18px;
+    background:#fffaf5;
+    color:#ff8a00;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+"
+>
+    <svg
+        width="30"
+        height="30"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+        <line x1="6" y1="20" x2="6" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="6"></line>
+        <line x1="18" y1="20" x2="18" y2="3"></line>
+    </svg>
+</button>
 
 <button
     id="themeBtn"
