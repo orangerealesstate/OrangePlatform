@@ -583,12 +583,12 @@
     title="Статистика"
     aria-label="Статистика"
 style="
-    width:64px;
-    height:64px;
-    min-width:64px;
+    width:36px;
+    height:36px;
+    min-width:36px;
     padding:0;
     border:2px solid #ff8a00;
-    border-radius:18px;
+    border-radius:12px;
     background:#fffaf5;
     color:#ff8a00;
     display:flex;
@@ -598,8 +598,8 @@ style="
 "
 >
     <svg
-        width="30"
-        height="30"
+        width="20"
+        height="20"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -622,11 +622,41 @@ style="
     🌙
 </button>
 
-        <div class="header-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+        <div class="language-wrapper">
+
+    <button
+        id="languageBtn"
+        class="language-btn"
+        type="button"
+        aria-label="Language"
+    >
+        🌐
+    </button>
+
+    <div
+        id="languageMenu"
+        class="language-menu"
+    >
+
+        <button
+            type="button"
+            class="language-option"
+            data-lang="ka"
+        >
+            🇬🇪 ქართული
+        </button>
+
+        <button
+            type="button"
+            class="language-option"
+            data-lang="en"
+        >
+            🇬🇧 English
+        </button>
+
+    </div>
+
+</div>
 
     </div>
 
