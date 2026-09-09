@@ -666,7 +666,8 @@ style="
             class="language-option"
             data-lang="en"
         >
-            <<span class="language-flag">
+            <span class="language-flag">
+
     <svg viewBox="0 0 60 40" aria-hidden="true">
         <rect width="60" height="40" fill="#012169"/>
         <path d="M0 0L60 40M60 0L0 40" stroke="#fff" stroke-width="10"/>
@@ -1531,7 +1532,7 @@ function toggleDistricts() {
     }
 }
 </script>
-<!-- LANGUAGE SWITCHER -->
+<!-- LANGUAGE SWITCHER + TRANSLATION -->
 
 <script>
 (function () {
@@ -1540,11 +1541,324 @@ function toggleDistricts() {
     const languageMenu = document.getElementById("languageMenu");
     const languageOptions = document.querySelectorAll(".language-option");
 
-    if (!languageBtn || !languageMenu) {
-        return;
+    if (!languageBtn || !languageMenu) return;
+
+    const translations = {
+
+        ru: {
+            promo1: "✨ Найдите свою идеальную квартиру в Тбилиси",
+            promo2: "📍 Квартиры в лучших районах Тбилиси",
+            promo3: "💰 Лучшие предложения в одном месте",
+            promo4: "🍊 Orange Real Estate — недвижимость в Тбилиси",
+
+            allDistricts: "Все районы",
+            rooms: "Комнаты",
+            priceFrom: "Цена от",
+            priceTo: "Цена до",
+
+            filter: "🔎 Фильтр",
+            map: "🗺️ Карта",
+
+            listingCode: "Введите код объявления",
+            chooseDistrict: "📍 Выберите район",
+
+            find: "🔎 Найти",
+            clear: "🗑 Очистить",
+
+            loading: "Загрузка..."
+        },
+
+        ka: {
+            promo1: "✨ იპოვეთ თქვენი იდეალური ბინა თბილისში",
+            promo2: "📍 ბინები თბილისის საუკეთესო უბნებში",
+            promo3: "💰 საუკეთესო შეთავაზებები ერთ სივრცეში",
+            promo4: "🍊 Orange Real Estate — უძრავი ქონება თბილისში",
+
+            allDistricts: "ყველა რაიონი",
+            rooms: "ოთახები",
+            priceFrom: "ფასი დან",
+            priceTo: "ფასი მდე",
+
+            filter: "🔎 ფილტრი",
+            map: "🗺️ რუკა",
+
+            listingCode: "შეიყვანეთ განცხადების კოდი",
+            chooseDistrict: "📍 აირჩიეთ რაიონი",
+
+            find: "🔎 ძებნა",
+            clear: "🗑 გასუფთავება",
+
+            loading: "იტვირთება..."
+        },
+
+        en: {
+            promo1: "✨ Find your perfect apartment in Tbilisi",
+            promo2: "📍 Apartments in the best areas of Tbilisi",
+            promo3: "💰 Best offers in one place",
+            promo4: "🍊 Orange Real Estate — real estate in Tbilisi",
+
+            allDistricts: "All districts",
+            rooms: "Rooms",
+            priceFrom: "Price from",
+            priceTo: "Price to",
+
+            filter: "🔎 Filter",
+            map: "🗺️ Map",
+
+            listingCode: "Enter listing code",
+            chooseDistrict: "📍 Choose district",
+
+            find: "🔎 Search",
+            clear: "🗑 Clear",
+
+            loading: "Loading..."
+        }
+
+    };
+
+
+    function setText(selector, text) {
+        const el = document.querySelector(selector);
+        if (el) el.textContent = text;
     }
 
-    /* გახსნა / დახურვა */
+
+    function translatePlatform(lang) {
+
+        const t = translations[lang] || translations.ru;
+
+        document.documentElement.lang = lang;
+
+
+        /* PROMO */
+
+        const promoLines =
+            document.querySelectorAll(".promo-line");
+
+        if (promoLines[0])
+            promoLines[0].textContent = t.promo1;
+
+        if (promoLines[1])
+            promoLines[1].textContent = t.promo2;
+
+        if (promoLines[2])
+            promoLines[2].textContent = t.promo3;
+
+        if (promoLines[3])
+            promoLines[3].textContent = t.promo4;
+
+
+        /* MAIN FILTER */
+
+        const legacyDistrict =
+            document.getElementById("legacyDistrictFilter");
+
+        if (legacyDistrict && legacyDistrict.options[0])
+            legacyDistrict.options[0].textContent =
+                t.allDistricts;
+
+
+        const roomsFilter =
+            document.getElementById("roomsFilter");
+
+        if (roomsFilter && roomsFilter.options[0])
+            roomsFilter.options[0].textContent =
+                t.rooms;
+
+
+        const minPrice =
+            document.getElementById("minPrice");
+
+        if (minPrice)
+            minPrice.placeholder = t.priceFrom;
+
+
+        const maxPrice =
+            document.getElementById("maxPrice");
+
+        if (maxPrice)
+            maxPrice.placeholder = t.priceTo;
+
+
+        /* VIEW BUTTONS */
+
+        const filterBtn =
+            document.getElementById("filterViewBtn");
+
+        if (filterBtn)
+            filterBtn.textContent = t.filter;
+
+
+        const mapBtn =
+            document.getElementById("mapViewBtn");
+
+        if (mapBtn)
+            mapBtn.textContent = t.map;
+
+
+        /* FILTER WINDOW */
+
+        const listingInput =
+            document.getElementById("filterListingId");
+
+        if (listingInput)
+            listingInput.placeholder = t.listingCode;
+
+
+        const districtTitle =
+            document.querySelector(".district-toggle-title");
+
+        if (districtTitle)
+            districtTitle.textContent = t.chooseDistrict;
+
+
+        const allDistricts =
+            document.querySelector(
+                "#allDistricts + span"
+            );
+
+        if (allDistricts)
+            allDistricts.textContent = t.allDistricts;
+
+
+        const filterRooms =
+            document.getElementById("filterRooms");
+
+        if (filterRooms && filterRooms.options[0])
+            filterRooms.options[0].textContent =
+                "🛏 " + t.rooms;
+
+
+        const filterMinPrice =
+            document.getElementById("filterMinPrice");
+
+        if (filterMinPrice)
+            filterMinPrice.placeholder =
+                t.priceFrom + " $";
+
+
+        const filterMaxPrice =
+            document.getElementById("filterMaxPrice");
+
+        if (filterMaxPrice)
+            filterMaxPrice.placeholder =
+                t.priceTo + " $";
+
+
+        /* BUTTONS */
+
+        const buttons =
+            document.querySelectorAll(".filter-actions button");
+
+        if (buttons[0])
+            buttons[0].textContent = t.find;
+
+        if (buttons[1])
+            buttons[1].textContent = t.clear;
+
+
+        /* LOADING */
+
+        const posts =
+            document.getElementById("posts");
+
+        if (
+            posts &&
+            (
+                posts.textContent.trim() === "Загрузка..." ||
+                posts.textContent.trim() === "იტვირთება..." ||
+                posts.textContent.trim() === "Loading..."
+            )
+        ) {
+            posts.textContent = t.loading;
+        }
+
+
+        /* SAVE LANGUAGE */
+
+        localStorage.setItem(
+            "orange-language",
+            lang
+        );
+    }
+
+
+    function setLanguageFlag(lang) {
+
+        if (lang === "ka") {
+
+            languageBtn.innerHTML = `
+                <svg
+                    class="main-language-flag"
+                    viewBox="0 0 60 40"
+                    aria-hidden="true"
+                >
+                    <rect width="60" height="40" fill="#fff"/>
+                    <path
+                        d="M27 0h6v40h-6zM0 17h60v6H0z"
+                        fill="#d40000"
+                    />
+                    <path
+                        d="M8 5h4v10H8zM5 8h10v4H5z
+                           M48 5h4v10h-4zM45 8h10v4H45z
+                           M8 25h4v10H8zM5 28h10v4H5z
+                           M48 25h4v10h-4zM45 28h10v4H45z"
+                        fill="#d40000"
+                    />
+                </svg>
+            `;
+
+        } else if (lang === "en") {
+
+            languageBtn.innerHTML = `
+                <svg
+                    class="main-language-flag"
+                    viewBox="0 0 60 40"
+                    aria-hidden="true"
+                >
+                    <rect width="60" height="40" fill="#012169"/>
+                    <path
+                        d="M0 0L60 40M60 0L0 40"
+                        stroke="#fff"
+                        stroke-width="10"
+                    />
+                    <path
+                        d="M0 0L60 40M60 0L0 40"
+                        stroke="#C8102E"
+                        stroke-width="5"
+                    />
+                    <path
+                        d="M30 0v40M0 20h60"
+                        stroke="#fff"
+                        stroke-width="14"
+                    />
+                    <path
+                        d="M30 0v40M0 20h60"
+                        stroke="#C8102E"
+                        stroke-width="8"
+                    />
+                </svg>
+            `;
+
+        } else {
+
+            languageBtn.innerHTML = `
+                <svg
+                    class="main-language-flag"
+                    viewBox="0 0 60 40"
+                    aria-hidden="true"
+                >
+                    <rect width="60" height="13.33" fill="#fff"/>
+                    <rect y="13.33" width="60" height="13.34" fill="#0039A6"/>
+                    <rect y="26.67" width="60" height="13.33" fill="#D52B1E"/>
+                </svg>
+            `;
+        }
+    }
+
+
+    /* OPEN / CLOSE MENU */
+
     languageBtn.addEventListener("click", function (event) {
 
         event.preventDefault();
@@ -1554,7 +1868,9 @@ function toggleDistricts() {
 
     });
 
-    /* ენის არჩევა */
+
+    /* LANGUAGE SELECT */
+
     languageOptions.forEach(function (option) {
 
         option.addEventListener("click", function (event) {
@@ -1564,58 +1880,45 @@ function toggleDistricts() {
 
             const lang = option.dataset.lang;
 
-            /* ენის დამახსოვრება */
-            localStorage.setItem("orange-language", lang);
+            setLanguageFlag(lang);
 
-            /* მთავარი დროშის შეცვლა */
-            if (lang === "ka") {
+            translatePlatform(lang);
 
-                languageBtn.textContent = "🇬🇪";
+            languageOptions.forEach(function (item) {
+                item.classList.remove("active");
+            });
 
-            } else if (lang === "en") {
+            option.classList.add("active");
 
-                languageBtn.textContent = "🇬🇧";
-
-            }
-
-            /* მენიუს დახურვა */
             languageMenu.classList.remove("open");
 
         });
 
     });
 
-    /* გარეთ დაჭერისას მენიუს დახურვა */
+
+    /* CLOSE WHEN CLICK OUTSIDE */
+
     document.addEventListener("click", function (event) {
 
         if (
             !languageBtn.contains(event.target) &&
             !languageMenu.contains(event.target)
         ) {
-
             languageMenu.classList.remove("open");
-
         }
 
     });
 
-    /* შენახული ენის ჩატვირთვა */
+
+    /* LOAD SAVED LANGUAGE */
+
     const savedLanguage =
-        localStorage.getItem("orange-language");
+        localStorage.getItem("orange-language") || "ru";
 
-    if (savedLanguage === "ka") {
+    setLanguageFlag(savedLanguage);
 
-        languageBtn.textContent = "🇬🇪";
-
-    } else if (savedLanguage === "en") {
-
-        languageBtn.textContent = "🇬🇧";
-
-    } else {
-
-        languageBtn.textContent = "🇷🇺";
-
-    }
+    translatePlatform(savedLanguage);
 
 })();
 </script>
