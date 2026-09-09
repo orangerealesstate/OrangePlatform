@@ -1,5 +1,112 @@
 console.log("🍊 ORANGE APP.JS — FIXED VERSION");
+/* =========================================================
+   ORANGE LANGUAGE SYSTEM
+========================================================= */
 
+let orangeLanguage =
+    localStorage.getItem("orange-language") || "ru";
+
+
+const orangeTranslations = {
+
+    ru: {
+        district: "Район",
+        rooms: "Комнат",
+        bedrooms: "Спальни",
+        bathrooms: "Ванные",
+        area: "Площадь",
+        floor: "Этаж",
+        viewTelegram: "Смотреть в Telegram",
+        share: "Поделиться",
+        openMap: "Открыть карту",
+        sold: "Сдано",
+        removeSold: "Снять Сдано",
+        edit: "Редактировать",
+        delete: "Удалить",
+        notFound: "Объявления не найдены",
+        locationMissing: "Локация для этой квартиры не указана"
+    },
+
+    ka: {
+        district: "რაიონი",
+        rooms: "ოთახი",
+        bedrooms: "საძინებელი",
+        bathrooms: "სველი წერტილი",
+        area: "ფართობი",
+        floor: "სართული",
+        viewTelegram: "ნახვა Telegram-ში",
+        share: "გაზიარება",
+        openMap: "რუკის გახსნა",
+        sold: "გაქირავებულია",
+        removeSold: "გაქირავებულის მოხსნა",
+        edit: "რედაქტირება",
+        delete: "წაშლა",
+        notFound: "განცხადებები ვერ მოიძებნა",
+        locationMissing: "ამ ბინისთვის ლოკაცია მითითებული არ არის"
+    },
+
+    en: {
+        district: "District",
+        rooms: "Rooms",
+        bedrooms: "Bedrooms",
+        bathrooms: "Bathrooms",
+        area: "Area",
+        floor: "Floor",
+        viewTelegram: "View in Telegram",
+        share: "Share",
+        openMap: "Open map",
+        sold: "Rented",
+        removeSold: "Remove rented",
+        edit: "Edit",
+        delete: "Delete",
+        notFound: "No listings found",
+        locationMissing: "Location is not specified for this apartment"
+    }
+
+};
+
+
+function t(key) {
+
+    return (
+        orangeTranslations[orangeLanguage]?.[key] ||
+        orangeTranslations.ru[key] ||
+        key
+    );
+
+}
+
+
+window.setOrangeLanguage = function (lang) {
+
+    if (!orangeTranslations[lang]) {
+        lang = "ru";
+    }
+
+    orangeLanguage = lang;
+
+    localStorage.setItem(
+        "orange-language",
+        lang
+    );
+
+    document.documentElement.lang = lang;
+
+    console.log(
+        "🍊 Language changed:",
+        lang
+    );
+
+    if (
+        typeof renderPosts === "function" &&
+        typeof getFilteredPosts === "function"
+    ) {
+        renderPosts(
+            getFilteredPosts()
+        );
+    }
+
+};
 
 /* =========================================================
    TELEGRAM
@@ -1688,7 +1795,7 @@ function renderPosts(posts) {
                 text-align:center;
                 padding:40px;
             ">
-                Объявления не найдены
+                ${t("notFound")}
             </h2>
         `;
 
@@ -1921,7 +2028,7 @@ const date = post.date
         </span>
 
         <div class="property-text">
-            <strong>Район:</strong>
+            <strong>${t("district")}:</strong>
             <span>${district}</span>
         </div>
 
@@ -1942,7 +2049,7 @@ const date = post.date
                         white-space:nowrap;
                     "
                 >
-                    🔴 Сдано
+                  🔴 ${t("sold")}
                 </span>
             `
             : ""
@@ -1959,7 +2066,7 @@ const date = post.date
                     </span>
 
                     <div class="property-text">
-                        <strong>Комнат:</strong>
+                        <strong>${t("rooms")}:</strong>
                         <span>${rooms}</span>
                     </div>
 
@@ -1974,7 +2081,7 @@ const date = post.date
                     </span>
 
                     <div class="property-text">
-                        <strong>Спальни:</strong>
+                        <strong>${t("bedrooms")}:</strong>
                         <span>${bedrooms}</span>
                     </div>
 
@@ -1989,7 +2096,7 @@ const date = post.date
                     </span>
 
                     <div class="property-text">
-                        <strong>Ванные:</strong>
+                        <strong>${t("bathrooms")}:</strong>
                         <span>${bathrooms}</span>
                     </div>
 
@@ -2004,7 +2111,7 @@ const date = post.date
                     </span>
 
                     <div class="property-text">
-                        <strong>Площадь:</strong>
+                        <strong>${t("area")}:</strong>
                         <span>${area} м²</span>
                     </div>
 
@@ -2019,7 +2126,7 @@ const date = post.date
                     </span>
 
                     <div class="property-text">
-                        <strong>Этаж:</strong>
+                        <strong>${t("floor")}:</strong>
                         <span>${floor}</span>
                     </div>
 
@@ -2041,7 +2148,7 @@ const date = post.date
                         ➤
                     </span>
 
-                    Смотреть в Telegram
+                    ${t("viewTelegram")}
                 </button>
 
 
@@ -2049,8 +2156,8 @@ const date = post.date
                 <button
                     type="button"
                     class="share-btn"
-                    title="Поделиться"
-                    aria-label="Поделиться"
+                    title="${t("share")}"
+aria-label="${t("share")}"
                 >
                     <svg
                         class="action-svg"
@@ -2076,8 +2183,8 @@ const date = post.date
                 <button
                     type="button"
                     class="location-btn"
-                    title="Открыть карту"
-                    aria-label="Открыть карту"
+                    title="${t("openMap")}"
+aria-label="${t("openMap")}"
                 >
                     <svg
                         class="action-svg location-svg"
@@ -2259,9 +2366,9 @@ if (telegramUserId === "5172653731") {
         statusBtn.type = "button";
 
         statusBtn.innerHTML =
-            post.status === "sdanо"
-                ? "🔴 Снять Сдано"
-                : "🏠 Сдано";
+            post.status === "sdang"
+    ? `🔴 ${t("removeSold")}`
+    : `🏠 ${t("sold")}`;
 
         statusBtn.style.cssText = `
             width:100%;
