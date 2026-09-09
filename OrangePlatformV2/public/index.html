@@ -1897,6 +1897,9 @@ function toggleDistricts() {
             setLanguageFlag(lang);
 
             translatePlatform(lang);
+            if (typeof window.setOrangeLanguage === "function") {
+    window.setOrangeLanguage(lang);
+}
 
             languageOptions.forEach(function (item) {
                 item.classList.remove("active");
