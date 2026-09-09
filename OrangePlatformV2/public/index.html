@@ -630,7 +630,15 @@ style="
         type="button"
         aria-label="Language"
     >
-        🇷🇺
+       <svg
+    class="main-language-flag"
+    viewBox="0 0 60 40"
+    aria-hidden="true"
+>
+    <rect width="60" height="13.33" fill="#fff"/>
+    <rect y="13.33" width="60" height="13.34" fill="#0039A6"/>
+    <rect y="26.67" width="60" height="13.33" fill="#D52B1E"/>
+</svg>
     </button>
 
     <div
@@ -643,7 +651,14 @@ style="
             class="language-option"
             data-lang="ka"
         >
-            🇬🇪 <span>ქართული</span>
+            <span class="language-flag">
+    <svg viewBox="0 0 60 40" aria-hidden="true">
+        <rect width="60" height="40" fill="#fff"/>
+        <path d="M27 0h6v40h-6zM0 17h60v6H0z" fill="#d40000"/>
+        <path d="M8 5h4v10H8zM5 8h10v4H5zM48 5h4v10h-4zM45 8h10v4H45zM8 25h4v10H8zM5 28h10v4H5zM48 25h4v10h-4zM45 28h10v4H45z" fill="#d40000"/>
+    </svg>
+</span>
+            <span class="language-name">ქართული</span>
         </button>
 
         <button
@@ -651,7 +666,16 @@ style="
             class="language-option"
             data-lang="en"
         >
-            🇬🇧 <span>English</span>
+            <<span class="language-flag">
+    <svg viewBox="0 0 60 40" aria-hidden="true">
+        <rect width="60" height="40" fill="#012169"/>
+        <path d="M0 0L60 40M60 0L0 40" stroke="#fff" stroke-width="10"/>
+        <path d="M0 0L60 40M60 0L0 40" stroke="#C8102E" stroke-width="5"/>
+        <path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="14"/>
+        <path d="M30 0v40M0 20h60" stroke="#C8102E" stroke-width="8"/>
+    </svg>
+</span>
+            <span class="language-name">English</span>
         </button>
 
     </div>
@@ -887,7 +911,7 @@ style="
         aria-expanded="true"
         onclick="toggleDistricts()"
     >
-        <span class="district-toggle-title">📍 Район</span>
+        <span class="district-toggle-title">📍 Выберите район</span>
         <span class="district-toggle-arrow">⌃</span>
     </button>
 

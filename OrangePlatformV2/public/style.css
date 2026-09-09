@@ -3236,3 +3236,28 @@ body.dark-mode .property-info-item strong {
     background: #fff3e6;
     color: #ff7a00;
 }
+/* LANGUAGE FLAGS */
+
+.main-language-flag {
+    width: 28px;
+    height: 20px;
+    display: block;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.language-flag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.language-flag svg {
+    width: 42px;
+    height: 28px;
+    display: block;
+    border-radius: 5px;
+}
