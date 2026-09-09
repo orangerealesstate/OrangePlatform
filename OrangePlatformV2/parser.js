@@ -304,6 +304,18 @@ function savePosts(
 
         }
 
+        // 🔒 NEVER RESTORE DELETED TELEGRAM POSTS
+        const deletedIds =
+            loadDeletedPostIds();
+
+        posts =
+            posts.filter(
+                post =>
+                    !deletedIds.includes(
+                        String(post.id)
+                    )
+            );
+
         const latestById =
             new Map();
 
