@@ -2161,236 +2161,256 @@ card.addEventListener(
 
     }
 );
+
 /* =========================
-   ADMIN EDIT + DELETE
+   ADMIN MANAGEMENT
 ========================= */
 
 if (telegramUserId === "5172653731") {
-const actions =
-    card.querySelector(".card-actions");
 
-const adminPriceActions =
-    card.querySelector(".admin-price-actions");
+    const adminPriceActions =
+        card.querySelector(".admin-price-actions");
 
-if (
-    actions &&
-    adminPriceActions
-) {
+    if (adminPriceActions) {
 
+        adminPriceActions.innerHTML = "";
+
+        /* MANAGEMENT WRAPPER */
+        const managementWrapper =
+            document.createElement("div");
+
+        managementWrapper.style.cssText = `
+            position:relative;
+            display:flex;
+            align-items:center;
+            flex-shrink:0;
+        `;
+
+        /* ⚙️ MANAGEMENT BUTTON */
+        const managementBtn =
+            document.createElement("button");
+
+        managementBtn.type = "button";
+        managementBtn.innerHTML = "⚙️";
+    
+
+        managementBtn.style.cssText = `
+            width:44px;
+            height:44px;
+            border:none;
+            border-radius:12px;
+            background:#f1f3f5;
+            color:#333;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            font-size:22px;
+            flex-shrink:0;
+            box-shadow:0 2px 6px rgba(0,0,0,.10);
+        `;
+
+        /* MENU */
+        const managementMenu =
+            document.createElement("div");
+
+        managementMenu.style.cssText = `
+            position:absolute;
+            top:50px;
+            right:0;
+            z-index:99999;
+            width:200px;
+            background:#fff;
+            border-radius:16px;
+            padding:8px;
+            box-shadow:0 10px 30px rgba(0,0,0,.20);
+            border:1px solid #eee;
+            display:none;
+        `;
+
+        /* ✏️ EDIT */
         const editBtn =
             document.createElement("button");
 
         editBtn.type = "button";
-        editBtn.className =
-            "admin-edit-btn";
-
-        editBtn.title =
-            "Редактировать";
-
-        editBtn.setAttribute(
-            "aria-label",
-            "Редактировать"
-        );
-
-        editBtn.innerHTML = `
-            <svg
-                viewBox="0 0 24 24"
-                width="22"
-                height="22"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <path d="M12 20h9"/>
-                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
-            </svg>
-        `;
+        editBtn.innerHTML =
+            "✏️ Редактировать";
 
         editBtn.style.cssText = `
-            width:30px;
-            height:30px;
+            width:100%;
+            height:46px;
             border:none;
-            border-radius:9px;
+            border-radius:12px;
             background:#fff3e8;
             color:#ff6600;
             display:flex;
             align-items:center;
-            justify-content:center;
+            padding:0 14px;
             cursor:pointer;
-            flex-shrink:0;
+            font-size:15px;
+            font-weight:700;
+            text-align:left;
         `;
 
+        /* 🏠 STATUS */
+        const statusBtn =
+            document.createElement("button");
 
+        statusBtn.type = "button";
+
+        statusBtn.innerHTML =
+            post.status === "sdanо"
+                ? "🔴 Снять Сдано"
+                : "🏠 Сдано";
+
+        statusBtn.style.cssText = `
+            width:100%;
+            height:46px;
+            margin-top:6px;
+            border:none;
+            border-radius:12px;
+            background:${
+                post.status === "sdanо"
+                    ? "#ffe5e5"
+                    : "#e8f7ed"
+            };
+            color:${
+                post.status === "sdanо"
+                    ? "#d93025"
+                    : "#159447"
+            };
+            display:flex;
+            align-items:center;
+            padding:0 14px;
+            cursor:pointer;
+            font-size:15px;
+            font-weight:700;
+            text-align:left;
+        `;
+
+        /* 🗑 DELETE */
         const deleteBtn =
             document.createElement("button");
 
         deleteBtn.type = "button";
-        deleteBtn.className =
-            "admin-delete-btn";
-
-        deleteBtn.title =
-            "Удалить";
-
-        deleteBtn.setAttribute(
-            "aria-label",
-            "Удалить"
-        );
-
-        deleteBtn.innerHTML = `
-            <svg
-                viewBox="0 0 24 24"
-                width="22"
-                height="22"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <path d="M3 6h18"/>
-                <path d="M8 6V4h8v2"/>
-                <path d="M19 6l-1 14H6L5 6"/>
-                <path d="M10 11v5"/>
-                <path d="M14 11v5"/>
-            </svg>
-        `;
+        deleteBtn.innerHTML =
+            "🗑️ Удалить";
 
         deleteBtn.style.cssText = `
-            width:30px;
-            height:30px;
+            width:100%;
+            height:46px;
+            margin-top:6px;
             border:none;
-            border-radius:9px;
+            border-radius:12px;
             background:#ffeaea;
             color:#e53935;
             display:flex;
             align-items:center;
-            justify-content:center;
+            padding:0 14px;
             cursor:pointer;
-            flex-shrink:0;
+            font-size:15px;
+            font-weight:700;
+            text-align:left;
         `;
 
+        /* MENU ORDER:
+           1. Редактировать
+           2. Сдано
+           3. Удалить
+        */
 
-        /* ღილაკების დამატება */
-        adminPriceActions.style.cssText = `
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:5px;
-    flex-shrink:0;
-`;
-
-        adminPriceActions.append(
-    deleteBtn
-);
-
-        adminPriceActions.append(
-    editBtn
-);
-/* =========================================================
-   STATUS BUTTON — ADMIN ONLY
-========================================================= */
-
-const statusBtn =
-    document.createElement("button");
-
-statusBtn.type = "button";
-
-statusBtn.className =
-    "admin-status-btn";
-
-statusBtn.title =
-    post.status === "sdanо"
-        ? "Снять статус Сдано"
-        : "Пометить как Сдано";
-
-statusBtn.setAttribute(
-    "aria-label",
-    statusBtn.title
-);
-
-statusBtn.innerHTML =
-    post.status === "sdanо"
-        ? "✓"
-        : "🏠";
-
-statusBtn.style.cssText = `
-    width:30px;
-    height:30px;
-    border:none;
-    border-radius:9px;
-
-    background:${
-        post.status === "sdanо"
-            ? "#ffe5e5"
-            : "#e8f7ed"
-    };
-
-    color:${
-        post.status === "sdanо"
-            ? "#d93025"
-            : "#159447"
-    };
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    cursor:pointer;
-    flex-shrink:0;
-
-    font-size:18px;
-    font-weight:800;
-`;
-
-adminPriceActions.append(
-    statusBtn
-);
-
-statusBtn.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        togglePostStatus(
-            post
+        managementMenu.append(
+            editBtn,
+            statusBtn,
+            deleteBtn
         );
 
-    }
-);
+        managementWrapper.append(
+            managementBtn,
+            managementMenu
+        );
 
+        adminPriceActions.append(
+            managementWrapper
+        );
 
-        /* რედაქტირება */
+        /* OPEN / CLOSE */
+        managementBtn.addEventListener(
+            "click",
+            event => {
 
+                event.preventDefault();
+                event.stopPropagation();
+
+                managementMenu.style.display =
+                    managementMenu.style.display === "block"
+                        ? "none"
+                        : "block";
+            }
+        );
+
+        /* EDIT */
         editBtn.addEventListener(
             "click",
             event => {
 
+                event.preventDefault();
                 event.stopPropagation();
 
-                editPost(post);
+                managementMenu.style.display =
+                    "none";
 
+                editPost(post);
             }
         );
 
+        /* STATUS */
+        statusBtn.addEventListener(
+            "click",
+            event => {
 
-        /* წაშლა */
+                event.preventDefault();
+                event.stopPropagation();
 
+                managementMenu.style.display =
+                    "none";
+
+                togglePostStatus(post);
+            }
+        );
+
+        /* DELETE */
         deleteBtn.addEventListener(
             "click",
             event => {
 
+                event.preventDefault();
                 event.stopPropagation();
 
-                deletePost(post);
+                managementMenu.style.display =
+                    "none";
 
+                deletePost(post);
             }
         );
 
-    }
+        /* CLICK OUTSIDE */
+        document.addEventListener(
+            "click",
+            event => {
 
+                if (
+                    !managementWrapper.contains(
+                        event.target
+                    )
+                ) {
+                    managementMenu.style.display =
+                        "none";
+                }
+
+            }
+        );
+    }
 }
 
 /* =========================
