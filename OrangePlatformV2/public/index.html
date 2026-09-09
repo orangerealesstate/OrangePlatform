@@ -630,7 +630,7 @@ style="
         type="button"
         aria-label="Language"
     >
-        🌐
+        🇷🇺
     </button>
 
     <div
@@ -643,7 +643,7 @@ style="
             class="language-option"
             data-lang="ka"
         >
-            🇬🇪 ქართული
+            🇬🇪 <span>ქართული</span>
         </button>
 
         <button
@@ -651,10 +651,12 @@ style="
             class="language-option"
             data-lang="en"
         >
-            🇬🇧 English
+            🇬🇧 <span>English</span>
         </button>
 
     </div>
+
+</div>
 
 </div>
 
@@ -1505,5 +1507,94 @@ function toggleDistricts() {
     }
 }
 </script>
+<!-- LANGUAGE SWITCHER -->
+
+<script>
+(function () {
+
+    const languageBtn = document.getElementById("languageBtn");
+    const languageMenu = document.getElementById("languageMenu");
+    const languageOptions = document.querySelectorAll(".language-option");
+
+    if (!languageBtn || !languageMenu) {
+        return;
+    }
+
+    /* გახსნა / დახურვა */
+    languageBtn.addEventListener("click", function (event) {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        languageMenu.classList.toggle("open");
+
+    });
+
+    /* ენის არჩევა */
+    languageOptions.forEach(function (option) {
+
+        option.addEventListener("click", function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const lang = option.dataset.lang;
+
+            /* ენის დამახსოვრება */
+            localStorage.setItem("orange-language", lang);
+
+            /* მთავარი დროშის შეცვლა */
+            if (lang === "ka") {
+
+                languageBtn.textContent = "🇬🇪";
+
+            } else if (lang === "en") {
+
+                languageBtn.textContent = "🇬🇧";
+
+            }
+
+            /* მენიუს დახურვა */
+            languageMenu.classList.remove("open");
+
+        });
+
+    });
+
+    /* გარეთ დაჭერისას მენიუს დახურვა */
+    document.addEventListener("click", function (event) {
+
+        if (
+            !languageBtn.contains(event.target) &&
+            !languageMenu.contains(event.target)
+        ) {
+
+            languageMenu.classList.remove("open");
+
+        }
+
+    });
+
+    /* შენახული ენის ჩატვირთვა */
+    const savedLanguage =
+        localStorage.getItem("orange-language");
+
+    if (savedLanguage === "ka") {
+
+        languageBtn.textContent = "🇬🇪";
+
+    } else if (savedLanguage === "en") {
+
+        languageBtn.textContent = "🇬🇧";
+
+    } else {
+
+        languageBtn.textContent = "🇷🇺";
+
+    }
+
+})();
+</script>
+
 </body>
 </html>
