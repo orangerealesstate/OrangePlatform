@@ -550,6 +550,177 @@ await bot.sendMessage(
             "✅ Ваша заявка отправлена. Мы свяжемся с вами!"
         );
 
+// =====================================================
+        // SEARCH MATCHING APARTMENTS AND SEND TO CLIENT
+        // =====================================================
+
+        try {
+            const matchResponse = await fetch(
+                `${API_URL}/api/match-request`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        district: data.district,
+                        rooms: data.rooms,
+                        budget: data.budget,
+                        pets: data.pets,
+                        period: data.period,
+                        moveIn: data.moveIn
+                    })
+                }
+            );
+
+            if (!matchResponse.ok) {
+                throw new Error(
+                    `Match API error: ${matchResponse.status}`
+                );
+            }
+
+            const matchData = await matchResponse.json();
+
+            if (
+                !matchData.success ||
+                !Array.isArray(matchData.posts) ||
+                matchData.posts.length === 0
+            ) {
+                await bot.sendMessage(
+                    msg.chat.id,
+                    "🔎 По вашему запросу пока не найдено подходящих квартир."
+                );
+            } else {
+
+                await bot.sendMessage(
+                    msg.chat.id,
+                    `🏠 Найдено подходящих квартир: ${matchData.posts.length}`
+                );
+
+                for (const post of matchData.posts) {
+
+                    const district =
+                        post.district || data.district || "-";
+
+                    const rooms =
+                        post.rooms || "-";
+
+                    const price =
+                        post.price || "-";
+
+                    const area =
+                        post.area || "-";
+
+                    const floor =
+                        post.floor || "-";
+
+                    const caption =
+`🏠 <b>Подходящий вариант</b>
+
+📍 <b>Район:</b> ${district}
+🛋 <b>Комнат:</b> ${rooms}
+💰 <b>Цена:</b> ${price}$
+📐 <b>Площадь:</b> ${area} м²
+🏢 <b>Этаж:</b> ${floor}`;
+
+                    const detailsUrl =
+                        `${API_URL}/details.html?id=${encodeURIComponent(post.id)}`;
+
+                    const keyboard = {
+                        inline_keyboard: [
+                            [
+                                {
+                                    text: "🏠 Открыть квартиру",
+                                    web_app: {
+                                        url: detailsUrl
+                                    }
+                                }
+                            ]
+                        ]
+                    };
+
+                    let imageUrl = null;
+
+                    if (
+                        Array.isArray(post.images) &&
+                        post.images.length > 0
+                    ) {
+                        const imagePath = String(post.images[0]);
+
+                        if (
+                            imagePath.startsWith("http://") ||
+                            imagePath.startsWith("https://")
+                        ) {
+                            imageUrl = imagePath;
+                        } else {
+                            imageUrl =
+                                `${API_URL}/${imagePath.replace(/^\/+/, "")}`;
+                        }
+                    }
+
+                    if (imageUrl) {
+
+                        try {
+
+                            await bot.sendPhoto(
+                                msg.chat.id,
+                                imageUrl,
+                                {
+                                    caption: caption,
+                                    parse_mode: "HTML",
+                                    reply_markup: keyboard
+                                }
+                            );
+
+                        } catch (photoError) {
+
+                            console.error(
+                                "❌ Ошибка отправки фото:",
+                                photoError.message
+                            );
+
+                            await bot.sendMessage(
+                                msg.chat.id,
+                                caption,
+                                {
+                                    parse_mode: "HTML",
+                                    reply_markup: keyboard
+                                }
+                            );
+                        }
+
+                    } else {
+
+                        await bot.sendMessage(
+                            msg.chat.id,
+                            caption,
+                            {
+                                parse_mode: "HTML",
+                                reply_markup: keyboard
+                            }
+                        );
+                    }
+
+                    await new Promise(
+                        resolve => setTimeout(resolve, 300)
+                    );
+                }
+            }
+
+        } catch (matchError) {
+
+            console.error(
+                "❌ MATCHING ERROR:",
+                matchError
+            );
+
+            await bot.sendMessage(
+                msg.chat.id,
+                "⚠️ Заявка получена, но пока не удалось автоматически подобрать квартиры."
+            );
+        }
+
+
         console.log(
             "📝 NEW CLIENT REQUEST:",
             {

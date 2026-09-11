@@ -617,6 +617,650 @@ app.get(
 
 
 // =========================================================
+// MATCH REQUEST — SEARCH APARTMENTS
+// =========================================================
+
+function normalizeMatchDistrict(value) {
+
+    const text = String(value || "")
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ");
+
+    const aliases = {
+
+        // SABURTALO
+        saburtalo: [
+            "saburtalo",
+            "сабуртало",
+            "საბურთალო"
+        ],
+
+        // VAKE
+        vake: [
+            "vake",
+            "ваки",
+            "ვაკე"
+        ],
+
+        // VERA
+        vera: [
+            "vera",
+            "вера",
+            "ვერა"
+        ],
+
+        // MTATSMINDA
+        mtatsminda: [
+            "mtatsminda",
+            "мтацминда",
+            "მთაწმინდა"
+        ],
+
+        // SOLOLAKI
+        sololaki: [
+            "sololaki",
+            "сололаки",
+            "სოლოლაკი"
+        ],
+
+        // CHUGURETI
+        chugureti: [
+            "chugureti",
+            "чугурети",
+            "ჩუღურეთი"
+        ],
+
+        // DIDUBE
+        didube: [
+            "didube",
+            "дидубе",
+            "დიდუბე"
+        ],
+
+        // NADZALADEVI
+        nadzaladevi: [
+            "nadzaladevi",
+            "надзаладеви",
+            "ნაძალადევი"
+        ],
+
+        // GLDANI
+        gldani: [
+            "gldani",
+            "глдани",
+            "გლდანი"
+        ],
+
+        // DIDI DIGOMI
+        "didi digomi": [
+            "didi digomi",
+            "დიდი დიღომი",
+            "დიდი დიღმის",
+            "большой дигоми"
+        ],
+
+        // DIGOMI
+        digomi: [
+            "digomi",
+            "дидигоми",
+            "დიღომი",
+            "дიღомი"
+        ],
+
+        // TEMKA
+        temka: [
+            "temka",
+            "темка",
+            "თემქა"
+        ],
+
+        // ISANI
+        isani: [
+            "isani",
+            "исани",
+            "ისანი"
+        ],
+
+        // SAMGORI
+        samgori: [
+            "samgori",
+            "самгори",
+            "სამგორი"
+        ],
+
+        // VARKETILI
+        varketili: [
+            "varketili",
+            "варкетили",
+            "ვარკეთილი"
+        ],
+
+        // VAZISUBANI
+        vazisubani: [
+            "vazisubani",
+            "вазисубани",
+            "ვაზისუბანი"
+        ],
+
+        // KRTSANISI
+        krtsanisi: [
+            "krtsanisi",
+            "крцаниси",
+            "კრწანისი"
+        ],
+
+        // ORTACHALA
+        ortachala: [
+            "ortachala",
+            "орточала",
+            "ორთაჭალა"
+        ],
+
+        // PONICHALA
+        ponichala: [
+            "ponichala",
+            "поничала",
+            "ფონიჭალა"
+        ],
+
+        // AVLABARI
+        avlabari: [
+            "avlabari",
+            "авлабари",
+            "ავლაბარი"
+        ],
+
+        // NAVTLUGHI
+        navtlughi: [
+            "navtlughi",
+            "нафтлуги",
+            "ნავთლუღი"
+        ],
+
+        // TBILISI SEA
+        "tbilisi sea": [
+            "tbilisi sea",
+            "тбилисское море",
+            "თბილისის ზღვა"
+        ]
+
+    };
+
+
+    for (
+        const [
+            district,
+            names
+        ]
+        of Object.entries(
+            aliases
+        )
+    ) {
+
+        if (
+            names.some(
+                name =>
+                    text.includes(
+                        name
+                    )
+            )
+        ) {
+
+            return district;
+
+        }
+
+    }
+
+
+    return text;
+}
+
+
+function getMatchPetStatus(post) {
+
+    const text = String(post.text || "");
+
+    const match = text.match(
+        /#Животные\s*:\s*([^\n]*)/i
+    );
+
+    const value = String(
+        match?.[1] || ""
+    )
+        .trim()
+        .toLowerCase();
+
+    if (
+        value.includes("❌") ||
+        value.includes("нет") ||
+        value.includes("no") ||
+        value.includes("არა")
+    ) {
+
+        return "no";
+
+    }
+
+    return "unknown";
+}
+
+
+function getMatchLeaseMonths(post) {
+
+    const text = String(post.text || "");
+
+    const match = text.match(
+        /Срок\s*ареньди\s*:\s*([^\n]+)/i
+    );
+
+    if (!match) {
+
+        return null;
+
+    }
+
+    const numbers = (
+        match[1].match(/\d+/g) || []
+    ).map(Number);
+
+
+    if (!numbers.length) {
+
+        return null;
+
+    }
+
+
+    if (numbers.length === 1) {
+
+        return {
+            min: numbers[0],
+            max: numbers[0]
+        };
+
+    }
+
+
+    return {
+        min: Math.min(...numbers),
+        max: Math.max(...numbers)
+    };
+}
+
+
+function getRequestMonths(value) {
+
+    const numbers = (
+        String(value || "")
+            .match(/\d+/g) || []
+    ).map(Number);
+
+
+    if (!numbers.length) {
+
+        return null;
+
+    }
+
+
+    return numbers[0];
+}
+
+
+app.post(
+    "/api/match-request",
+    (req, res) => {
+
+        try {
+
+            const {
+                district,
+                rooms,
+                budget,
+                pets,
+                period,
+                moveIn
+            } = req.body || {};
+
+
+            console.log(
+                "🔎 MATCH REQUEST:",
+                req.body
+            );
+
+
+            const requestedDistrict =
+                normalizeMatchDistrict(
+                    district
+                );
+
+
+            const requestedRooms =
+                Number(
+                    rooms
+                );
+
+
+            const requestedBudget =
+                Number(
+                    String(
+                        budget || ""
+                    ).replace(
+                        /[^\d.]/g,
+                        ""
+                    )
+                );
+
+
+            const requestedMonths =
+                getRequestMonths(
+                    period
+                );
+
+
+            const clientHasPet =
+                /да|yes|კი/i.test(
+                    String(
+                        pets || ""
+                    )
+                );
+
+
+            const posts =
+                getVisiblePosts();
+
+
+            const matches =
+                posts.filter(
+                    post => {
+
+                        // =================================================
+                        // მხოლოდ ACTIVE განცხადებები
+                        // =================================================
+
+                        if (
+                            String(
+                                post.status || ""
+                            )
+                                .toLowerCase()
+                            !== "active"
+                        ) {
+
+                            return false;
+
+                        }
+
+
+                        // =================================================
+                        // რაიონი
+                        // =================================================
+
+                        if (
+                            requestedDistrict
+                        ) {
+
+                            const postDistrict =
+                                normalizeMatchDistrict(
+                                    post.district
+                                );
+
+
+                            if (
+                                postDistrict !==
+                                requestedDistrict
+                            ) {
+
+                                return false;
+
+                            }
+
+                        }
+
+
+                        // =================================================
+                        // ოთახები
+                        // =================================================
+
+                        if (
+                            Number.isFinite(
+                                requestedRooms
+                            ) &&
+                            requestedRooms > 0
+                        ) {
+
+                            if (
+                                Number(
+                                    post.rooms
+                                ) !==
+                                requestedRooms
+                            ) {
+
+                                return false;
+
+                            }
+
+                        }
+
+
+                        // =================================================
+                        // ფასი
+                        // =================================================
+
+                        if (
+                            Number.isFinite(
+                                requestedBudget
+                            ) &&
+                            requestedBudget > 0
+                        ) {
+
+                            const postPrice =
+                                Number(
+                                    String(
+                                        post.price || ""
+                                    ).replace(
+                                        /[^\d.]/g,
+                                        ""
+                                    )
+                                );
+
+
+                            if (
+                                !Number.isFinite(
+                                    postPrice
+                                ) ||
+                                postPrice >
+                                requestedBudget
+                            ) {
+
+                                return false;
+
+                            }
+
+                        }
+
+
+                        // =================================================
+                        // შინაური ცხოველი
+                        // =================================================
+
+                        if (
+                            clientHasPet
+                        ) {
+
+                            const petStatus =
+                                getMatchPetStatus(
+                                    post
+                                );
+
+
+                            if (
+                                petStatus === "no"
+                            ) {
+
+                                return false;
+
+                            }
+
+                        }
+
+
+                        // =================================================
+                        // ქირაობის პერიოდი
+                        // =================================================
+
+                        if (
+                            requestedMonths
+                        ) {
+
+                            const lease =
+                                getMatchLeaseMonths(
+                                    post
+                                );
+
+
+                            // თუ განცხადებაში პერიოდი
+                            // საერთოდ არ წერია,
+                            // ბინას არ გამოვრიცხავთ
+
+                            if (
+                                lease
+                            ) {
+
+                                if (
+                                    requestedMonths <
+                                    lease.min ||
+                                    requestedMonths >
+                                    lease.max
+                                ) {
+
+                                    return false;
+
+                                }
+
+                            }
+
+                        }
+
+
+                        return true;
+
+                    }
+                );
+
+
+            // =================================================
+            // მაქსიმუმ 10 შესაბამისი ბინა
+            // =================================================
+
+            const result =
+                matches
+                    .slice(0, 10)
+                    .map(
+                        post => ({
+
+                            id:
+                                post.id,
+
+                            telegramLink:
+                                post.telegramLink
+                                || "",
+
+                            images:
+                                Array.isArray(
+                                    post.images
+                                )
+                                    ? post.images
+                                    : [],
+
+                            price:
+                                post.price
+                                || "",
+
+                            district:
+                                post.district
+                                || "",
+
+                            street:
+                                post.street
+                                || "",
+
+                            rooms:
+                                post.rooms
+                                || "",
+
+                            bedrooms:
+                                post.bedrooms
+                                || "",
+
+                            area:
+                                post.area
+                                || "",
+
+                            floor:
+                                post.floor
+                                || "",
+
+                            bathrooms:
+                                post.bathrooms
+                                || "",
+
+                            text:
+                                post.text
+                                || ""
+
+                        })
+                    );
+
+
+            console.log(
+                `🏠 MATCHES FOUND: ${result.length}`
+            );
+
+
+            res.json({
+
+                success: true,
+
+                count:
+                    result.length,
+
+                posts:
+                    result
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(
+                "❌ MATCH REQUEST ERROR:",
+                err
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success: false,
+
+                    error:
+                        "Match request failed"
+
+                });
+
+        }
+
+    }
+);
+
+
+
+
+// =========================================================
 // FAVORITES
 // =========================================================
 
