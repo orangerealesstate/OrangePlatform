@@ -22,19 +22,44 @@ let currentIndex = 0;
 // PRELOAD GALLERY IMAGES
 // =========================================================
 
-function preloadImages() {
+const galleryCache = new Map();
 
-    if (!Array.isArray(currentImages)) return;
+function preloadImage(index) {
 
-    currentImages.forEach((img) => {
+    if (
+        !Array.isArray(currentImages) ||
+        !currentImages.length
+    ) return;
 
-        const image = new Image();
-        image.src = "/" + img;
+    if (index < 0) {
+        index = currentImages.length - 1;
+    }
 
-    });
+    if (index >= currentImages.length) {
+        index = 0;
+    }
 
+    const src = "/" + currentImages[index];
+
+    if (galleryCache.has(src)) return;
+
+    const image = new Image();
+
+    image.src = src;
+
+    galleryCache.set(src, image);
 }
 
+function preloadGallery() {
+
+    if (!currentImages.length) return;
+
+    // შემდეგი ფოტო
+    preloadImage(currentIndex + 1);
+
+    // წინა ფოტო
+    preloadImage(currentIndex - 1);
+}
 /* =========================================================
    ADMIN CHECK
 ========================================================= */
@@ -1105,6 +1130,7 @@ function prevImage() {
 
 
     updateGallery();
+preloadGallery();
 
 }
 
@@ -1138,6 +1164,7 @@ function nextImage() {
 
 
     updateGallery();
+preloadGallery();
 
 }
 
