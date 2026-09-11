@@ -623,21 +623,16 @@ await bot.sendMessage(
 📐 <b>Площадь:</b> ${area} м²
 🏢 <b>Этаж:</b> ${floor}`;
 
-                    const detailsUrl =
-                        `${API_URL}/details.html?id=${encodeURIComponent(post.id)}`;
-
                     const keyboard = {
-                        inline_keyboard: [
-                            [
-                                {
-                                    text: "🏠 Открыть квартиру",
-                                    web_app: {
-                                        url: detailsUrl
-                                    }
-                                }
-                            ]
-                        ]
-                    };
+    inline_keyboard: [
+        [
+            {
+                text: "📲 Открыть оригинальный пост",
+                url: post.telegramLink
+            }
+        ]
+    ]
+};
 
                     let imageUrl = null;
 
