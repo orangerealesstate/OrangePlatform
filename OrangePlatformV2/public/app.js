@@ -4127,132 +4127,121 @@ function openGallery(
 
 
 /* =========================
-   FAST & SMOOTH SWIPE GALLERY
-========================= */
+       SWIPE GALLERY
+    ========================= */
 
-let touchStartX = 0;
-let touchStartY = 0;
-let touchCurrentX = 0;
-let isDragging = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
 
 
-/* PRELOAD ALL PHOTOS */
+    viewer.addEventListener(
+        "touchstart",
+        event => {
 
-post.images.forEach(imagePath => {
+            touchStartX =
+                event.changedTouches[0].screenX;
 
-    const preload = new Image();
+            touchStartY =
+                event.changedTouches[0].screenY;
 
-    preload.src =
-        imagePath.startsWith("http")
-            ? imagePath
-            : "/" + imagePath;
-
-});
+        },
+        { passive: true }
+    );
 
 
-/* TOUCH START */
+    viewer.addEventListener(
+        "touchend",
+        event => {
 
-viewer.addEventListener(
-    "touchstart",
-    event => {
+            const touchEndX =
+                event.changedTouches[0].screenX;
 
-        const touch =
-            event.changedTouches[0];
+            const touchEndY =
+                event.changedTouches[0].screenY;
 
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
-        touchCurrentX = touch.clientX;
+            const diffX =
+                touchEndX - touchStartX;
 
-        isDragging = true;
+            const diffY =
+                touchEndY - touchStartY;
 
-        image.style.transition =
-            "none";
 
-    },
-    {
-        passive: true
+            // ვერტიკალური სქროლი არ ჩაითვალოს swipe-ად
+            if (
+                Math.abs(diffX) < 40 ||
+                Math.abs(diffX) < Math.abs(diffY)
+            ) {
+                return;
+            }
+
+
+            // მარცხნივ → შემდეგი ფოტო
+            if (diffX < 0) {
+
+                current++;
+
+                if (
+                    current >=
+                    post.images.length
+                ) {
+                    current = 0;
+                }
+
+            }
+
+            // მარჯვნივ → წინა ფოტო
+            else {
+
+                current--;
+
+                if (current < 0) {
+                    current =
+                        post.images.length - 1;
+                }
+
+            }
+
+
+            showImage();
+
+        },
+        { passive: true }
+    );
+
+    function showImage() {
+
+        const currentImage =
+            post.images[
+                current
+            ];
+
+
+        image.src =
+            currentImage.startsWith(
+                "http"
+            )
+                ? currentImage
+                : "/" + currentImage;
+
+
+        counter.textContent =
+            `${current + 1} / ${post.images.length}`;
+
     }
-);
 
 
-/* TOUCH MOVE */
+    viewer.querySelector(
+        "#nextPhoto"
+    ).onclick =
+        event => {
 
-viewer.addEventListener(
-    "touchmove",
-    event => {
+            event.preventDefault();
 
-        if (!isDragging) {
-            return;
-        }
+            event.stopPropagation();
 
-        const touch =
-            event.changedTouches[0];
-
-        touchCurrentX =
-            touch.clientX;
-
-        const diffX =
-            touchCurrentX -
-            touchStartX;
-
-        const diffY =
-            touch.clientY -
-            touchStartY;
-
-        /* მხოლოდ ჰორიზონტალური მოძრაობა */
-
-        if (
-            Math.abs(diffX) >
-            Math.abs(diffY)
-        ) {
-
-            image.style.transform =
-                `translateX(${diffX}px)`;
-        }
-
-    },
-    {
-        passive: true
-    }
-);
-
-
-/* TOUCH END */
-
-viewer.addEventListener(
-    "touchend",
-    () => {
-
-        if (!isDragging) {
-            return;
-        }
-
-        isDragging = false;
-
-        const diffX =
-            touchCurrentX -
-            touchStartX;
-
-
-        /* პატარა მოძრაობა */
-
-        if (Math.abs(diffX) < 60) {
-
-            image.style.transition =
-                "transform .15s ease";
-
-            image.style.transform =
-                "translateX(0)";
-
-            return;
-        }
-
-
-        /* მარცხნივ → შემდეგი ფოტო */
-
-        if (diffX < 0) {
 
             current++;
+
 
             if (
                 current >=
@@ -4260,92 +4249,70 @@ viewer.addEventListener(
             ) {
 
                 current = 0;
+
             }
 
-        }
+
+            showImage();
+
+        };
 
 
-        /* მარჯვნივ → წინა ფოტო */
+    viewer.querySelector(
+        "#prevPhoto"
+    ).onclick =
+        event => {
 
-        else {
+            event.preventDefault();
+
+            event.stopPropagation();
+
 
             current--;
 
-            if (current < 0) {
+
+            if (
+                current < 0
+            ) {
 
                 current =
                     post.images.length - 1;
+
             }
-        }
 
 
-        const direction =
-            diffX < 0 ? -1 : 1;
+            showImage();
+
+        };
 
 
-        /* ძველი ფოტო გადის */
+    viewer.querySelector(
+        "#closeViewer"
+    ).onclick =
+        () => {
 
-        image.style.transition =
-            "transform .14s ease-out";
+            viewer.remove();
 
-        image.style.transform =
-            `translateX(${
-                direction *
-                -window.innerWidth
-            }px)`;
+        };
 
 
-        setTimeout(() => {
+    viewer.onclick =
+        event => {
 
-            const currentImage =
-                post.images[current];
+            if (
+                event.target ===
+                viewer
+            ) {
 
+                viewer.remove();
 
-            /* ახალი ფოტო თავიდან */
+            }
 
-            image.style.transition =
-                "none";
-
-            image.style.transform =
-                `translateX(${
-                    direction *
-                    window.innerWidth
-                }px`;
+        };
 
 
-            image.src =
-                currentImage.startsWith("http")
-                    ? currentImage
-                    : "/" + currentImage;
+    showImage();
 
-
-            counter.textContent =
-                `${current + 1} / ${post.images.length}`;
-
-
-            /* ახალი ფოტო შემოდის */
-
-            requestAnimationFrame(() => {
-
-                requestAnimationFrame(() => {
-
-                    image.style.transition =
-                        "transform .14s ease-out";
-
-                    image.style.transform =
-                        "translateX(0)";
-
-                });
-
-            });
-
-        }, 140);
-
-    },
-    {
-        passive: true
-    }
-);
 }
 
 /* =========================================================
