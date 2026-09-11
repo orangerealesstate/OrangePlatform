@@ -18,6 +18,22 @@ const telegramUserId =
 let currentImages = [];
 let currentIndex = 0;
 
+// =========================================================
+// PRELOAD GALLERY IMAGES
+// =========================================================
+
+function preloadImages() {
+
+    if (!Array.isArray(currentImages)) return;
+
+    currentImages.forEach((img) => {
+
+        const image = new Image();
+        image.src = "/" + img;
+
+    });
+
+}
 
 /* =========================================================
    ADMIN CHECK
@@ -329,6 +345,8 @@ async function toggleFavorite(postId) {
 
 
         currentIndex = 0;
+
+        preloadImages();
 
 
         let images = "";
@@ -1147,17 +1165,19 @@ function updateGallery() {
             "viewerImage"
         );
 
+if (mainImage) {
 
-    if (mainImage) {
+    const newImage = new Image();
 
-        mainImage.src =
+    newImage.onload = function () {
+        mainImage.src = newImage.src;
+    };
 
-            "/" +
-            currentImages[
-                currentIndex
-            ];
+    newImage.src =
+        "/" +
+        currentImages[currentIndex];
 
-    }
+}
 
 
     if (photoNumber) {
