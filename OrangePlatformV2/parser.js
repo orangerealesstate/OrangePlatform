@@ -1239,104 +1239,124 @@ async function getYandexCoordinates(
     return null;
 
 }
-/* =========================================================
-   PARSE COORDINATES FROM GOOGLE MAPS URL
-========================================================= */
-
 function parseGoogleCoordinatesFromUrl(url) {
 
     if (!url) {
         return null;
     }
 
-    const value = String(url);
-
-    /* Google Maps:
-       https://www.google.com/maps/@41.7151,44.8271,17z
-    */
-
-    let match =
-        value.match(
-            /@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i
+    const text =
+        decodeURIComponent(
+            String(url)
         );
 
-    if (match) {
-
-        const lat = Number(match[1]);
-        const lng = Number(match[2]);
-
-        const coords =
-            makeCoords(
-                lng,
-                lat,
-                "google-url",
-                "google-direct"
-            );
-
-        if (coords) {
-            return coords;
-        }
-    }
-
-
-    /* Google place format:
-       !3d41.7151!4d44.8271
+    /*
+       =====================================================
+       GOOGLE EXACT PLACE COORDINATES
+       
+       !3d LATITUDE
+       !4d LONGITUDE
+       =====================================================
     */
 
-    match =
-        value.match(
+    const placeMatch =
+        text.match(
             /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/i
         );
 
-    if (match) {
-
-        const lat = Number(match[1]);
-        const lng = Number(match[2]);
+    if (placeMatch) {
 
         const coords =
             makeCoords(
-                lng,
-                lat,
+                placeMatch[2],
+                placeMatch[1],
                 "google-url",
-                "google-place"
+                "exact-place"
             );
 
         if (coords) {
+
+            console.log(
+                "🟢 GOOGLE EXACT PLACE:",
+                coords
+            );
+
             return coords;
         }
     }
 
 
-    /* Google query:
-       ?query=41.7151,44.8271
+    /*
+       =====================================================
+       GOOGLE @LAT,LNG
+       
+       გამოიყენება მხოლოდ მაშინ,
+       თუ !3d / !4d ვერ მოიძებნა
+       =====================================================
     */
 
-    match =
-        value.match(
-            /[?&](?:query|q|ll)=(-?\d+(?:\.\d+)?)[,%](-?\d+(?:\.\d+)?)/i
+    const atMatch =
+        text.match(
+            /@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i
         );
 
-    if (match) {
-
-        const lat = Number(match[1]);
-        const lng = Number(match[2]);
+    if (atMatch) {
 
         const coords =
             makeCoords(
-                lng,
-                lat,
+                atMatch[2],
+                atMatch[1],
+                "google-url",
+                "map-center"
+            );
+
+        if (coords) {
+
+            console.log(
+                "🟡 GOOGLE MAP CENTER:",
+                coords
+            );
+
+            return coords;
+        }
+    }
+
+
+    /*
+       =====================================================
+       GOOGLE QUERY
+       =====================================================
+    */
+
+    const queryMatch =
+        text.match(
+            /[?&](?:query|q|ll)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i
+        );
+
+    if (queryMatch) {
+
+        const coords =
+            makeCoords(
+                queryMatch[2],
+                queryMatch[1],
                 "google-url",
                 "google-query"
             );
 
         if (coords) {
+
+            console.log(
+                "🟢 GOOGLE QUERY:",
+                coords
+            );
+
             return coords;
         }
     }
 
+
     return null;
 }
-
 
 /* =========================================================
    RESOLVE GOOGLE MAPS LINK
