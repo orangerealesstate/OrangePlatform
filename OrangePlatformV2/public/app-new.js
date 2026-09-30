@@ -45,8 +45,11 @@ const telegramUserId =
 /* =========================================================
    GLOBAL STATE
 ========================================================= */
-
 let allPosts = [];
+
+let currentPage = 1;
+
+const POSTS_PER_PAGE = 20;
 
 let currentView =
     "catalog";
@@ -726,6 +729,8 @@ function getFilteredPosts() {
 
 function filterPosts() {
 
+    currentPage = 1;
+
     const filtered =
         getFilteredPosts();
 
@@ -759,6 +764,7 @@ function filterPosts() {
 ========================================================= */
 
 function clearFilters() {
+    currentPage = 1;
 
     [
         "search",
@@ -959,6 +965,29 @@ function renderPosts(
 
     container.innerHTML =
         "";
+        // =====================================================
+// PAGINATION — 20 განცხადება თითო გვერდზე
+// =====================================================
+
+const totalPages = Math.ceil(
+    posts.length / POSTS_PER_PAGE
+);
+
+if (
+    currentPage > totalPages &&
+    totalPages > 0
+) {
+    currentPage = totalPages;
+}
+
+const start =
+    (currentPage - 1) * POSTS_PER_PAGE;
+
+const end =
+    start + POSTS_PER_PAGE;
+
+const pagePosts =
+    posts.slice(start, end);
 
 
     if (!posts.length) {
@@ -981,8 +1010,7 @@ function renderPosts(
     }
 
 
-    posts.forEach(
-        post => {
+    pagePosts.forEach(post => {
 
             const images =
                 Array.isArray(
@@ -1245,6 +1273,178 @@ function renderPosts(
         }
     );
 
+    // =====================================================
+// PAGINATION BUTTONS
+// =====================================================
+
+const oldPagination =
+    document.getElementById(
+        "orangePagination"
+    );
+
+if (oldPagination) {
+    oldPagination.remove();
+}
+
+if (totalPages > 1) {
+
+    const pagination =
+        document.createElement("div");
+
+    pagination.id =
+        "orangePagination";
+
+    pagination.style.cssText = `
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        flex-wrap:wrap;
+        gap:8px;
+        padding:20px 10px 30px;
+    `;
+
+    function createPageButton(
+        text,
+        page,
+        disabled = false
+    ) {
+
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+
+        button.textContent = text;
+
+        button.disabled = disabled;
+
+        button.style.cssText = `
+            min-width:42px;
+            height:42px;
+            padding:0 12px;
+            border:none;
+            border-radius:12px;
+            background:${
+                page === currentPage
+                    ? "#ff6600"
+                    : "#f1f1f1"
+            };
+            color:${
+                page === currentPage
+                    ? "#fff"
+                    : "#333"
+            };
+            font-size:15px;
+            font-weight:700;
+            cursor:pointer;
+        `;
+
+        if (!disabled) {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    currentPage = page;
+
+                    renderPosts(
+                        getFilteredPosts()
+                    );
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    });
+
+                }
+            );
+
+        }
+
+        return button;
+    }
+
+
+    // PREVIOUS BUTTON
+    pagination.appendChild(
+        createPageButton(
+            "‹",
+            Math.max(
+                1,
+                currentPage - 1
+            ),
+            currentPage === 1
+        )
+    );
+
+
+    // PAGE NUMBERS
+    for (
+        let page = 1;
+        page <= totalPages;
+        page++
+    ) {
+
+        if (
+            page === 1 ||
+            page === totalPages ||
+            Math.abs(
+                page - currentPage
+            ) <= 2
+        ) {
+
+            pagination.appendChild(
+                createPageButton(
+                    String(page),
+                    page
+                )
+            );
+
+        }
+
+        else if (
+            page === currentPage - 3 ||
+            page === currentPage + 3
+        ) {
+
+            const dots =
+                document.createElement(
+                    "span"
+                );
+
+            dots.textContent = "...";
+
+            dots.style.cssText = `
+                padding:0 4px;
+                font-weight:700;
+                color:#777;
+            `;
+
+            pagination.appendChild(
+                dots
+            );
+        }
+
+    }
+
+
+    // NEXT BUTTON
+    pagination.appendChild(
+        createPageButton(
+            "›",
+            Math.min(
+                totalPages,
+                currentPage + 1
+            ),
+            currentPage === totalPages
+        )
+    );
+
+
+    container.parentNode.appendChild(
+        pagination
+    );
+}
 
     setupCardEvents();
 
