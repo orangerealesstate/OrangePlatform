@@ -2848,6 +2848,132 @@ card.querySelector(
 );
 
     });
+// =====================================================
+    // PAGINATION
+    // =====================================================
+
+    if (totalPages > 1) {
+
+        const pagination =
+            document.createElement("div");
+
+        pagination.id =
+            "orangePagination";
+
+        pagination.style.cssText = `
+            width:100%;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:8px;
+            flex-wrap:wrap;
+            padding:20px 10px 40px;
+        `;
+
+        function createPageButton(
+            text,
+            page,
+            disabled = false
+        ) {
+
+            const button =
+                document.createElement("button");
+
+            button.type = "button";
+
+            button.textContent = text;
+
+            button.disabled = disabled;
+
+            button.style.cssText = `
+                min-width:42px;
+                height:42px;
+                border:none;
+                border-radius:12px;
+                background:${
+                    page === currentPage
+                        ? "#ff6600"
+                        : "#f1f1f1"
+                };
+                color:${
+                    page === currentPage
+                        ? "#fff"
+                        : "#333"
+                };
+                font-size:15px;
+                font-weight:700;
+                cursor:pointer;
+            `;
+
+            if (!disabled) {
+
+                button.onclick = () => {
+
+                    currentPage = page;
+
+                    renderPosts(
+                        getFilteredPosts()
+                    );
+
+                    window.scrollTo({
+                        top:0,
+                        behavior:"smooth"
+                    });
+
+                };
+
+            }
+
+            return button;
+        }
+
+        // PREVIOUS
+        pagination.appendChild(
+            createPageButton(
+                "‹",
+                currentPage - 1,
+                currentPage === 1
+            )
+        );
+
+        // PAGE NUMBERS
+        for (
+            let page = 1;
+            page <= totalPages;
+            page++
+        ) {
+
+            pagination.appendChild(
+                createPageButton(
+                    String(page),
+                    page
+                )
+            );
+
+        }
+
+        // NEXT
+        pagination.appendChild(
+            createPageButton(
+                "›",
+                currentPage + 1,
+                currentPage === totalPages
+            )
+        );
+
+      const postsContainer =
+    document.getElementById("posts");
+
+if (postsContainer) {
+
+    postsContainer.insertAdjacentElement(
+        "afterend",
+        pagination
+    );
+
+}
+}
+
 
 }/* =========================
    ADMIN EDIT POST
