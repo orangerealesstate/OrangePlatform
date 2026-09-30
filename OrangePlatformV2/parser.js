@@ -744,62 +744,73 @@ function makeCoords(
 
 }
 
-
 /* =========================================================
-   YANDEX MAP LINK FINDER
+   MAP LINK FINDER — YANDEX + GOOGLE
 ========================================================= */
 
-function extractYandexLinks(
-    text
-) {
+function extractMapLinks(text) {
 
-    if (
-        !text
-    ) {
-
-        return [];
-
+    if (!text) {
+        return {
+            yandex: [],
+            google: []
+        };
     }
 
+    const value = String(text);
 
-    const matches =
-        String(
-            text
-        ).match(
+    /* =========================
+       YANDEX MAPS
+    ========================= */
 
+    const yandexMatches =
+        value.match(
             /https?:\/\/(?:www\.)?yandex\.[^\/\s<>"')]+\/maps\/[^\s<>"')]+/gi
-
-        );
-
-
-    if (
-        !matches
-    ) {
-
-        return [];
-
-    }
+        ) || [];
 
 
-    return [
-        ...new Set(
+    /* =========================
+       GOOGLE MAPS
+    ========================= */
 
-            matches.map(
+    const googleMatches =
+        value.match(
+            /https?:\/\/(?:www\.)?(?:google\.[^\/\s<>"')]+\/maps\/[^\s<>"')]+|maps\.app\.goo\.gl\/[^\s<>"')]+)/gi
+        ) || [];
 
-                url =>
 
-                    String(
-                        url
-                    )
-                        .replace(
-                            /[),.;]+$/,
-                            ""
-                        )
+    return {
 
+        /* =========================
+           YANDEX LINKS
+        ========================= */
+
+        yandex: [
+            ...new Set(
+                yandexMatches.map(
+                    url =>
+                        String(url)
+                            .replace(/[),.;]+$/, "")
+                )
             )
+        ],
 
-        )
-    ];
+
+        /* =========================
+           GOOGLE LINKS
+        ========================= */
+
+        google: [
+            ...new Set(
+                googleMatches.map(
+                    url =>
+                        String(url)
+                            .replace(/[),.;]+$/, "")
+                )
+            )
+        ]
+
+    };
 
 }
 
@@ -1227,6 +1238,281 @@ async function getYandexCoordinates(
 
     return null;
 
+}
+/* =========================================================
+   PARSE COORDINATES FROM GOOGLE MAPS URL
+========================================================= */
+
+function parseGoogleCoordinatesFromUrl(url) {
+
+    if (!url) {
+        return null;
+    }
+
+    const value = String(url);
+
+    /* Google Maps:
+       https://www.google.com/maps/@41.7151,44.8271,17z
+    */
+
+    let match =
+        value.match(
+            /@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i
+        );
+
+    if (match) {
+
+        const lat = Number(match[1]);
+        const lng = Number(match[2]);
+
+        const coords =
+            makeCoords(
+                lng,
+                lat,
+                "google-url",
+                "google-direct"
+            );
+
+        if (coords) {
+            return coords;
+        }
+    }
+
+
+    /* Google place format:
+       !3d41.7151!4d44.8271
+    */
+
+    match =
+        value.match(
+            /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/i
+        );
+
+    if (match) {
+
+        const lat = Number(match[1]);
+        const lng = Number(match[2]);
+
+        const coords =
+            makeCoords(
+                lng,
+                lat,
+                "google-url",
+                "google-place"
+            );
+
+        if (coords) {
+            return coords;
+        }
+    }
+
+
+    /* Google query:
+       ?query=41.7151,44.8271
+    */
+
+    match =
+        value.match(
+            /[?&](?:query|q|ll)=(-?\d+(?:\.\d+)?)[,%](-?\d+(?:\.\d+)?)/i
+        );
+
+    if (match) {
+
+        const lat = Number(match[1]);
+        const lng = Number(match[2]);
+
+        const coords =
+            makeCoords(
+                lng,
+                lat,
+                "google-url",
+                "google-query"
+            );
+
+        if (coords) {
+            return coords;
+        }
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   RESOLVE GOOGLE MAPS LINK
+========================================================= */
+
+async function resolveGoogleLink(originalUrl) {
+
+    if (!originalUrl) {
+        return null;
+    }
+
+
+    /* DIRECT GOOGLE URL */
+
+    const direct =
+        parseGoogleCoordinatesFromUrl(
+            originalUrl
+        );
+
+    if (direct) {
+
+        return {
+            ...direct,
+            googleMapUrl: originalUrl
+        };
+
+    }
+
+
+    /* SHORT GOOGLE LINK */
+
+    try {
+
+        console.log(
+            "🔗 Resolving Google link:",
+            originalUrl
+        );
+
+        const response =
+            await axios.get(
+                originalUrl,
+                {
+
+                    maxRedirects: 10,
+
+                    timeout: 10000,
+
+                    responseType: "text",
+
+                    validateStatus:
+                        () => true,
+
+                    headers: {
+
+                        "User-Agent":
+                            "Orange Real Estate Tbilisi"
+
+                    }
+
+                }
+            );
+
+
+        const finalUrl =
+            response
+                ?.request
+                ?.res
+                ?.responseUrl ||
+
+            response
+                ?.request
+                ?._redirectable
+                ?._currentUrl ||
+
+            "";
+
+
+        if (finalUrl) {
+
+            console.log(
+                "🔗 Google final URL:",
+                finalUrl
+            );
+
+
+            const fromFinal =
+                parseGoogleCoordinatesFromUrl(
+                    finalUrl
+                );
+
+
+            if (fromFinal) {
+
+                return {
+
+                    ...fromFinal,
+
+                    googleMapUrl:
+                        originalUrl
+
+                };
+
+            }
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "⚠️ Google resolve error:",
+            error.message
+        );
+
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   GET GOOGLE COORDINATES
+========================================================= */
+
+async function getGoogleCoordinates(text) {
+
+    const links =
+        extractGoogleLinks(
+            text
+        );
+
+
+    if (!links.length) {
+
+        return null;
+
+    }
+
+
+    console.log(
+        "🗺️ GOOGLE LINKS FOUND:",
+        links
+    );
+
+
+    for (
+        const link of links
+    ) {
+
+        const result =
+            await resolveGoogleLink(
+                link
+            );
+
+
+        if (result) {
+
+            console.log(
+                "✅ GOOGLE LOCATION FOUND:",
+                result
+            );
+
+            return result;
+
+        }
+
+    }
+
+
+    console.log(
+        "⚠️ Google link found, but coordinates were not extracted."
+    );
+
+
+    return null;
 }
 
 
@@ -2065,6 +2351,23 @@ async function getCoordinatesForPost(
         return yandex;
 
     }
+    /* =====================================================
+   GOOGLE SECOND
+===================================================== */
+
+const google =
+    await getGoogleCoordinates(
+        post.text || ""
+    );
+
+
+if (
+    google
+) {
+
+    return google;
+
+}
 
 
     /*
@@ -2612,8 +2915,19 @@ const telegramCode = telegramCodeMatch
             geoUpdatedAt:
                 "",
 
-            yandexMapUrl:
-                ""
+           
+                yandexMapUrl:
+    "",
+
+googleMapUrl:
+    "",
+
+mapUrl:
+    "",
+
+mapProvider:
+    ""
+                
 
         };
 
@@ -2811,26 +3125,70 @@ const detectedStreet =
 
     }
 
+/* =====================================================
+   MAP URL — YANDEX + GOOGLE
+===================================================== */
 
-    /* =====================================================
-       YANDEX URL
-    ===================================================== */
-
-    const yandexLinks =
-        extractYandexLinks(
-            post.text
-        );
+const mapLinks =
+    extractMapLinks(
+        post.text
+    );
 
 
-    if (
-        yandexLinks.length
-    ) {
+/* =========================
+   YANDEX
+========================= */
 
-        post.yandexMapUrl =
-            yandexLinks[0];
+if (
+    mapLinks.yandex.length
+) {
 
-    }
+    post.yandexMapUrl =
+        mapLinks.yandex[0];
 
+}
+
+
+/* =========================
+   GOOGLE
+========================= */
+
+if (
+    mapLinks.google.length
+) {
+
+    post.googleMapUrl =
+        mapLinks.google[0];
+
+}
+
+
+/* =========================
+   MAIN MAP URL
+========================= */
+
+if (
+    mapLinks.google.length
+) {
+
+    post.mapUrl =
+        mapLinks.google[0];
+
+    post.mapProvider =
+        "google";
+
+}
+else if (
+    mapLinks.yandex.length
+) {
+
+    post.mapUrl =
+        mapLinks.yandex[0];
+
+    post.mapProvider =
+        "yandex";
+
+}
 
     /* =====================================================
        ROOMS
@@ -3782,6 +4140,46 @@ async function backfillOldPosts(
 
                 }
 
+                /* =====================================================
+   SAVE GOOGLE MAP
+===================================================== */
+
+if (
+    result.googleMapUrl
+) {
+
+    post.googleMapUrl =
+        result.googleMapUrl;
+
+}
+
+
+/* =====================================================
+   SAVE MAIN MAP
+===================================================== */
+
+if (
+    result.mapUrl
+) {
+
+    post.mapUrl =
+        result.mapUrl;
+
+}
+
+
+/* =====================================================
+   SAVE MAP PROVIDER
+===================================================== */
+
+if (
+    result.mapProvider
+) {
+
+    post.mapProvider =
+        result.mapProvider;
+
+}
 
                 console.log(
                     "📍 BACKFILL SAVED:",
