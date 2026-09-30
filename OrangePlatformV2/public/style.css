@@ -3261,3 +3261,130 @@ body.dark-mode .property-info-item strong {
     display: block;
     border-radius: 5px;
 }
+/* =========================================================
+   ORANGE PLATFORM — DESKTOP SIZE FIX
+   ტელეფონის დიზაინს არ ეხება
+========================================================= */
+
+@media (min-width: 901px) {
+
+    body {
+        overflow-x: hidden;
+    }
+
+    /* მთავარი კატალოგის სიგანე */
+    .grid {
+        width: 100%;
+        max-width: 1200px !important;
+        margin: 20px auto !important;
+        padding: 12px !important;
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+
+        gap: 18px !important;
+    }
+
+    /* განცხადების ბარათი */
+    .card {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 18px;
+    }
+
+    /* ფოტო */
+    .card-slider,
+    .card-image {
+        height: 210px !important;
+    }
+
+    /* ფასი */
+    .property-price {
+        font-size: 26px !important;
+    }
+
+    /* განცხადების ინფორმაცია */
+    .property-text strong,
+    .property-text span {
+        font-size: 15px !important;
+    }
+
+    .property-icon {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        font-size: 20px !important;
+    }
+
+    .property-info-item {
+        min-height: 58px !important;
+    }
+
+    /* ზედა ღილაკები */
+    .view-switcher {
+        max-width: 600px !important;
+        margin: 12px auto 16px !important;
+    }
+
+    /* ზედა Header */
+    header {
+        padding: 12px 20px !important;
+        font-size: 22px !important;
+    }
+
+    .logo {
+        font-size: 24px !important;
+    }
+
+    /* Promo ტექსტი */
+    .promo-text {
+        max-width: 600px !important;
+    }
+
+    /* Details გვერდი */
+    .details-container {
+        max-width: 1000px !important;
+        margin: 18px auto 100px !important;
+    }
+
+    /* ქვედა action bar */
+    .bottom-bar {
+        max-width: 800px !important;
+    }
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1400px) {
+
+    .grid {
+        max-width: 1250px !important;
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+
+/* =========================================================
+   TABLET / SMALL DESKTOP
+========================================================= */
+
+@media (min-width: 601px) and (max-width: 900px) {
+
+    .grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+
+        max-width: 900px !important;
+        padding: 12px !important;
+        gap: 15px !important;
+    }
+
+    .card-slider,
+    .card-image {
+        height: 210px !important;
+    }
+}

@@ -1629,9 +1629,8 @@ function setupCardEvents() {
 
 }
 
-
 /* =========================================================
-   CHANGE CARD IMAGE
+   CHANGE CARD IMAGE — FAST + PRELOAD
 ========================================================= */
 
 function changeCardImage(
@@ -1642,98 +1641,139 @@ function changeCardImage(
     const post =
         allPosts.find(
             item =>
-                String(
-                    item.id
-                ) ===
-                String(
-                    postId
-                )
+                String(item.id) ===
+                String(postId)
         );
 
-
     if (!post) {
-
         return;
-
     }
 
 
     const images =
-        Array.isArray(
-            post.images
-        )
+        Array.isArray(post.images)
             ? post.images
             : [];
 
 
-    if (
-        images.length <= 1
-    ) {
-
+    if (images.length <= 1) {
         return;
-
     }
 
+
+    /* =========================
+       CURRENT IMAGE INDEX
+    ========================= */
 
     let index =
-        currentCardImage[
-            post.id
-        ] || 0;
+        currentCardImage[post.id] || 0;
 
 
-    index +=
-        direction;
+    index += direction;
 
 
-    if (
-        index < 0
-    ) {
+    /* =========================
+       LOOP
+    ========================= */
 
+    if (index < 0) {
         index =
             images.length - 1;
-
     }
 
 
-    if (
-        index >=
-        images.length
-    ) {
-
-        index =
-            0;
-
+    if (index >= images.length) {
+        index = 0;
     }
 
 
-    currentCardImage[
-        post.id
-    ] = index;
+    currentCardImage[post.id] =
+        index;
 
+
+    /* =========================
+       FIND CARD IMAGE
+    ========================= */
 
     const image =
         document.querySelector(
-            `.card-image[data-post-id="${post.id}"]`
+            `#card-image-${post.id}`
         );
 
 
     if (!image) {
-
         return;
-
     }
 
 
-    const src =
-        images[index];
+    /* =========================
+       IMAGE URL
+    ========================= */
 
+    function getImageSrc(src) {
 
-    image.src =
-        src.startsWith(
-            "http"
-        )
+        if (!src) {
+            return "";
+        }
+
+        return src.startsWith("http")
             ? src
             : "/" + src;
+    }
+
+
+    const newSrc =
+        getImageSrc(
+            images[index]
+        );
+
+
+    /* =========================
+       CHANGE IMAGE
+    ========================= */
+
+    image.src =
+        newSrc;
+
+
+    /* =========================
+       PRELOAD NEXT IMAGE
+    ========================= */
+
+    const nextIndex =
+        index + 1 >= images.length
+            ? 0
+            : index + 1;
+
+
+    const nextImage =
+        new Image();
+
+
+    nextImage.src =
+        getImageSrc(
+            images[nextIndex]
+        );
+
+
+    /* =========================
+       PRELOAD PREVIOUS IMAGE
+    ========================= */
+
+    const prevIndex =
+        index - 1 < 0
+            ? images.length - 1
+            : index - 1;
+
+
+    const prevImage =
+        new Image();
+
+
+    prevImage.src =
+        getImageSrc(
+            images[prevIndex]
+        );
 
 }
 
