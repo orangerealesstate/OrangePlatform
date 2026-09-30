@@ -154,6 +154,9 @@ const telegramUserId =
 ========================================================= */
 
 let allPosts = [];
+let currentPage = 1;
+
+const POSTS_PER_PAGE = 20
 
 let currentView =
     "catalog";
@@ -1537,6 +1540,7 @@ if (allDistrictsSelected) {
 ========================================================= */
 
 function filterPosts() {
+    currentPage = 1;
 
     const filtered =
         getFilteredPosts();
@@ -1570,6 +1574,7 @@ function filterPosts() {
    CLEAR FILTERS
 ========================================================= */
 function clearFilters() {
+    currentPage = 1;
 
     const filterIds = [
         "search",
@@ -1787,6 +1792,34 @@ function renderPosts(posts) {
     if (!container) return;
 
     container.innerHTML = "";
+    const oldPagination =
+    document.getElementById("orangePagination");
+
+if (oldPagination) {
+    oldPagination.remove();
+}
+
+const totalPages =
+    Math.ceil(
+        posts.length / POSTS_PER_PAGE
+    );
+
+if (
+    currentPage > totalPages &&
+    totalPages > 0
+) {
+    currentPage = totalPages;
+}
+
+const start =
+    (currentPage - 1) *
+    POSTS_PER_PAGE;
+
+const end =
+    start + POSTS_PER_PAGE;
+
+const pagePosts =
+    posts.slice(start, end);
 
     if (!posts.length) {
 
@@ -1802,7 +1835,7 @@ function renderPosts(posts) {
         return;
     }
 
-    posts.forEach(post => {
+    pagePosts.forEach(post => {
 
         const images =
             Array.isArray(post.images) &&
