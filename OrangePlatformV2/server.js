@@ -916,13 +916,14 @@ app.post(
         try {
 
             const {
-                district,
-                rooms,
-                budget,
-                pets,
-                period,
-                moveIn
-            } = req.body || {};
+    districts,
+    district,
+    rooms,
+    budget,
+    pets,
+    period,
+    moveIn
+} = req.body || {};
 
 
             console.log(
@@ -931,10 +932,40 @@ app.post(
             );
 
 
-            const requestedDistrict =
-                normalizeMatchDistrict(
-                    district
-                );
+            /* =========================================
+   SELECTED DISTRICTS
+========================================= */
+
+let requestedDistricts = [];
+
+if (Array.isArray(districts)) {
+
+    requestedDistricts =
+        districts
+            .map(
+                item =>
+                    normalizeMatchDistrict(item)
+            )
+            .filter(Boolean);
+
+}
+
+/* ძველი ვერსიის მხარდაჭერა */
+if (
+    requestedDistricts.length === 0 &&
+    district
+) {
+
+    requestedDistricts = [
+        normalizeMatchDistrict(district)
+    ];
+
+}
+
+console.log(
+    "📍 REQUESTED DISTRICTS:",
+    requestedDistricts
+);
 
 
             const requestedRooms =
@@ -997,26 +1028,26 @@ app.post(
                         // რაიონი
                         // =================================================
 
-                        if (
-                            requestedDistrict
-                        ) {
+                       if (
+    requestedDistricts.length > 0
+) {
 
-                            const postDistrict =
-                                normalizeMatchDistrict(
-                                    post.district
-                                );
+    const postDistrict =
+        normalizeMatchDistrict(
+            post.district
+        );
 
+    if (
+        !requestedDistricts.includes(
+            postDistrict
+        )
+    ) {
 
-                            if (
-                                postDistrict !==
-                                requestedDistrict
-                            ) {
+        return false;
 
-                                return false;
+    }
 
-                            }
-
-                        }
+}
 
 
                         // =================================================

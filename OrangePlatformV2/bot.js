@@ -530,7 +530,11 @@ bot.on("message", async (msg) => {
 📱 <b>Telegram:</b> ${escapeHtml(username)}
 🆔 <b>User ID:</b> ${escapeHtml(user.id)}
 
-📍 <b>Район:</b> ${escapeHtml(data.district)}
+📍 <b>Районы:</b> ${escapeHtml(
+    Array.isArray(data.districts)
+        ? data.districts.join(", ")
+        : data.district || "-"
+)}
 🛋 <b>Комнат:</b> ${escapeHtml(data.rooms)}
 📅 <b>Период:</b> ${escapeHtml(data.period)}
 💰 <b>Цена:</b> ${escapeHtml(data.budget)}
@@ -563,13 +567,24 @@ await bot.sendMessage(
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        district: data.district,
-                        rooms: data.rooms,
-                        budget: data.budget,
-                        pets: data.pets,
-                        period: data.period,
-                        moveIn: data.moveIn
-                    })
+    districts: Array.isArray(data.districts)
+        ? data.districts
+        : (
+            data.district
+                ? [data.district]
+                : []
+        ),
+
+    rooms: data.rooms,
+
+    budget: data.budget,
+
+    pets: data.pets,
+
+    period: data.period,
+
+    moveIn: data.moveIn
+})
                 }
             );
 

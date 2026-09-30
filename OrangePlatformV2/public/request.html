@@ -203,42 +203,143 @@
         </div>
 
         <!-- РАЙОН -->
-        <div class="field">
+<div class="field">
 
-            <label>📍 Район</label>
+    <label>📍 Район</label>
 
-            <select id="district">
+    <div class="district-picker" id="districtPicker">
 
-                <option value="">
-                    Выберите район
-                </option>
+        <button
+            type="button"
+            class="district-select"
+            id="districtSelectBtn"
+        >
+            <span id="districtPlaceholder">
+                Выберите районы
+            </span>
 
-                <option>Ваке</option>
-                <option>Сабуртало</option>
-                <option>Вера</option>
-                <option>Мтацминда</option>
-                <option>Сололаки</option>
-                <option>Чугурети</option>
-                <option>Дидубе</option>
-                <option>Надзаладеви</option>
-                <option>Глдани</option>
-                <option>Диди Дигоми</option>
-                <option>Дигоми</option>
-                <option>Темка</option>
-                <option>Исани</option>
-                <option>Самгори</option>
-                <option>Варкетили</option>
-                <option>Вазисубани</option>
-                <option>Крцаниси</option>
-                <option>Ортачала</option>
-                <option>Фоничала</option>
-                <option>Авлабари</option>
-                <option>Навтлуги</option>
-                <option>Тбилисское море</option>
+            <span class="district-arrow">⌄</span>
+        </button>
 
-            </select>
+        <div
+            class="district-menu"
+            id="districtMenu"
+        >
+
+            <label class="district-option">
+                <input type="checkbox" value="Ваке">
+                <span>Ваке</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Сабуртало">
+                <span>Сабуртало</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Вера">
+                <span>Вера</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Мтацминда">
+                <span>Мтацминда</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Сололаки">
+                <span>Сололаки</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Чугурети">
+                <span>Чугурети</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Дидубе">
+                <span>Дидубе</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Надзаладеви">
+                <span>Надзаладеви</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Глдани">
+                <span>Глдани</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Диди Дигоми">
+                <span>Диди Дигоми</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Дигоми">
+                <span>Дигоми</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Темка">
+                <span>Темка</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Исани">
+                <span>Исани</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Самгори">
+                <span>Самгори</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Варкетили">
+                <span>Варкетили</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Вაზისუბანი">
+                <span>Вაზისუბანი</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Крцаниси">
+                <span>Крцаниси</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Ортачала">
+                <span>Ортачала</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Фоничала">
+                <span>Фоничала</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Авлабари">
+                <span>Авлабари</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Навтлуги">
+                <span>Навтлуги</span>
+            </label>
+
+            <label class="district-option">
+                <input type="checkbox" value="Тбилисское море">
+                <span>Тбилисское море</span>
+            </label>
 
         </div>
+    </div>
+
+</div>
 
 
         <!-- КОМНАТЫ -->
@@ -377,10 +478,128 @@ if (tg) {
 /* =========================================
    STATE
 ========================================= */
-
+let selectedDistricts = [];
 let selectedRooms = "";
 let selectedPets = "";
 
+/* =========================================
+   DISTRICTS - MULTI SELECT
+========================================= */
+
+const districtSelectBtn =
+    document.getElementById("districtSelectBtn");
+
+const districtMenu =
+    document.getElementById("districtMenu");
+
+const districtPlaceholder =
+    document.getElementById("districtPlaceholder");
+
+const districtPicker =
+    document.getElementById("districtPicker");
+
+const districtCheckboxes =
+    districtMenu.querySelectorAll(
+        'input[type="checkbox"]'
+    );
+
+
+function updateDistrictButton() {
+
+    if (selectedDistricts.length === 0) {
+
+        districtPlaceholder.textContent =
+            "Выберите районы";
+
+        districtPlaceholder.className = "";
+
+        return;
+    }
+
+    districtPlaceholder.className =
+        "district-selected";
+
+    districtPlaceholder.innerHTML =
+        selectedDistricts
+            .map(
+                district =>
+                    `<span class="district-tag">
+                        ${district}
+                    </span>`
+            )
+            .join("");
+}
+
+
+districtSelectBtn.addEventListener(
+    "click",
+    () => {
+
+        const open =
+            districtMenu.classList.toggle(
+                "open"
+            );
+
+        districtSelectBtn.classList.toggle(
+            "open",
+            open
+        );
+    }
+);
+
+
+districtCheckboxes.forEach(
+    checkbox => {
+
+        checkbox.addEventListener(
+            "change",
+            () => {
+
+                selectedDistricts =
+                    Array.from(
+                        districtCheckboxes
+                    )
+                    .filter(
+                        item =>
+                            item.checked
+                    )
+                    .map(
+                        item =>
+                            item.value
+                    );
+
+                updateDistrictButton();
+
+            }
+        );
+
+    }
+);
+
+
+document.addEventListener(
+    "click",
+    event => {
+
+        if (
+            districtPicker &&
+            !districtPicker.contains(
+                event.target
+            )
+        ) {
+
+            districtMenu.classList.remove(
+                "open"
+            );
+
+            districtSelectBtn.classList.remove(
+                "open"
+            );
+
+        }
+
+    }
+);
 
 /* =========================================
    ROOMS
@@ -439,7 +658,6 @@ document
 
     });
 
-
 /* =========================================
    SUBMIT
 ========================================= */
@@ -449,11 +667,6 @@ document
     .addEventListener(
         "click",
         () => {
-
-            const district =
-                document.getElementById(
-                    "district"
-                ).value;
 
             const period =
                 document.getElementById(
@@ -474,7 +687,7 @@ document
             /* VALIDATION */
 
             if (
-                !district ||
+                selectedDistricts.length === 0 ||
                 !selectedRooms ||
                 !period ||
                 !budget ||
@@ -499,8 +712,8 @@ document
 
             const request = {
 
-                district:
-                    district,
+                districts:
+                    selectedDistricts,
 
                 rooms:
                     selectedRooms,
