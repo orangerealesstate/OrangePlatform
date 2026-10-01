@@ -1909,8 +1909,13 @@ app.post(
                 "area",
                 "floor",
                 "price",
-                "text"
+                "text",
+"images"
+
             ];
+
+
+
 
             for (
                 const field of
@@ -1957,6 +1962,11 @@ app.post(
 
                 text:
                     updated.text,
+
+                    images:
+    Array.isArray(updated.images)
+        ? updated.images
+        : posts[index].images || [],
 
                 manualEdits:
                     manualEdits

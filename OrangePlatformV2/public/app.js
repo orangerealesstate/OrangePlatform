@@ -3462,6 +3462,43 @@ function editPost(post) {
         </div>
 
 
+<!-- PHOTOS -->
+
+<div style="margin-top:16px;">
+    <div style="font-weight:700; margin-bottom:8px;">
+        📸 Фотографии
+    </div>
+
+    <div
+        style="
+            font-size:12px;
+            opacity:.65;
+            margin-bottom:10px;
+        "
+    >
+        Перетащите фото. Первое — главное.
+    </div>
+
+    <div
+        id="editPhotoList"
+        style="
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:8px;
+        "
+    ></div>
+
+    <div
+        style="
+            font-size:12px;
+            opacity:.6;
+            margin-top:8px;
+        "
+    >
+        ⭐ Нажмите на фото, чтобы сделать его главным
+    </div>
+</div>
+
         <!-- STATUS -->
 
         <div
@@ -3639,6 +3676,123 @@ function editPost(post) {
         );
 
 
+
+        // =====================================================
+// EDIT PHOTOS - REORDER / MAIN PHOTO
+// =====================================================
+
+let editImages = Array.isArray(post.images)
+    ? [...post.images]
+    : [];
+
+function renderEditPhotos() {
+
+    const container = document.getElementById("editPhotoList");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    editImages.forEach((img, index) => {
+
+        const item = document.createElement("div");
+
+        item.draggable = true;
+
+        item.style.cssText = `
+            position:relative;
+            aspect-ratio:1/1;
+            border-radius:10px;
+            overflow:hidden;
+            cursor:grab;
+            border:2px solid ${index === 0 ? "#ff8a00" : "transparent"};
+            background:#eee;
+        `;
+
+        const image = document.createElement("img");
+
+        image.src = img;
+
+        image.style.cssText = `
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            display:block;
+        `;
+
+        item.appendChild(image);
+
+        if (index === 0) {
+
+            const mainLabel = document.createElement("div");
+
+            mainLabel.textContent = "⭐ ГЛАВНОЕ";
+
+            mainLabel.style.cssText = `
+                position:absolute;
+                left:4px;
+                right:4px;
+                bottom:4px;
+                padding:4px;
+                border-radius:6px;
+                background:rgba(0,0,0,.7);
+                color:white;
+                font-size:10px;
+                text-align:center;
+                font-weight:700;
+            `;
+
+            item.appendChild(mainLabel);
+        }
+
+        // Нажатие = сделать главным
+        item.addEventListener("click", () => {
+
+            if (index === 0) return;
+
+            const selected = editImages.splice(index, 1)[0];
+
+            editImages.unshift(selected);
+
+            renderEditPhotos();
+        });
+
+        // Drag & Drop
+        item.addEventListener("dragstart", () => {
+            item.dataset.dragIndex = index;
+        });
+
+        item.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+
+        item.addEventListener("drop", (e) => {
+
+            e.preventDefault();
+
+            const fromIndex = Number(item.dataset.dragIndex);
+            const toIndex = index;
+
+            if (
+                Number.isNaN(fromIndex) ||
+                fromIndex === toIndex
+            ) {
+                return;
+            }
+
+            const moved = editImages.splice(fromIndex, 1)[0];
+
+            editImages.splice(toIndex, 0, moved);
+
+            renderEditPhotos();
+        });
+
+        container.appendChild(item);
+    });
+}
+
+renderEditPhotos();
+
     /* =========================================
        SAVE
     ========================================= */
@@ -3739,7 +3893,9 @@ function editPost(post) {
                                 "editText"
                             )
                             .value
-                            .trim()
+                            .trim(),
+                            images:
+    [...editImages]
                 };
 
 
