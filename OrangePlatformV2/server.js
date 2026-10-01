@@ -2118,6 +2118,120 @@ savePosts(
 
     }
 );
+
+// =========================================================
+// TOP POST
+// =========================================================
+
+app.post(
+    "/api/post/top",
+    (req, res) => {
+
+        const adminId =
+            "5172653731";
+
+        const userId =
+            String(
+                req.body.userId || ""
+            );
+
+        if (
+            userId !== adminId
+        ) {
+
+            return res
+                .status(403)
+                .json({
+                    success: false,
+                    error:
+                        "Access denied"
+                });
+
+        }
+
+        try {
+
+            const posts =
+                getPosts();
+
+            const postId =
+                String(
+                    req.body.id
+                );
+
+            const isTop =
+                req.body.isTop === true;
+
+            const index =
+                posts.findIndex(
+                    post =>
+                        String(post.id) ===
+                        postId
+                );
+
+            if (
+                index === -1
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+                        success: false,
+                        error:
+                            "Apartment not found"
+                    });
+
+            }
+
+            // TOP სტატუსი
+            posts[index].isTop =
+                isTop;
+
+            // TOP განცხადებები ყოველთვის პირველები
+            posts.sort(
+                (a, b) =>
+                    Number(b.isTop === true) -
+                    Number(a.isTop === true)
+            );
+
+            savePosts(
+                posts
+            );
+
+            console.log(
+                "🔥 TOP UPDATED:",
+                postId,
+                isTop
+            );
+
+            res.json({
+                success: true,
+                isTop: isTop
+            });
+
+        }
+        catch (err) {
+
+            console.error(
+                "TOP update error:",
+                err
+            );
+
+            res
+                .status(500)
+                .json({
+                    success: false,
+                    error:
+                        "TOP update failed"
+                });
+
+        }
+
+    }
+);
+
+
+
 // =========================================================
 // DELETE POST
 // =========================================================

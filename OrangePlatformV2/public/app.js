@@ -1911,9 +1911,36 @@ const date = post.date
 
             <!-- PHOTO -->
             <div class="card-slider">
+${
+    post.isTop
+        ? `
+            <div
+                class="top-post-badge"
+                style="
+                    position:absolute;
+                    top:12px;
+                    left:12px;
+                    z-index:10;
 
-    ${
-        isPostNew(post)
+                    background:#ff5a00;
+                    color:#fff;
+
+                    padding:6px 11px;
+                    border-radius:9px;
+
+                    font-size:13px;
+                    font-weight:900;
+                    line-height:1;
+
+                    box-shadow:
+                        0 3px 10px
+                        rgba(0,0,0,.25);
+                "
+            >
+                🔥 TOP
+            </div>
+        `
+        : isPostNew(post)
             ? `
                 <div
                     class="new-post-badge"
@@ -1922,21 +1949,27 @@ const date = post.date
                         top:12px;
                         left:12px;
                         z-index:10;
+
                         background:#20b15a;
                         color:#fff;
+
                         padding:6px 10px;
                         border-radius:9px;
+
                         font-size:12px;
                         font-weight:800;
                         line-height:1;
-                        box-shadow:0 3px 10px rgba(0,0,0,.20);
+
+                        box-shadow:
+                            0 3px 10px
+                            rgba(0,0,0,.20);
                     "
                 >
                     NEW
                 </div>
             `
             : ""
-    }
+}
 
     <!-- FAVORITE -->
     <button
@@ -2392,6 +2425,76 @@ if (telegramUserId === "5172653731") {
             text-align:left;
         `;
 
+/* 🔥 TOP */
+
+topBtn.addEventListener(
+    "click",
+    async event => {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        managementMenu.style.display =
+            "none";
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/post/top",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                userId:
+                                    telegramUserId,
+
+                                id:
+                                    post.id,
+
+                                isTop:
+                                    !post.isTop
+                            })
+                    }
+                );
+
+            const result =
+                await response.json();
+
+            if (!result.success) {
+
+                throw new Error(
+                    result.error ||
+                    "TOP update failed"
+                );
+
+            }
+
+            await loadPosts();
+
+        } catch (error) {
+
+            console.error(
+                "TOP error:",
+                error
+            );
+
+            alert(
+                "Не удалось изменить TOP"
+            );
+
+        }
+
+    }
+);
+
+
         /* 🏠 STATUS */
         const statusBtn =
             document.createElement("button");
@@ -2460,10 +2563,11 @@ if (telegramUserId === "5172653731") {
         */
 
         managementMenu.append(
-            editBtn,
-            statusBtn,
-            deleteBtn
-        );
+    editBtn,
+    topBtn,
+    statusBtn,
+    deleteBtn
+);
 
         managementWrapper.append(
             managementBtn,
