@@ -2425,6 +2425,39 @@ if (telegramUserId === "5172653731") {
             text-align:left;
         `;
 
+        /* 🔥 TOP */
+
+const topBtn =
+    document.createElement("button");
+
+topBtn.type = "button";
+
+topBtn.innerHTML =
+    post.isTop
+        ? "🔥 Убрать TOP"
+        : "🔥 TOP";
+
+topBtn.style.cssText = `
+    width:100%;
+    height:46px;
+    margin-top:6px;
+    border:none;
+    border-radius:12px;
+    background:${
+        post.isTop
+            ? "#fff0e6"
+            : "#fff3e8"
+    };
+    color:#ff5a00;
+    display:flex;
+    align-items:center;
+    padding:0 14px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:800;
+    text-align:left;
+`;
+
 /* 🔥 TOP */
 
 topBtn.addEventListener(
