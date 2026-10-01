@@ -2188,12 +2188,26 @@ app.post(
                 isTop;
 
             // TOP განცხადებები ყოველთვის პირველები
-            posts.sort(
-                (a, b) =>
-                    Number(b.isTop === true) -
-                    Number(a.isTop === true)
-            );
+           posts.sort(
+    (a, b) => {
 
+        const aTop =
+            a.isTop === true;
+
+        const bTop =
+            b.isTop === true;
+
+        if (aTop && !bTop) {
+            return -1;
+        }
+
+        if (!aTop && bTop) {
+            return 1;
+        }
+
+        return 0;
+    }
+);
             savePosts(
                 posts
             );
