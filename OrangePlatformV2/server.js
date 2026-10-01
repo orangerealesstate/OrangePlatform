@@ -492,77 +492,163 @@ function getVisiblePosts() {
 
 
     const maxAgeMs =
-
         POST_MAX_AGE_DAYS *
-
         24 *
-
         60 *
-
         60 *
-
         1000;
 
 
-    return posts.filter(
-        post => {
+    // =====================================================
+    // მხოლოდ ბოლო 30 დღის განცხადებები
+    // =====================================================
+
+    const visiblePosts =
+        posts.filter(
+            post => {
+
+                const rawDate =
+                    post.date ??
+                    post.createdAt ??
+                    post.created_at ??
+                    post.publishedAt ??
+                    post.published_at;
 
 
-            const rawDate =
-
-                post.date ??
-
-                post.createdAt ??
-
-                post.created_at ??
-
-                post.publishedAt ??
-
-                post.published_at;
+                const postDate =
+                    parsePostDate(
+                        rawDate
+                    );
 
 
-            const postDate =
+                // თუ თარიღი არ აქვს,
+                // განცხადებას არ ვშლით
+                if (!postDate) {
 
-                parsePostDate(
-                    rawDate
+                    return true;
+
+                }
+
+
+                const ageMs =
+                    now -
+                    postDate.getTime();
+
+
+                // მომავლის თარიღიც დაშვებულია
+                return (
+                    ageMs <=
+                    maxAgeMs
                 );
 
+            }
+        );
 
-            /*
-             * თუ თარიღი საერთოდ არ აქვს
-             * ან უცნობ ფორმატშია,
-             * განცხადებას არ ვშლით.
-             */
 
-            if (!postDate) {
+    // =====================================================
+    // 🔥 TOP — ყოველთვის პირველი
+    // =====================================================
 
-                return true;
+    visiblePosts.sort(
+        (a, b) => {
+
+            const aTop =
+                a.isTop === true ||
+                a.isTop === "true" ||
+                a.isTop === 1 ||
+                a.isTop === "1";
+
+
+            const bTop =
+                b.isTop === true ||
+                b.isTop === "true" ||
+                b.isTop === 1 ||
+                b.isTop === "1";
+
+
+            // A არის TOP → წინ
+            if (
+                aTop &&
+                !bTop
+            ) {
+
+                return -1;
 
             }
 
 
-            const ageMs =
+            // B არის TOP → წინ
+            if (
+                !aTop &&
+                bTop
+            ) {
 
-                now -
+                return 1;
 
-                postDate.getTime();
+            }
 
 
-            /*
-             * მომავლის თარიღიც დაშვებულია.
-             */
+            // =================================================
+            // ორივე TOP არის ან ორივე ჩვეულებრივი
+            // → ახალი განცხადება პირველი
+            // =================================================
+
+            const aDate =
+                parsePostDate(
+                    a.date ??
+                    a.createdAt ??
+                    a.created_at ??
+                    a.publishedAt ??
+                    a.published_at
+                );
+
+
+            const bDate =
+                parsePostDate(
+                    b.date ??
+                    b.createdAt ??
+                    b.created_at ??
+                    b.publishedAt ??
+                    b.published_at
+                );
+
+
+            if (
+                !aDate &&
+                !bDate
+            ) {
+
+                return 0;
+
+            }
+
+
+            if (!aDate) {
+
+                return 1;
+
+            }
+
+
+            if (!bDate) {
+
+                return -1;
+
+            }
+
 
             return (
-                ageMs <=
-                maxAgeMs
+                bDate.getTime() -
+                aDate.getTime()
             );
 
         }
-
     );
 
-}
 
+    return visiblePosts;
+
+}
 
 // =========================================================
 // DIRECT ACCESS TO posts.json
