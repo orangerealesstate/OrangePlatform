@@ -43,7 +43,6 @@ const MINI_APP_BUTTON = {
         ]
     ]
 };
-
 async function sendMiniAppAd(chatId) {
 
     const adText = `
@@ -58,21 +57,37 @@ async function sendMiniAppAd(chatId) {
 📸 Фото и подробная информация
 🗺 Точное расположение на карте
 
-🔥 <b>Новые объявления добавляются каждый день!</b>
+🔥 <b>Новые объявления каждый день!</b>
 
 Все квартиры в одном месте — быстро, удобно и без лишнего поиска.
 
 👇 <b>Откройте Orange Real Estate Mini App</b>
 `;
 
-    // 🖼 БАНЕР + ТЕКСТ + КНОПКИ = ერთი პოსტი
     await bot.sendPhoto(
         chatId,
         "./public/banner.jpg",
         {
             caption: adText,
             parse_mode: "HTML",
-            reply_markup: MINI_APP_BUTTON
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "🏠 OPEN APP",
+                            url: "https://t.me/TBILISI2026_BOT?startapp=orange"
+                        }
+                    ],
+                    [
+                        {
+                            text: "📝 ПОДАТЬ ЗАПРОС",
+                            web_app: {
+                                url: "https://orangeplatform.onrender.com/request.html"
+                            }
+                        }
+                    ]
+                ]
+            }
         }
     );
 }
