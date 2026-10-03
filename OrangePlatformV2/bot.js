@@ -17,6 +17,10 @@ const API_URL =
     "https://orangeplatform.onrender.com";
     const ADMIN_ID = "5172653731";
     const REQUEST_GROUP_ID = "-5378097330";
+const AD_GROUP_IDS = [
+    "-1001760069369"
+];
+
     const MINI_APP_DIRECT_LINK =
     "https://t.me/TBILISI2026_BOT?startapp=orange";
 
@@ -40,7 +44,6 @@ const MINI_APP_BUTTON = {
     ]
 };
 
-
 async function sendMiniAppAd(chatId) {
 
     const adText = `
@@ -62,38 +65,17 @@ async function sendMiniAppAd(chatId) {
 👇 <b>Откройте Orange Real Estate Mini App</b>
 `;
 
-    // 📸 ბანერი ცალკე
+    // 🖼 БАНЕР + ТЕКСТ + КНОПКИ = ერთი პოსტი
     await bot.sendPhoto(
         chatId,
-        "./public/banner.jpg"
-    );
-
-    // 📝 ტექსტი ცალკე + ღილაკი
-    await bot.sendMessage(
-        chatId,
-        adText,
+        "./public/banner.jpg",
         {
+            caption: adText,
             parse_mode: "HTML",
             reply_markup: MINI_APP_BUTTON
         }
     );
 }
-bot.onText(/\/openapp/, async (msg) => {
-
-    try {
-
-        await sendMiniAppAd(msg.chat.id);
-
-    } catch (error) {
-
-        console.error(
-            "❌ OPEN APP AD ERROR:",
-            error
-        );
-
-    }
-
-});
 
 console.log("🤖 Bot started successfully");
 
@@ -107,9 +89,9 @@ bot.onText(/\/postminiapp/, async (msg) => {
 
     try {
 
-        await sendMiniAppAd(
-            REQUEST_GROUP_ID
-        );
+        for (const groupId of AD_GROUP_IDS) {
+    await sendMiniAppAd(groupId);
+}
 
         console.log(
             "✅ Mini App პოსტი ჯგუფში გაიგზავნა"
