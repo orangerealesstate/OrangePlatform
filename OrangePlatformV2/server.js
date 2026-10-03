@@ -665,42 +665,7 @@ app.get(
     }
 );
 
-
-// =========================================================
-// API POSTS
-// ONLY LAST 30 DAYS
-// =========================================================
-
-app.get(
-    "/api/posts",
-    (req, res) => {
-
-
-        res.setHeader(
-            "Cache-Control",
-            "no-store, no-cache, must-revalidate, proxy-revalidate"
-        );
-
-
-        res.setHeader(
-            "Pragma",
-            "no-cache"
-        );
-
-
-        res.setHeader(
-            "Expires",
-            "0"
-        );
-
-
-        res.json(
-            getVisiblePosts()
-        );
-
-    }
-);
-
+q
 
 // =========================================================
 // MATCH REQUEST — SEARCH APARTMENTS
@@ -2503,6 +2468,12 @@ app.post(
 
     }
 );
+
+// =====================================================
+// START TELEGRAM BOT
+// =====================================================
+
+require("./bot.js");
 
 // =========================================================
 // START SERVER
