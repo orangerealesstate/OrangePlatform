@@ -28,6 +28,14 @@ const MINI_APP_BUTTON = {
                 text: "🏠 OPEN APP",
                 url: MINI_APP_DIRECT_LINK
             }
+        ],
+        [
+            {
+                text: "📝 ПОДАТЬ ЗАПРОС",
+                web_app: {
+                    url: `${API_URL}/request.html`
+                }
+            }
         ]
     ]
 };
