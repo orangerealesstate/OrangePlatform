@@ -4797,6 +4797,9 @@ async function start() {
 
 
     const albums = {};
+    const existingPostIds = new Set(
+    posts.map(post => String(post.id))
+);
 
 
     /* =====================================================
