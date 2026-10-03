@@ -113,7 +113,7 @@ const BACKFILL_MISSING_COORDS =
 
 const MAX_BACKFILL_PER_RUN =
     Number(
-        process.env.MAX_BACKFILL_PER_RUN || 100
+        process.env.MAX_BACKFILL_PER_RUN || 1000
     );
 
 
