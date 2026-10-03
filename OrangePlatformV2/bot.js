@@ -17,7 +17,76 @@ const API_URL =
     "https://orangeplatform.onrender.com";
     const ADMIN_ID = "5172653731";
     const REQUEST_GROUP_ID = "-5378097330";
+    const MINI_APP_DIRECT_LINK =
+    "https://t.me/TBILISI2026_BOT?startapp=orange";
 
+
+const MINI_APP_BUTTON = {
+    inline_keyboard: [
+        [
+            {
+                text: "🏠 OPEN APP",
+                url: MINI_APP_DIRECT_LINK
+            }
+        ]
+    ]
+};
+
+
+async function sendMiniAppAd(chatId) {
+
+    const adText = `
+🍊 <b>ORANGE REAL ESTATE</b>
+
+🇬🇪 <b>Квартиры в Тбилиси — теперь в одном Mini App!</b>
+
+🔎 Удобный поиск квартир
+📍 Выбор района
+🛏 Количество комнат
+💰 Фильтр по цене
+📸 Фото и подробная информация
+🗺 Точное расположение на карте
+
+🔥 <b>Новые объявления добавляются каждый день!</b>
+
+Все квартиры в одном месте — быстро, удобно и без лишнего поиска.
+
+👇 <b>Откройте Orange Real Estate Mini App</b>
+`;
+
+    return bot.sendMessage(
+        chatId,
+        adText,
+        {
+            parse_mode: "HTML",
+            reply_markup: MINI_APP_BUTTON
+        }
+    );
+}
+
+
+/* =====================================================
+   OPEN APP AD
+===================================================== */
+
+bot.onText(/\/openapp/, async (msg) => {
+
+    try {
+
+        await sendMiniAppAd(
+            msg.chat.id
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ OPEN APP AD ERROR:",
+            error
+        );
+
+    }
+
+});
 console.log("🤖 Bot started successfully");
 
 bot.getMe().then(me => {
