@@ -5782,52 +5782,36 @@ if (mapInstance && satelliteButton) {
 
 }
 
-
 /* =========================================================
-   POST COORDINATES
+   POST COORDINATES — YANDEX LOCATION
 ========================================================= */
 
-function getPostCoordinates(
-    post
-) {
+function getPostCoordinates(post) {
 
-    const lat =
-        Number(
-            post.latitude ??
-            post.lat ??
-            post.location?.latitude ??
-            post.location?.lat
-        );
+    // 1. უკვე შენახული ზუსტი კოორდინატები
+    const lat = Number(
+        post.latitude ??
+        post.lat ??
+        post.location?.latitude ??
+        post.location?.lat
+    );
 
+    const lng = Number(
+        post.longitude ??
+        post.lng ??
+        post.lon ??
+        post.location?.longitude ??
+        post.location?.lng
+    );
 
-    const lng =
-        Number(
-            post.longitude ??
-            post.lng ??
-            post.lon ??
-            post.location?.longitude ??
-            post.location?.lng
-        );
-
-
-    const valid =
+    if (
         Number.isFinite(lat) &&
         Number.isFinite(lng) &&
-
         lat >= 41.60 &&
         lat <= 41.84 &&
-
         lng >= 44.62 &&
-        lng <= 44.98;
-
-
-    /*
-       თუ განცხადებას აქვს
-       რეალური კოორდინატები —
-       პირდაპირ ვიყენებთ.
-    */
-
-    if (valid) {
+        lng <= 44.98
+    ) {
 
         return [
             lat,
@@ -5837,89 +5821,166 @@ function getPostCoordinates(
     }
 
 
-    /*
-       თუ რეალური კოორდინატები
-       არ აქვს — რაიონის ცენტრი.
-    */
+    // 2. ვეძებთ Yandex ლოკაციას
+    //    თვითონ განცხადების ტექსტში
+    const sources = [
 
-    const district =
         String(
-            post.district ||
-            ""
-        )
-            .toLowerCase()
-            .trim();
+            post.yandexMapUrl || ""
+        ),
 
-
-    for (
-        const key of
-        Object.keys(
-            districtCenters
-        )
-    ) {
-
-        if (
-            district.includes(
-                key
-            )
-        ) {
-
-            return districtCenters[
-                key
-            ];
-
-        }
-
-    }
-
-
-    /*
-       დამატებით ვეძებთ რაიონს
-       განცხადების ტექსტში.
-    */
-
-    const text =
         String(
-            post.text ||
-            ""
+            post.text || ""
         )
-            .toLowerCase();
 
-
-    for (
-        const key of
-        Object.keys(
-            districtCenters
-        )
-    ) {
-
-        if (
-            text.includes(
-                key
-            )
-        ) {
-
-            return districtCenters[
-                key
-            ];
-
-        }
-
-    }
-
-
-    /*
-       საბოლოო fallback —
-       თბილისის ცენტრი.
-    */
-
-    return [
-        41.7151,
-        44.8271
     ];
 
-}
 
+    for (
+        const source of sources
+    ) {
+
+        if (!source) {
+            continue;
+        }
+
+
+        /*
+           Yandex:
+           ll=longitude,latitude
+        */
+
+        const llMatch =
+            source.match(
+                /[?&#]ll=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i
+            );
+
+
+        if (llMatch) {
+
+            const yandexLng =
+                Number(
+                    llMatch[1]
+                );
+
+            const yandexLat =
+                Number(
+                    llMatch[2]
+                );
+
+
+            if (
+                Number.isFinite(yandexLat) &&
+                Number.isFinite(yandexLng) &&
+                yandexLat >= 41.60 &&
+                yandexLat <= 41.84 &&
+                yandexLng >= 44.62 &&
+                yandexLng <= 44.98
+            ) {
+
+                return [
+                    yandexLat,
+                    yandexLng
+                ];
+
+            }
+
+        }
+
+
+        /*
+           Yandex:
+           sll=longitude,latitude
+        */
+
+        const sllMatch =
+            source.match(
+                /[?&#]sll=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i
+            );
+
+
+        if (sllMatch) {
+
+            const yandexLng =
+                Number(
+                    sllMatch[1]
+                );
+
+            const yandexLat =
+                Number(
+                    sllMatch[2]
+                );
+
+
+            if (
+                Number.isFinite(yandexLat) &&
+                Number.isFinite(yandexLng) &&
+                yandexLat >= 41.60 &&
+                yandexLat <= 41.84 &&
+                yandexLng >= 44.62 &&
+                yandexLng <= 44.98
+            ) {
+
+                return [
+                    yandexLat,
+                    yandexLng
+                ];
+
+            }
+
+        }
+
+
+        /*
+           Yandex:
+           rll=longitude,latitude
+        */
+
+        const rllMatch =
+            source.match(
+                /[?&#]rll=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/i
+            );
+
+
+        if (rllMatch) {
+
+            const yandexLng =
+                Number(
+                    rllMatch[1]
+                );
+
+            const yandexLat =
+                Number(
+                    rllMatch[2]
+                );
+
+
+            if (
+                Number.isFinite(yandexLat) &&
+                Number.isFinite(yandexLng) &&
+                yandexLat >= 41.60 &&
+                yandexLat <= 41.84 &&
+                yandexLng >= 44.62 &&
+                yandexLng <= 44.98
+            ) {
+
+                return [
+                    yandexLat,
+                    yandexLng
+                ];
+
+            }
+
+        }
+
+    }
+
+
+    // 3. თუ Yandex ლოკაციიდან
+    //    კოორდინატის ამოღება ვერ მოხერხდა
+    return null;
+
+}
 /* =========================================================
    MAP MARKER
    🔵 BLUE CIRCLE + PRICE
