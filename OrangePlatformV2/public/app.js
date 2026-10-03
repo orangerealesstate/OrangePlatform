@@ -5691,10 +5691,15 @@ window.mapSatelliteMode =
 
 
         mapLayer =
-            L.layerGroup()
-                .addTo(
-                    mapInstance
-                );
+    L.markerClusterGroup({
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        spiderfyOnMaxZoom: true,
+        disableClusteringAtZoom: 17,
+        maxClusterRadius: 45
+    }).addTo(
+        mapInstance
+    );
 const satelliteButton =
     document.createElement("button");
 
