@@ -54,7 +54,14 @@ async function sendMiniAppAd(chatId) {
 👇 <b>Откройте Orange Real Estate Mini App</b>
 `;
 
-    return bot.sendMessage(
+    // 📸 ბანერი ცალკე
+    await bot.sendPhoto(
+        chatId,
+        "./public/banner.jpg"
+    );
+
+    // 📝 ტექსტი ცალკე + ღილაკი
+    await bot.sendMessage(
         chatId,
         adText,
         {
