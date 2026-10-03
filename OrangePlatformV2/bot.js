@@ -103,6 +103,29 @@ bot.getMe().then(me => {
 
 bot.on("polling_error", console.error);
 bot.on("error", console.error);
+bot.onText(/\/postminiapp/, async (msg) => {
+
+    try {
+
+        await sendMiniAppAd(
+            REQUEST_GROUP_ID
+        );
+
+        console.log(
+            "✅ Mini App პოსტი ჯგუფში გაიგზავნა"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ GROUP MINI APP ERROR:",
+            error
+        );
+
+    }
+
+});
+
 
 /* =====================================================
    START
@@ -617,6 +640,8 @@ bot.on("message", async (msg) => {
 💰 <b>Цена:</b> ${escapeHtml(data.budget)}
 🐾 <b>Домашнее животное:</b> ${escapeHtml(data.pets)}
 🗓 <b>Дата заселения:</b> ${escapeHtml(data.moveIn)}`;
+
+console.log("📨 ვაგზავნი განაცხადს ჯგუფში:", REQUEST_GROUP_ID);
 
 await bot.sendMessage(
     REQUEST_GROUP_ID,
