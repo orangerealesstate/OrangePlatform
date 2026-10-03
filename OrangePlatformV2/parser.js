@@ -2358,22 +2358,47 @@ async function getCoordinatesForPost(
 
 
     /* =====================================================
-       2. YANDEX FIRST
-    ===================================================== */
+   2. YANDEX FIRST
+   ჯერ უკვე შენახულ Yandex URL-ს ვამოწმებთ
+===================================================== */
 
-    const yandex =
-        await getYandexCoordinates(
-            post.text || ""
+if (
+    post.yandexMapUrl &&
+    typeof post.yandexMapUrl === "string"
+) {
+
+    const yandexUrlResult =
+        await resolveYandexLink(
+            post.yandexMapUrl
         );
 
-
     if (
-        yandex
+        yandexUrlResult
     ) {
 
-        return yandex;
+        return yandexUrlResult;
 
     }
+
+}
+
+
+/* =====================================================
+   3. YANDEX FROM TELEGRAM TEXT
+===================================================== */
+
+const yandex =
+    await getYandexCoordinates(
+        post.text || ""
+    );
+
+if (
+    yandex
+) {
+
+    return yandex;
+
+}
 
 
     /* =====================================================
