@@ -2689,25 +2689,38 @@ topBtn.addEventListener(
         );
     }
 }
-
 /* =========================
-   LOCATION
+   LOCATION — YANDEX ONLY
 ========================= */
+
 card.querySelector(
     ".location-btn"
 )?.addEventListener(
     "click",
     event => {
 
+        event.preventDefault();
         event.stopPropagation();
 
-        if (
-            post.lat &&
-            post.lng
-        ) {
+        const lat = Number(
+            post.latitude ??
+            post.lat ??
+            post.location?.latitude ??
+            post.location?.lat
+        );
 
-            const lat = Number(post.lat);
-            const lng = Number(post.lng);
+        const lng = Number(
+            post.longitude ??
+            post.lng ??
+            post.lon ??
+            post.location?.longitude ??
+            post.location?.lng
+        );
+
+        if (
+            Number.isFinite(lat) &&
+            Number.isFinite(lng)
+        ) {
 
             const yandexUrl =
                 `https://yandex.com/maps/?ll=${lng},${lat}&z=17&pt=${lng},${lat},pm2rdm`;
@@ -2717,11 +2730,12 @@ card.querySelector(
                 "_blank"
             );
 
-        } else {
-
-            alert("Локация для этой квартиры не указана");
-
+            return;
         }
+
+        alert(
+            t("locationMissing")
+        );
 
     }
 );
