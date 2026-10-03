@@ -2702,6 +2702,23 @@ card.querySelector(
         event.preventDefault();
         event.stopPropagation();
 
+        // 1. პირველ რიგში — პირდაპირი Yandex ლინკი
+        if (
+            post.yandexMapUrl &&
+            typeof post.yandexMapUrl === "string" &&
+            post.yandexMapUrl.startsWith("https://yandex.com/maps/")
+        ) {
+
+            window.open(
+                post.yandexMapUrl,
+                "_blank"
+            );
+
+            return;
+        }
+
+        // 2. თუ პირდაპირი Yandex ლინკი არ არსებობს —
+        // ვიყენებთ კოორდინატებს
         const lat = Number(
             post.latitude ??
             post.lat ??
@@ -2733,6 +2750,7 @@ card.querySelector(
             return;
         }
 
+        // 3. საერთოდ თუ ლოკაცია არ აქვს
         alert(
             t("locationMissing")
         );
