@@ -113,7 +113,7 @@ const BACKFILL_MISSING_COORDS =
 
 const MAX_BACKFILL_PER_RUN =
     Number(
-        process.env.MAX_BACKFILL_PER_RUN || 1000
+        process.env.MAX_BACKFILL_PER_RUN || 250
     );
 
 
@@ -4930,102 +4930,92 @@ async function start() {
 
 
     /* =====================================================
-       NEW POST IDS
-    ===================================================== */
+   NEW POST IDS
+   ყველა ახალი Telegram განცხადება:
+   album + ჩვეულებრივი post
+===================================================== */
 
-    const newPostIds = [];
+const newPostIds = [];
 
-
-    for (
-        const albumId of
-        Object.keys(
-            albums
+const currentMessageIds =
+    new Set(
+        messages.map(
+            msg =>
+                String(
+                    msg.id
+                )
         )
+    );
+
+
+for (
+    const post of
+    posts
+) {
+
+    if (
+        !post
     ) {
-
-        const album =
-            albums[
-                albumId
-            ];
-
-
-        if (
-            !album
-        ) {
-
-            continue;
-
-        }
-
-
-        const existsBefore =
-            false;
-
-
-        /*
-           რადგან saveAlbumsImmediately()
-           უკვე მუშაობდა, ვამოწმებთ Telegram ID-ს.
-        */
-
-        const matching =
-            posts.find(
-                post =>
-
-                    String(
-                        post.id
-                    ) ===
-                    String(
-                        album.id
-                    )
-
-            );
-
-
-        if (
-            matching
-        ) {
-
-            /*
-               ახალი პოსტი თუ არის,
-               მისი ID ამ სიაში გვჭირდება.
-            */
-
-            const wasRecentlyAdded =
-                Number(
-                    matching.date
-                ) >=
-                Number(
-                    album.date
-                );
-
-
-            if (
-                wasRecentlyAdded
-            ) {
-
-                if (
-                    !newPostIds.includes(
-                        matching.id
-                    )
-                ) {
-
-                    newPostIds.push(
-                        matching.id
-                    );
-
-                }
-
-            }
-
-        }
-
+        continue;
     }
 
 
-    console.log(
-        "🆕 POSTS TO PROCESS:",
-        newPostIds.length
-    );
+    /*
+       ეს პოსტი მიმდინარე Telegram
+       messages-ში უნდა არსებობდეს.
+    */
+
+    if (
+        !currentMessageIds.has(
+            String(
+                post.id
+            )
+        )
+    ) {
+        continue;
+    }
+
+
+    /*
+       თუ უკვე აქვს სწორი
+       თბილისის კოორდინატა,
+       ხელახლა არ ვეძებთ.
+    */
+
+    if (
+        isTbilisiCoordinates(
+            post.lat,
+            post.lng
+        )
+    ) {
+        continue;
+    }
+
+
+    /*
+       ახალი პოსტი კოორდინატების
+       მოსაძებნ სიაში.
+    */
+
+    if (
+        !newPostIds.includes(
+            post.id
+        )
+    ) {
+
+        newPostIds.push(
+            post.id
+        );
+
+    }
+
+}
+
+
+console.log(
+    "🆕 POSTS TO PROCESS:",
+    newPostIds.length
+);
 
 
     /* =====================================================
