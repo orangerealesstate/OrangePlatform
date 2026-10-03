@@ -80,28 +80,6 @@ bot.onText(/\/openapp/, async (msg) => {
 
 });
 
-/* =====================================================
-   OPEN APP AD
-===================================================== */
-
-bot.onText(/\/openapp/, async (msg) => {
-
-    try {
-
-        await sendMiniAppAd(
-            msg.chat.id
-        );
-
-    } catch (error) {
-
-        console.error(
-            "❌ OPEN APP AD ERROR:",
-            error
-        );
-
-    }
-
-});
 console.log("🤖 Bot started successfully");
 
 bot.getMe().then(me => {
