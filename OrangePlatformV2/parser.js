@@ -2313,7 +2313,6 @@ async function geocodeAddress(
 
 }
 
-
 /* =========================================================
    GET COORDINATES FOR POST
 ========================================================= */
@@ -2321,6 +2320,10 @@ async function geocodeAddress(
 async function getCoordinatesForPost(
     post
 ) {
+
+    /* =====================================================
+       1. EXISTING COORDINATES
+    ===================================================== */
 
     if (
         isTbilisiCoordinates(
@@ -2354,9 +2357,9 @@ async function getCoordinatesForPost(
     }
 
 
-    /*
-       Yandex FIRST
-    */
+    /* =====================================================
+       2. YANDEX FIRST
+    ===================================================== */
 
     const yandex =
         await getYandexCoordinates(
@@ -2371,28 +2374,13 @@ async function getCoordinatesForPost(
         return yandex;
 
     }
+
+
     /* =====================================================
-   GOOGLE SECOND
-===================================================== */
-
-const google =
-    await getGoogleCoordinates(
-        post.text || ""
-    );
-
-
-if (
-    google
-) {
-
-    return google;
-
-}
-
-
-    /*
-       Address SECOND
-    */
+       3. ADDRESS
+       Yandex ლინკი თუ არ არის,
+       მისამართით ვეძებთ კოორდინატას.
+    ===================================================== */
 
     if (
         post.street &&
@@ -2419,51 +2407,14 @@ if (
 
     }
 
-/*
-   Street only
 
-   მხოლოდ ქუჩის ცენტრს აღარ ვიყენებთ
-   ბინის ზუსტ ლოკაციად.
+    /* =====================================================
+       4. NOTHING FOUND
+    ===================================================== */
 
-   თუ სახლის ნომერი არ გვაქვს,
-   არ ვაბრუნებთ არაზუსტ კოორდინატას.
-*/
-
-if (
-    post.street &&
-    post.street !== "-"
-) {
-
-    const houseNumber =
-        extractHouseNumber(
-            post.street
-        );
-
-    if (
-        houseNumber
-    ) {
-
-        const exactAddress =
-            `${post.street}, Tbilisi, Georgia`;
-
-        const result =
-            await geocodeAddress(
-                exactAddress
-            );
-
-        if (
-            result
-        ) {
-
-            return result;
-
-        }
-
-    }
+    return null;
 
 }
-}
-
 /* =========================================================
    DOWNLOAD TELEGRAM PHOTO
    IMPORTANT:
@@ -4780,7 +4731,7 @@ async function start() {
         loadPosts();
         posts =
     ensureListingIds(posts);
-
+    
 
     console.log(
         "📦 Existing posts:",
