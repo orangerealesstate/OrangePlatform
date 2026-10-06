@@ -3388,3 +3388,261 @@ body.dark-mode .property-info-item strong {
         height: 210px !important;
     }
 }
+/* =========================================================
+   ORANGE PLATFORM — TELEGRAM DESKTOP FINAL
+   მხოლოდ კომპიუტერისთვის
+   ტელეფონის დიზაინს არ ეხება
+========================================================= */
+
+@media (min-width: 901px) {
+
+    html,
+    body {
+        width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    body {
+        background: #f4f6f9;
+    }
+
+    /* მთავარი კატალოგი */
+    .grid {
+        width: 100% !important;
+        max-width: 1250px !important;
+        margin: 20px auto !important;
+        padding: 10px 18px 40px !important;
+
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 18px !important;
+    }
+
+    /* ბარათები */
+    .card {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+
+        border-radius: 18px !important;
+        overflow: hidden !important;
+    }
+
+    /* ფოტო */
+    .card-slider,
+    .card-slider img,
+    .card-image {
+        width: 100% !important;
+        height: 200px !important;
+        min-height: 200px !important;
+        object-fit: cover !important;
+    }
+
+    /* ფასი */
+    .property-price {
+        font-size: 27px !important;
+    }
+
+    /* ინფორმაცია */
+    .property-info {
+        padding: 0 15px !important;
+    }
+
+    .property-info-item {
+        min-height: 54px !important;
+        padding: 7px 0 !important;
+    }
+
+    .property-icon {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        font-size: 19px !important;
+        margin-right: 10px !important;
+    }
+
+    .property-text strong {
+        font-size: 14px !important;
+    }
+
+    .property-text span {
+        font-size: 14px !important;
+    }
+
+    /* მთავარი ღილაკები */
+    .view-switcher {
+        width: 100% !important;
+        max-width: 700px !important;
+
+        margin: 14px auto 20px !important;
+        padding: 0 15px !important;
+
+        gap: 12px !important;
+    }
+
+    .view-switcher .view-btn {
+        height: 54px !important;
+        font-size: 16px !important;
+        border-radius: 14px !important;
+    }
+
+    /* =====================================================
+       FILTER — DESKTOP
+    ===================================================== */
+
+    .filter-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+
+        display: none;
+        align-items: center !important;
+        justify-content: center !important;
+
+        padding: 25px !important;
+
+        background: rgba(0,0,0,.40) !important;
+
+        z-index: 99999 !important;
+    }
+
+    .filter-window {
+        position: relative !important;
+
+        width: min(680px, calc(100vw - 50px)) !important;
+        max-width: 680px !important;
+
+        max-height: 88vh !important;
+
+        padding: 22px !important;
+
+        background: #fff !important;
+        border-radius: 24px !important;
+
+        box-shadow:
+            0 25px 70px rgba(0,0,0,.25) !important;
+
+        overflow: hidden !important;
+    }
+
+    /* ფილტრის სათაური */
+    .filter-header {
+        margin-bottom: 18px !important;
+    }
+
+    .filter-header h2 {
+        font-size: 23px !important;
+    }
+
+    /* ფილტრის ველები */
+    .filter-window-content {
+        gap: 12px !important;
+    }
+
+    .filter-window-content input,
+    .filter-window-content select {
+        height: 48px !important;
+        font-size: 15px !important;
+    }
+
+    /* რაიონების სია */
+    #filterDistrict {
+        display: grid !important;
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+
+        gap: 8px !important;
+
+        width: 100% !important;
+
+        max-height: 360px !important;
+        overflow-y: auto !important;
+
+        padding: 8px !important;
+    }
+
+    #filterDistrict .district-option,
+    #filterDistrict label {
+        min-width: 0 !important;
+        width: 100% !important;
+
+        min-height: 42px !important;
+
+        padding: 7px 9px !important;
+
+        display: flex !important;
+        align-items: center !important;
+
+        box-sizing: border-box !important;
+    }
+
+    #filterDistrict .district-option span,
+    #filterDistrict label span {
+        font-size: 14px !important;
+
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    #filterDistrict .select-all {
+        grid-column: 1 / -1 !important;
+    }
+
+    /* ფილტრის ღილაკები */
+    .filter-actions {
+        display: flex !important;
+        gap: 10px !important;
+        margin-top: 15px !important;
+    }
+
+    .filter-actions button {
+        height: 48px !important;
+        font-size: 15px !important;
+    }
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+
+    header {
+        padding: 12px 20px !important;
+        font-size: 22px !important;
+    }
+
+    .logo {
+        font-size: 25px !important;
+    }
+
+    /* =====================================================
+       BOTTOM BAR
+    ===================================================== */
+
+    .bottom-bar {
+        width: min(850px, calc(100% - 40px)) !important;
+        max-width: 850px !important;
+    }
+}
+
+
+/* =========================================================
+   VERY WIDE DESKTOP
+========================================================= */
+
+@media (min-width: 1400px) {
+
+    .grid {
+        max-width: 1350px !important;
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+
+        gap: 22px !important;
+    }
+
+    .card-slider,
+    .card-slider img,
+    .card-image {
+        height: 220px !important;
+    }
+}
