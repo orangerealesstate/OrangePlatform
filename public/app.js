@@ -234,20 +234,18 @@ renderPosts(allPosts);
             </h2>
         `;
 
-    }function renderPosts(posts) {
+    function renderPosts(posts) {
 
     const container = document.getElementById("posts");
 
     container.innerHTML = "";
 
     if (!posts.length) {
-
         container.innerHTML = `
             <h2 style="text-align:center;padding:40px;">
                 ${t("notFound")}
             </h2>
         `;
-
         return;
     }
 
@@ -258,59 +256,84 @@ renderPosts(allPosts);
                 ? "/" + post.images[0]
                 : "https://via.placeholder.com/600x400?text=No+Photo";
 
-        const district =
-            post.district || "-";
+        const district = post.district || "-";
+        const street = post.street || "-";
+        const rooms = post.rooms || "-";
+        const area = post.area || "-";
+        const price = post.price || "-";
 
         container.innerHTML += `
 
             <div class="card">
 
-                <img
-                    src="${image}"
-                    class="card-image"
-                    onclick="openGallery('${post.id}')"
-                >
+                <div class="card-photo-wrap">
+
+                    <img
+                        src="${image}"
+                        class="card-image"
+                        onclick="openGallery('${post.id}')"
+                        loading="lazy"
+                    >
+
+                    <span class="card-photo-label">
+                        🍊 Orange Real Estate
+                    </span>
+
+                </div>
 
                 <div class="info">
 
-                    <div class="price">
-                        $${post.price || "-"}
-                    </div>
+                    <div class="card-price-row">
 
-                    <div class="details">
+                        <div class="price">
+                            ${price}$ 
+                        </div>
 
-                        📍 <b>${t("district")}</b>
-                        ${district}
-                        <br><br>
-
-                        📌 <b>${t("address")}</b>
-                        ${post.street || "-"}
-                        <br><br>
-
-                        🛏 <b>${t("roomsLabel")}</b>
-                        ${post.rooms || "-"}
-                        <br><br>
-
-                        📐 <b>${t("area")}</b>
-                        ${post.area || "-"} მ²
+                        <div class="card-id">
+                            ID #${post.id}
+                        </div>
 
                     </div>
 
-                    <button
-                        class="details-btn"
-                        onclick="location.href='details.html?id=${post.id}'"
-                    >
-                        ${t("details")}
-                    </button>
+                    <div class="card-location">
+                        📍 ${district}
+                    </div>
 
-                    <a
-                        class="telegram-btn"
-                        href="${post.telegramLink || '#'}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        ${t("telegram")}
-                    </a>
+                    <div class="card-address">
+                        ${street}
+                    </div>
+
+                    <div class="card-details-grid">
+
+                        <div>
+                            🛏 ${t("roomsLabel")}: <b>${rooms}</b>
+                        </div>
+
+                        <div>
+                            📐 ${t("area")}: <b>${area} მ²</b>
+                        </div>
+
+                    </div>
+
+                    <div class="card-actions">
+
+                        <a
+                            class="telegram-btn"
+                            href="${post.telegramLink || '#'}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            ✈ Telegram
+                        </a>
+
+                        <button
+                            class="details-btn"
+                            onclick="location.href='details.html?id=${post.id}'"
+                        >
+                            ${t("details")} →
+                        </button>
+
+                    </div>
 
                 </div>
 
