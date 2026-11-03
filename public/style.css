@@ -400,3 +400,180 @@ header{
     opacity: 1;
     transform: scale(1.15);
 }
+/* =====================================
+   ORANGE PLATFORM — NEW CARD DESIGN
+===================================== */
+
+.card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #eeeeee;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+    transition: transform .25s, box-shadow .25s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+.card-photo-wrap {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-image {
+    display: block;
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    transition: transform .3s;
+}
+
+.card:hover .card-image {
+    transform: scale(1.035);
+}
+
+.card-photo-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #ff6b00;
+    color: white;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.card-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.card .price {
+    color: #f4510b;
+    font-size: 27px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.card-id {
+    color: #687386;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.card-location {
+    font-size: 17px;
+    font-weight: bold;
+    color: #252b36;
+    margin-bottom: 8px;
+}
+
+.card-address {
+    font-size: 14px;
+    color: #687386;
+    margin-bottom: 14px;
+}
+
+.card-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 0;
+    border-top: 1px solid #eeeeee;
+    color: #465268;
+    font-size: 14px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.card-actions .telegram-btn,
+.card-actions .details-btn {
+    flex: 1;
+    width: auto;
+    margin: 0;
+    padding: 12px 8px;
+    font-size: 14px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.card-actions .telegram-btn {
+    background: #229ED9;
+}
+
+.card-actions .details-btn {
+    background: #ff6b00;
+}
+
+/* =====================================
+   DESKTOP LAYOUT
+===================================== */
+
+@media (min-width: 1100px) {
+
+    .grid {
+        width: 100%;
+        max-width: 1700px;
+        margin: 20px auto;
+        padding: 20px 30px;
+
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+    }
+
+    .card-image {
+        height: 230px;
+    }
+
+    .card .info {
+        padding: 16px;
+    }
+
+    header {
+        padding: 18px 35px;
+    }
+
+}
+
+/* =====================================
+   SMALLER DESKTOP / TABLET
+===================================== */
+
+@media (min-width: 700px) and (max-width: 1099px) {
+
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+}
+
+/* =====================================
+   MOBILE — KEEP COMPACT
+===================================== */
+
+@media (max-width: 699px) {
+
+    .grid {
+        grid-template-columns: 1fr;
+        padding: 12px;
+        gap: 16px;
+    }
+
+    .card-image {
+        height: 220px;
+    }
+
+}
