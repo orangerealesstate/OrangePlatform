@@ -665,6 +665,28 @@ app.get(
     }
 );
 
+// =========================================================
+// API ACCESS TO POSTS FOR MINI APP
+// =========================================================
+
+app.get("/api/posts", (req, res) => {
+    try {
+        if (!fs.existsSync(POSTS_FILE)) {
+            return res.json([]);
+        }
+
+        const data = fs.readFileSync(POSTS_FILE, "utf8");
+        const posts = JSON.parse(data);
+
+        res.json(Array.isArray(posts) ? posts : []);
+
+    } catch (error) {
+        console.error("API POSTS ERROR:", error);
+        res.status(500).json({
+            error: "Failed to load posts"
+        });
+    }
+});
 
 // =========================================================
 // MATCH REQUEST — SEARCH APARTMENTS
