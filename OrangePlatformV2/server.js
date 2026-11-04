@@ -312,7 +312,7 @@ function getPosts() {
 // 30 DAY POST FILTER
 // =========================================================
 
-const POST_MAX_AGE_DAYS = 30;
+const POST_MAX_AGE_DAYS = 14;
 
 
 function parsePostDate(value) {
@@ -523,16 +523,13 @@ function getVisiblePosts() {
 
                 // თუ თარიღი არ აქვს,
                 // განცხადებას არ ვშლით
-                if (!postDate) {
+               if (!postDate) {
+    return false;
+}
 
-                    return true;
+const ageMs = now - postDate.getTime();
 
-                }
-
-
-                const ageMs =
-                    now -
-                    postDate.getTime();
+return ageMs >= 0 && ageMs <= maxAgeMs;
 
 
                 // მომავლის თარიღიც დაშვებულია
@@ -657,11 +654,13 @@ function getVisiblePosts() {
 app.get(
     "/posts.json",
     (req, res) => {
-
-        res.sendFile(
-            POSTS_FILE
-        );
-
+        try {
+            const posts = getVisiblePosts();
+            res.json(posts);
+        } catch (error) {
+            console.error("POSTS JSON ERROR:", error);
+            res.status(500).json([]);
+        }
     }
 );
 
@@ -671,17 +670,12 @@ app.get(
 
 app.get("/api/posts", (req, res) => {
     try {
-        if (!fs.existsSync(POSTS_FILE)) {
-            return res.json([]);
-        }
-
-        const data = fs.readFileSync(POSTS_FILE, "utf8");
-        const posts = JSON.parse(data);
-
-        res.json(Array.isArray(posts) ? posts : []);
+        const posts = getVisiblePosts();
+        res.json(posts);
 
     } catch (error) {
         console.error("API POSTS ERROR:", error);
+
         res.status(500).json({
             error: "Failed to load posts"
         });
