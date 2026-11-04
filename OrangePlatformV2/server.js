@@ -312,7 +312,7 @@ function getPosts() {
 // 30 DAY POST FILTER
 // =========================================================
 
-const POST_MAX_AGE_DAYS = 14;
+const POST_MAX_AGE_DAYS = 20;
 
 
 function parsePostDate(value) {
