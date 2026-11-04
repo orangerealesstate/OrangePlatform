@@ -532,12 +532,7 @@ const ageMs = now - postDate.getTime();
 return ageMs >= 0 && ageMs <= maxAgeMs;
 
 
-                // მომავლის თარიღიც დაშვებულია
-                return (
-                    ageMs <=
-                    maxAgeMs
-                );
-
+                
             }
         );
 
