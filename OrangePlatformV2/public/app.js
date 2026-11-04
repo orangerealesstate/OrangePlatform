@@ -1330,15 +1330,7 @@ const allDistrictsSelected =
             ? maxPriceRaw
             : Infinity;
 
-const listingIdInput =
-    document.getElementById(
-        "filterListingId"
-    );
 
-const listingIdSearch =
-    normalizeSearchText(
-        listingIdInput?.value
-    );
     console.log(
         "🔎 FILTER:",
         {
@@ -1353,13 +1345,7 @@ const listingIdSearch =
 
     return allPosts.filter(
         post => {
-            if (
-            listingIdSearch &&
-            String(post.listingId || "")
-                .toLowerCase() !== listingIdSearch
-        ) {
-            return false;
-        }
+            
 
             /* =========================================
                SEARCH
@@ -1578,7 +1564,6 @@ function clearFilters() {
 
     const filterIds = [
         "search",
-        "filterListingId",
         "filterDistrict",
         "roomsFilter",
         "minPrice",
@@ -1622,19 +1607,7 @@ function clearFilters() {
     }
 
 
-    // აუცილებლად გავანულოთ ID-ის ველი
-    const listingIdInput =
-        document.getElementById("filterListingId");
-
-    if (listingIdInput) {
-        listingIdInput.value = "";
-        listingIdInput.dispatchEvent(
-            new Event("input", { bubbles: true })
-        );
-        listingIdInput.dispatchEvent(
-            new Event("change", { bubbles: true })
-        );
-    }
+   
 
 
     // თავიდან ვაჩვენოთ ყველა განცხადება
@@ -8227,32 +8200,5 @@ document.addEventListener("click", function (event) {
         shareUrl,
         "_blank"
     );
-
-});
-/* =====================================================
-   ENTER — LISTING ID SEARCH
-===================================================== */
-
-document.addEventListener("keydown", function (event) {
-
-    if (
-        event.key === "Enter" &&
-        event.target &&
-        event.target.id === "filterListingId"
-    ) {
-
-        event.preventDefault();
-
-        // კლავიატურის დახურვა ტელეფონზე
-        event.target.blur();
-
-        // ფილტრის გაშვება
-        if (typeof applyFilters === "function") {
-            applyFilters();
-        } else if (typeof getFilteredPosts === "function") {
-            renderPosts(getFilteredPosts());
-        }
-
-    }
 
 });
