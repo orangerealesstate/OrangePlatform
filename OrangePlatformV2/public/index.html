@@ -898,31 +898,7 @@ style="
             <!-- FILTER CONTENT -->
 
             <div class="filter-window-content">
-<!-- LISTING ID -->
 
-<div class="listing-id-box">
-
-    <div class="listing-id-row">
-
-        <input
-            type="text"
-            id="filterListingId"
-            placeholder="Введите код объявления"
-            autocomplete="off"
-            inputmode="numeric"
-        >
-
-        <button
-            type="button"
-            class="listing-id-search"
-            onclick="applyFilters(); document.getElementById('filterListingId').blur();"
-        >
-            🔎
-        </button>
-
-    </div>
-
-</div>
 
                 <!-- DISTRICT -->
 
@@ -1723,12 +1699,6 @@ function toggleDistricts() {
 
 
         /* FILTER WINDOW */
-
-        const listingInput =
-            document.getElementById("filterListingId");
-
-        if (listingInput)
-            listingInput.placeholder = t.listingCode;
 
 
         const districtTitle =
