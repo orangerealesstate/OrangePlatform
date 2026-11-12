@@ -1308,6 +1308,11 @@ function getFilteredPosts() {
         document.getElementById(
             "maxPrice"
         );
+   const metroInput =
+    document.getElementById("filterMetro");
+
+const selectedMetro =
+    String(metroInput?.value || "").trim();
 
 
     const search =
@@ -1456,6 +1461,26 @@ if (allDistrictsSelected) {
 ) {
     return false;
 }
+                       /* =========================================
+               METRO
+            ========================================= */
+
+            if (selectedMetro) {
+                const metroLine = normalizeMetroText(
+                    getMetroLineForFilter(post)
+                );
+
+                const aliases =
+                    metroStationAliases[selectedMetro] || [selectedMetro];
+
+                const matchesMetro = aliases.some(alias =>
+                    metroLine.includes(normalizeMetroText(alias))
+                );
+
+                if (!matchesMetro) {
+                    return false;
+                }
+            }
 
             /* =========================================
                ROOMS
@@ -1606,6 +1631,7 @@ function clearFilters() {
     const filterIds = [
         "search",
         "filterDistrict",
+        "filterMetro",
         "roomsFilter",
         "minPrice",
         "maxPrice"
@@ -1666,6 +1692,7 @@ const ids = [
 
     "search",
     "filterDistrict",
+   "filterMetro",
     "roomsFilter",
     "minPrice",
     "maxPrice"
