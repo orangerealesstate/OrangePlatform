@@ -343,11 +343,31 @@ renderPosts(allPosts);
 
     });
 
+
 }
+   // =========================
+// METRO DETECTION
+// =========================
 
-}function filterPosts() {
+function getMetroLine(post) {
 
+    const text =
+        post.text ||
+        post.caption ||
+        post.content ||
+        post.message ||
+        post.postText ||
+        post.rawText ||
+        "";
 
+    const lines = String(text).split(/\r?\n/);
+
+    return lines.find(line =>
+        /МЕТРО|METRO|მეტრო/i.test(line)
+    ) || "";
+}
+   
+   function filterPosts() {
 
     const district =
         document.getElementById("districtFilter").value.toLowerCase();
@@ -355,14 +375,42 @@ renderPosts(allPosts);
     const rooms =
         document.getElementById("roomsFilter").value;
 
+    const metro =
+        document.getElementById("metroFilter").value;
+
     const minPrice =
         Number(document.getElementById("minPrice").value) || 0;
 
     const maxPrice =
         Number(document.getElementById("maxPrice").value) || 999999999;
 
-    const filtered = allPosts.filter(post => {
+    // მეტროს სახელების შესაბამისობა ქართულ და რუსულ პოსტებთან
+    const metroAliases = {
+        "დელისი": ["дэллиси", "делиси", "დელისი"],
+        "ვაჟა-ფშაველა": ["важапшавела", "важа-пшавела", "ვაჟა-ფშაველა"],
+        "სამედიცინო უნივერსიტეტი": ["медицинскийуниверситет", "სამედიცინო უნივერსიტეტი"],
+        "ტექნიკური უნივერსიტეტი": ["техническийуниверситет", "ტექნიკური უნივერსიტეტი"],
+        "ისანი": ["исани", "ისანი"],
+        "ავლაბარი": ["авлабари", "ავლაბარი"],
+        "რუსთაველი": ["руставели", "რუსთაველი"],
+        "თავისუფლების მოედანი": ["площадьсвободы", "свободыплощадь", "თავისუფლების მოედანი"],
+        "მარჯანიშვილი": ["марджанишвили", "მარჯანიშვილი"],
+        "სადგურის მოედანი": ["вокзальнаяплощадь", "სადგურის მოედანი"],
+        "დიდუბე": ["дидубе", "დიდუბე"],
+        "ვარკეთილი": ["варкетили", "ვარკეთილი"],
+        "სამგორი": ["самгори", "სამგორი"],
+        "300 არაგველი": ["300арагвели", "300არაგველი"],
+        "გოცირიძე": ["гоциридзе", "გოცირიძე"],
+        "ახმეტელის თეატრი": ["ахметелитеатр", "ახმეტელის თეატრი"],
+        "სახელმწიფო უნივერსიტეტი": ["государственныйуниверситет", "სახელმწიფო უნივერსიტეტი"]
+    };
 
+    const normalize = value =>
+        String(value || "")
+            .toLowerCase()
+            .replace(/[#\s\-_.,]/g, "");
+
+    const filtered = allPosts.filter(post => {
 
         const postDistrict =
             (post.district || "").toLowerCase();
@@ -373,6 +421,7 @@ renderPosts(allPosts);
         const postPrice =
             Number(post.price) || 0;
 
+        // უბანი
         if (
             district &&
             !postDistrict.includes(district)
@@ -380,27 +429,35 @@ renderPosts(allPosts);
             return false;
         }
 
+        // ოთახები
         if (rooms) {
 
             if (rooms === "5") {
-
-                if (postRooms < 5)
-                    return false;
-
+                if (postRooms < 5) return false;
             } else {
-
-                if (postRooms !== Number(rooms))
-                    return false;
-
+                if (postRooms !== Number(rooms)) return false;
             }
 
         }
 
-        if (postPrice < minPrice)
-            return false;
+        // მეტრო
+        if (metro) {
 
-        if (postPrice > maxPrice)
-            return false;
+            const metroLine = normalize(getMetroLine(post));
+
+            const aliases = metroAliases[metro] || [metro];
+
+            const found = aliases.some(alias =>
+                metroLine.includes(normalize(alias))
+            );
+
+            if (!found) return false;
+        }
+
+        // ფასი
+        if (postPrice < minPrice) return false;
+
+        if (postPrice > maxPrice) return false;
 
         return true;
 
@@ -408,7 +465,9 @@ renderPosts(allPosts);
 
     renderPosts(filtered);
 
-}function openGallery(postId) {
+}
+
+function openGallery(postId) {
 
     const post = allPosts.find(
         p => String(p.id) === String(postId)
