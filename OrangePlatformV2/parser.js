@@ -4908,231 +4908,118 @@ async function start() {
     );
 
 
-    /* =====================================================
-   NEW POST IDS
-   ყველა ახალი Telegram განცხადება:
-   album + ჩვეულებრივი post
+ 
+/* =====================================================
+   SEPARATE PHOTO AND COORDINATE PROCESSING
 ===================================================== */
 
 const newPostIds = [];
+const photoPostIds = [];
 
-const currentMessageIds =
-    new Set(
-        messages.map(
-            msg =>
-                String(
-                    msg.id
-                )
-        )
+const currentMessageIds = new Set(
+    messages.map(msg => String(msg.id))
+);
+
+for (const post of posts) {
+
+    if (!post) continue;
+
+    if (!currentMessageIds.has(String(post.id))) {
+        continue;
+    }
+
+    /* COORDINATES */
+    if (!isTbilisiCoordinates(post.lat, post.lng)) {
+        if (!newPostIds.includes(post.id)) {
+            newPostIds.push(post.id);
+        }
+    }
+
+    /* PHOTOS — DOWNLOAD ONLY MISSING FILES */
+    const album = Object.values(albums).find(
+        item => String(item.id) === String(post.id)
     );
 
+    if (!album) continue;
 
-for (
-    const post of
-    posts
-) {
+    const groupId = String(album.groupId);
 
-    if (
-        !post
-    ) {
-        continue;
-    }
+    const relatedPhotoMessages = messages.filter(msg => {
+        const id = msg.groupedId
+            ? String(msg.groupedId)
+            : String(msg.id);
 
+        return id === groupId && msg.photo;
+    });
 
-    /*
-       ეს პოსტი მიმდინარე Telegram
-       messages-ში უნდა არსებობდეს.
-    */
-
-    if (
-        !currentMessageIds.has(
-            String(
-                post.id
-            )
-        )
-    ) {
-        continue;
-    }
-
-
-    /*
-       თუ უკვე აქვს სწორი
-       თბილისის კოორდინატა,
-       ხელახლა არ ვეძებთ.
-    */
-
-    if (
-        isTbilisiCoordinates(
-            post.lat,
-            post.lng
-        )
-    ) {
-        continue;
-    }
-
-
-    /*
-       ახალი პოსტი კოორდინატების
-       მოსაძებნ სიაში.
-    */
-
-    if (
-        !newPostIds.includes(
-            post.id
-        )
-    ) {
-
-        newPostIds.push(
-            post.id
+    const hasMissingPhoto = relatedPhotoMessages.some(msg => {
+        const filePath = path.join(
+            DOWNLOADS,
+            `${msg.id}.jpg`
         );
 
-    }
+        return !fs.existsSync(filePath);
+    });
 
+    if (hasMissingPhoto && !photoPostIds.includes(post.id)) {
+        photoPostIds.push(post.id);
+    }
+}
+
+console.log("📸 POSTS WITH MISSING PHOTOS:", photoPostIds.length);
+console.log("🗺️ POSTS TO PROCESS COORDINATES:", newPostIds.length);
+
+
+/* PHOTOS */
+try {
+    await downloadNewPostPhotos(
+        posts,
+        albums,
+        messages,
+        photoPostIds
+    );
+}
+catch (error) {
+    console.log("⚠️ Photo stage error:", error.message);
+    savePosts(posts);
 }
 
 
-console.log(
-    "🆕 POSTS TO PROCESS:",
-    newPostIds.length
-);
-
-
-    /* =====================================================
-       PHOTOS
-       
-       ფოტოები ახლა იტვირთება.
-       posts.json უკვე არსებობს.
-    ===================================================== */
-
-    try {
-
-        await downloadNewPostPhotos(
-            posts,
-            albums,
-            messages,
-            newPostIds
-        );
-
-    }
-
-    catch (
-        error
-    ) {
-
-        console.log(
-            "⚠️ Photo stage error:",
-            error.message
-        );
-
-
-        /*
-           ფოტოებზე პრობლემა არ უნდა
-           წყვეტდეს parser-ს.
-        */
-
-        savePosts(
-            posts
-        );
-
-    }
-
-
-    /* =====================================================
-       COORDINATES
-       
-       ახალი ბინების კოორდინატები
-       ცალკე ეტაპზე იძებნება.
-    ===================================================== */
-
-    try {
-
-        await updateNewPostCoordinates(
-            posts,
-            newPostIds
-        );
-
-    }
-
-    catch (
-        error
-    ) {
-
-        console.log(
-            "⚠️ New coordinates stage error:",
-            error.message
-        );
-
-
-        /*
-           მთავარი პოსტი უკვე შენახულია.
-        */
-
-        savePosts(
-            posts
-        );
-
-    }
-
-
-    /* =====================================================
-       NORMALIZE
-    ===================================================== */
-
-    normalizeAllPosts(
-        posts
+/* COORDINATES */
+try {
+    await updateNewPostCoordinates(
+        posts,
+        newPostIds
     );
+}
+catch (error) {
+    console.log("⚠️ New coordinates stage error:", error.message);
+    savePosts(posts);
+}
 
 
-    /* =====================================================
-       SORT
-    ===================================================== */
-
-    sortPosts(
-        posts
-    );
+/* NORMALIZE */
+normalizeAllPosts(posts);
 
 
-    /* =====================================================
-       SAVE
-    ===================================================== */
-
-    savePosts(
-        posts
-    );
+/* SORT */
+sortPosts(posts);
 
 
-    /* =====================================================
-       OLD POSTS BACKFILL
-       
-       ძველი ბინები ცალკე მუშავდება.
-       
-       ეს ეტაპი ახალი ბინების დამატებას
-       აღარ უშლის ხელს.
-    ===================================================== */
-
-    try {
-
-        await backfillOldPosts(
-            posts
-        );
-
-    }
-
-    catch (
-        error
-    ) {
-
-        console.log(
-            "⚠️ Backfill stage error:",
-            error.message
-        );
-
-    }
+/* SAVE */
+savePosts(posts);
 
 
-    /* =====================================================
-       FINAL SAVE
-    ===================================================== */
+/* OLD POSTS BACKFILL */
+try {
+    await backfillOldPosts(posts);
+}
+catch (error) {
+    console.log("⚠️ Backfill stage error:", error.message);
+}
+
+
+/* FINAL SAVE */
 
     normalizeAllPosts(
         posts
