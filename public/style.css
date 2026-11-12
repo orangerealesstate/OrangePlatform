@@ -50,6 +50,13 @@ header{
     border-radius:10px;
     font-size:16px;
 }
+#metroFilter {
+    display: block !important;
+    width: 100%;
+    min-height: 45px;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
 #search{
     flex:2;
