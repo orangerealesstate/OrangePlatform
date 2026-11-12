@@ -1177,6 +1177,17 @@ async function resolveYandexLink(
 /* =========================================================
    GET YANDEX COORDINATES
 ========================================================= */
+function extractYandexLinks(text) {
+    if (!text) return [];
+
+    const matches = String(text).match(
+        /https?:\/\/(?:(?:www\.)?yandex\.[a-z.]+|maps\.yandex\.[a-z.]+)\/maps\/[^\s<>"'`]+/gi
+    ) || [];
+
+    return [...new Set(
+        matches.map(link => link.replace(/[),.;!?]+$/, ""))
+    )];
+}
 
 async function getYandexCoordinates(
     text
