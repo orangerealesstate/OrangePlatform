@@ -212,10 +212,19 @@ async function loadPosts() {
         }
 
         const posts = await response.json();
+// ბოლო 30 დღის განცხადებები
+const last30Days = Date.now() - (30 * 24 * 60 * 60 * 1000);
+
+const recentPosts = posts.filter(post => {
+    const postDate = Number(post.date);
+
+    return postDate > 0 &&
+           postDate * 1000 >= last30Days;
+});
 
 allPosts = Array.from(
     new Map(
-        posts.map(post => [
+        recentPosts.map(post => [
             String(post.id),
             post
         ])
