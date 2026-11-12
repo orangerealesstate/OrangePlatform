@@ -1382,6 +1382,7 @@ const allDistrictsSelected =
         {
             search,
             selectedDistricts,
+           selectedMetro,
             selectedRooms,
             minPrice,
             maxPrice
