@@ -1242,18 +1242,13 @@ function normalizeMetroText(value) {
 }
 
 function getMetroLineForFilter(post) {
-    const source = String(
+    return String(
         post?.text ||
         post?.caption ||
         post?.description ||
         ""
     );
-
-    return source.split(/\r?\n/).find(line =>
-        /(метро|metro|მეტრო)/i.test(line)
-    ) || "";
 }
-
 const metroStationAliases = {
     "დელისი": ["დელისი", "делиси", "delisi"],
     "ვაჟა-ფშაველა": ["ვაჟა-ფშაველა", "важапшавела", "vazha-pshavela"],
