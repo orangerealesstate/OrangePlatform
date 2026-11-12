@@ -3690,14 +3690,16 @@ if (
     }
 
 
-    /* =====================================================
-       EXISTING POST
-    ===================================================== */
+   /* =====================================================
+   EXISTING POST — DO NOT MODIFY
+===================================================== */
 
-    const oldPost =
-        posts[
-            existingIndex
-        ];
+console.log(
+    "⏭️ EXISTING POST LEFT UNCHANGED:",
+    post.id
+);
+
+return posts[existingIndex];
 
 const manualEdits =
     oldPost.manualEdits || {};
@@ -4934,6 +4936,9 @@ const currentMessageIds = new Set(
 for (const post of posts) {
 
     if (!post) continue;
+       if (existingPostIds.has(String(post.id))) {
+        continue;
+    }
 
     if (!currentMessageIds.has(String(post.id))) {
         continue;
@@ -5020,15 +5025,8 @@ sortPosts(posts);
 /* SAVE */
 savePosts(posts);
 
-
-/* OLD POSTS BACKFILL */
-try {
-    await backfillOldPosts(posts);
-}
-catch (error) {
-    console.log("⚠️ Backfill stage error:", error.message);
-}
-
+/* OLD POSTS BACKFILL DISABLED */
+// ძველი განცხადებების კოორდინატები აღარ მუშავდება
 
 /* FINAL SAVE */
 
