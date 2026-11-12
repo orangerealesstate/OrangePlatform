@@ -1456,28 +1456,27 @@ if (allDistrictsSelected) {
     )
 ) {
     return false;
+}/* =========================================
+   METRO
+========================================= */
+
+if (selectedMetro) {
+
+    const postText = normalizeMetroText(
+        getMetroLineForFilter(post)
+    );
+
+    const aliases = metroStationAliases[selectedMetro] || [selectedMetro];
+
+    const matchesMetro = aliases.some(alias => {
+        const normalizedAlias = normalizeMetroText(alias);
+        return normalizedAlias && postText.includes(normalizedAlias);
+    });
+
+    if (!matchesMetro) {
+        return false;
+    }
 }
-                       /* =========================================
-               METRO
-            ========================================= */
-
-            if (selectedMetro) {
-                const metroLine = normalizeMetroText(
-                    getMetroLineForFilter(post)
-                );
-
-                const aliases =
-                    metroStationAliases[selectedMetro] || [selectedMetro];
-
-                const matchesMetro = aliases.some(alias =>
-                    metroLine.includes(normalizeMetroText(alias))
-                );
-
-                if (!matchesMetro) {
-                    return false;
-                }
-            }
-
             /* =========================================
                ROOMS
             ========================================= */
@@ -1673,10 +1672,10 @@ function clearFilters() {
    
 
 
-    // თავიდან ვაჩვენოთ ყველა განცხადება
-    if (typeof renderPosts === "function") {
-        renderPosts(allPosts);
-    }
+// ფილტრების განულების შემდეგ თავიდან გავუშვათ ფილტრაცია
+if (typeof getFilteredPosts === "function") {
+    renderPosts(getFilteredPosts());
+}
 
 }
 /* =========================================================
