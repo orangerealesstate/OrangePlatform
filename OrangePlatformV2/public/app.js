@@ -1242,12 +1242,13 @@ function normalizeMetroText(value) {
 }
 
 function getMetroLineForFilter(post) {
-    return String(
-        post?.text ||
-        post?.caption ||
-        post?.description ||
-        ""
-    );
+    return [
+        post?.text,
+        post?.caption,
+        post?.description
+    ]
+    .filter(Boolean)
+    .join(" ");
 }
 const metroStationAliases = {
     "დელისი": ["დელისი", "делиси", "delisi"],
