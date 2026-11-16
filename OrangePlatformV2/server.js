@@ -523,8 +523,9 @@ function getVisiblePosts() {
 
                 // თუ თარიღი არ აქვს,
                 // განცხადებას არ ვშლით
-               if (!postDate) {
-    return false;
+              if (!postDate) {
+    console.log("⚠️ POST WITHOUT VALID DATE:", post.id);
+    return true;
 }
 
 const ageMs = now - postDate.getTime();
