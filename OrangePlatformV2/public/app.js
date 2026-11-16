@@ -156,7 +156,7 @@ const telegramUserId =
 let allPosts = [];
 let currentPage = 1;
 
-const POSTS_PER_PAGE = 20
+const POSTS_PER_PAGE = 21
 
 let currentView =
     "catalog";
