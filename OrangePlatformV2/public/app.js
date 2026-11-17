@@ -246,8 +246,12 @@ const districtCenters = {
     navtlughi:
         [41.6850, 44.8500],
 
-    "tbilisi sea":
-        [41.7600, 44.9000]
+   "tbilisi sea":
+    [41.7600, 44.9000],
+
+"lisi lake":
+    [41.7385, 44.7385]
+   
 
 };
 
@@ -458,11 +462,19 @@ function normalizeDistrict(
             "საბურთალო"
         ],
 
-        vake: [
+vake: [
             "vake",
             "ваки",
             "ვაკე"
         ],
+       
+       "lisi lake": [
+    "lisi lake",
+    "лиси",
+    "ლისი",
+    "ლისის ტბა",
+    "озеро лиси"
+],
 
         vera: [
             "vera",
@@ -3396,6 +3408,9 @@ function editPost(post) {
                     <option value="Ортачала">
                         Ортачала
                     </option>
+                    <option value="Лиси">
+    Лиси
+</option>
 
                 </select>
 
