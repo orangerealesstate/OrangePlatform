@@ -8032,11 +8032,28 @@ function openRequestForm() {
                     </select>
                 </label>
 
-                <label>
-                    Районы
-                    <input name="districts"
-                    placeholder="Ваке, Сабуртало, Вера">
-                </label>
+               
+<label>
+    Районы (можно несколько)
+    <select name="districts" multiple class="orange-district-select">
+        <option value="Ваке">Ваке</option>
+        <option value="Сабуртало">Сабуртало</option>
+        <option value="Вера">Вера</option>
+        <option value="Мтацминда">Мтацминда</option>
+        <option value="Авлабари">Авлабари</option>
+        <option value="Ортачала">Ортачала</option>
+        <option value="Диди Дигоми">Диди Дигоми</option>
+        <option value="Глдани">Глдани</option>
+        <option value="Исани">Исани</option>
+        <option value="Самгори">Самгори</option>
+        <option value="Чугурети">Чугурети</option>
+        <option value="Дидубе">Дидубе</option>
+        <option value="Надзаладеви">Надзаладеви</option>
+        <option value="Крцаниси">Крцаниси</option>
+        <option value="Любой район">Любой район</option>
+    </select>
+</label>
+
 
                 <div class="orange-request-row">
 
@@ -8073,6 +8090,15 @@ function openRequestForm() {
                     <textarea name="details"
                     placeholder="Мебель, новостройка, парковка и т.д."></textarea>
                 </label>
+                <label>
+    Telegram Username
+    <input
+        name="username"
+        type="text"
+        placeholder="@username"
+        required
+    >
+</label>
 
                 <label>
                     Телефон
@@ -8092,6 +8118,12 @@ function openRequestForm() {
     `;
 
     document.body.appendChild(modal);
+   const usernameInput = modal.querySelector('[name="username"]');
+
+if (telegramWebApp?.initDataUnsafe?.user?.username) {
+    usernameInput.value =
+        "@" + telegramWebApp.initDataUnsafe.user.username;
+}
 
     // დახურვა X ღილაკით
     modal.querySelector(".orange-request-close").onclick = () => {
