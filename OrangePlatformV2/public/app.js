@@ -7945,7 +7945,25 @@ function setupViewButtons() {
         document.getElementById(
             "mapViewBtn"
         );
+// 📝 REQUEST BUTTON
+const viewSwitcher = document.querySelector(".view-switcher");
 
+if (viewSwitcher && !document.getElementById("requestViewBtn")) {
+    const requestButton = document.createElement("button");
+
+    requestButton.type = "button";
+    requestButton.id = "requestViewBtn";
+    requestButton.className = "view-btn";
+    requestButton.innerHTML = "📝 Запрос";
+
+    requestButton.style.background = "#F59E0B";
+
+    requestButton.addEventListener("click", () => {
+        openRequestForm();
+    });
+
+    viewSwitcher.appendChild(requestButton);
+}
 
     if (catalogButton) {
 
@@ -7983,7 +8001,180 @@ function setupViewButtons() {
     }
 
 }
+/* =========================================================
+   ORANGE REQUEST FORM
+========================================================= */
 
+function openRequestForm() {
+
+    if (document.getElementById("orangeRequestModal")) {
+        return;
+    }
+
+    const modal = document.createElement("div");
+
+    modal.id = "orangeRequestModal";
+
+    modal.innerHTML = `
+        <div class="orange-request-dialog">
+
+            <button class="orange-request-close" type="button">✕</button>
+
+            <h2>📝 Запрос на квартиру</h2>
+
+            <form id="orangeRequestForm">
+
+                <label>
+                    Тип сделки
+                    <select name="dealType" required>
+                        <option value="Аренда">Аренда</option>
+                        <option value="Покупка">Покупка</option>
+                    </select>
+                </label>
+
+                <label>
+                    Районы
+                    <input name="districts"
+                    placeholder="Ваке, Сабуртало, Вера">
+                </label>
+
+                <div class="orange-request-row">
+
+                    <label>
+                        Бюджет от ($)
+                        <input name="minPrice" type="number" min="0">
+                    </label>
+
+                    <label>
+                        до ($)
+                        <input name="maxPrice" type="number" min="0">
+                    </label>
+
+                </div>
+
+                <label>
+                    Комнаты
+                    <select name="rooms">
+                        <option value="">Любое</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4+">4+</option>
+                    </select>
+                </label>
+
+                <label>
+                    Площадь от (м²)
+                    <input name="area" type="number" min="0">
+                </label>
+
+                <label>
+                    Дополнительно
+                    <textarea name="details"
+                    placeholder="Мебель, новостройка, парковка и т.д."></textarea>
+                </label>
+
+                <label>
+                    Телефон
+                    <input name="phone" type="tel" required
+                    placeholder="+995 5XX XX XX XX">
+                </label>
+
+                <button type="submit" class="orange-request-submit">
+                    📨 Отправить запрос
+                </button>
+
+            </form>
+
+            <div class="orange-request-status"></div>
+
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // დახურვა X ღილაკით
+    modal.querySelector(".orange-request-close").onclick = () => {
+        modal.remove();
+    };
+
+    // დახურვა გარეთ დაჭერისას
+    modal.addEventListener("click", event => {
+        if (event.target === modal) {
+            modal.remove();
+        }
+    });
+
+    // ფორმის გაგზავნა
+    modal.querySelector("#orangeRequestForm")
+    .addEventListener("submit", async event => {
+
+        event.preventDefault();
+
+        const form = event.target;
+
+        const data = Object.fromEntries(
+            new FormData(form).entries()
+        );
+
+        data.userId =
+            telegramWebApp?.initDataUnsafe?.user?.id || null;
+
+        data.username =
+            telegramWebApp?.initDataUnsafe?.user?.username || null;
+
+        const status =
+            modal.querySelector(".orange-request-status");
+
+        const submit =
+            form.querySelector(".orange-request-submit");
+
+        submit.disabled = true;
+        submit.textContent = "⏳ Отправка...";
+
+        try {
+
+            const response = await fetch("/api/requests", {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.error || "Ошибка отправки");
+            }
+
+            status.textContent = "✅ Запрос успешно отправлен!";
+
+            form.reset();
+
+            setTimeout(() => {
+                modal.remove();
+            }, 1800);
+
+        } catch (error) {
+
+            console.error("REQUEST ERROR:", error);
+
+            status.textContent =
+                "❌ Ошибка отправки. Попробуйте еще раз.";
+
+        } finally {
+
+            submit.disabled = false;
+            submit.textContent = "📨 Отправить запрос";
+
+        }
+
+    });
+
+}
 
 /* =========================================================
    AUTO REFRESH
