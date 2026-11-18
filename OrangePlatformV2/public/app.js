@@ -8033,26 +8033,35 @@ function openRequestForm() {
                 </label>
 
                
-<label>
-    Районы (можно несколько)
-    <select name="districts" multiple class="orange-district-select">
-        <option value="Ваке">Ваке</option>
-        <option value="Сабуртало">Сабуртало</option>
-        <option value="Вера">Вера</option>
-        <option value="Мтацминда">Мтацминда</option>
-        <option value="Авлабари">Авлабари</option>
-        <option value="Ортачала">Ортачала</option>
-        <option value="Диди Дигоми">Диди Дигоми</option>
-        <option value="Глдани">Глдани</option>
-        <option value="Исани">Исани</option>
-        <option value="Самгори">Самгори</option>
-        <option value="Чугурети">Чугурети</option>
-        <option value="Дидубе">Дидубе</option>
-        <option value="Надзаладеви">Надзаладеви</option>
-        <option value="Крцаниси">Крцаниси</option>
-        <option value="Любой район">Любой район</option>
-    </select>
-</label>
+<div class="orange-district-picker">
+    <label>Районы (можно несколько)</label>
+
+    <button type="button" class="orange-district-trigger">
+        Выберите районы ▾
+    </button>
+
+    <div class="orange-district-options">
+        <label><input type="checkbox" value="Ваке"> Ваке</label>
+        <label><input type="checkbox" value="Сабуртало"> Сабуртало</label>
+        <label><input type="checkbox" value="Вера"> Вера</label>
+        <label><input type="checkbox" value="Мтацминда"> Мтацминда</label>
+        <label><input type="checkbox" value="Авлабари"> Авлабари</label>
+        <label><input type="checkbox" value="Ортачала"> Ортачала</label>
+        <label><input type="checkbox" value="Диди Дигоми"> Диди Дигоми</label>
+        <label><input type="checkbox" value="Глдани"> Глдани</label>
+        <label><input type="checkbox" value="Исани"> Исани</label>
+        <label><input type="checkbox" value="Самгори"> Самгори</label>
+        <label><input type="checkbox" value="Чугурети"> Чугурети</label>
+        <label><input type="checkbox" value="Дидубе"> Дидубе</label>
+        <label><input type="checkbox" value="Надзаладеви"> Надзаладеви</label>
+        <label><input type="checkbox" value="Крцаниси"> Крцანისი</label>
+        <label><input type="checkbox" value="Любой район"> Любой район</label>
+
+        <button type="button" class="orange-district-done">
+            Готово
+        </button>
+    </div>
+</div>
 
 
                 <div class="orange-request-row">
