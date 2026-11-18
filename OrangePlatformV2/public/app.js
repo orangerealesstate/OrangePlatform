@@ -8130,6 +8130,25 @@ function openRequestForm() {
     `;
 
     document.body.appendChild(modal);
+   const districtTrigger = modal.querySelector(".orange-district-trigger");
+const districtOptions = modal.querySelector(".orange-district-options");
+const districtDone = modal.querySelector(".orange-district-done");
+
+districtTrigger.onclick = () => {
+    districtOptions.classList.toggle("open");
+};
+
+districtDone.onclick = () => {
+    const selected = Array.from(
+        districtOptions.querySelectorAll('input[type="checkbox"]:checked')
+    ).map(cb => cb.value);
+
+    districtTrigger.textContent = selected.length
+        ? selected.join(", ")
+        : "Выберите районы ▾";
+
+    districtOptions.classList.remove("open");
+};
    const usernameInput = modal.querySelector('[name="username"]');
 
 if (telegramWebApp?.initDataUnsafe?.user?.username) {
@@ -8160,6 +8179,11 @@ if (telegramWebApp?.initDataUnsafe?.user?.username) {
         const data = Object.fromEntries(
             new FormData(form).entries()
         );
+       data.districts = Array.from(
+    modal.querySelectorAll(
+        '.orange-district-options input[type="checkbox"]:checked'
+    )
+).map(cb => cb.value);
 
         data.userId =
             telegramWebApp?.initDataUnsafe?.user?.id || null;
