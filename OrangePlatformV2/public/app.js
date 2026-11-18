@@ -8086,10 +8086,13 @@ function openRequestForm() {
                 </label>
 
                 <label>
-                    Дополнительно
-                    <textarea name="details"
-                    placeholder="Мебель, новостройка, парковка и т.д."></textarea>
-                </label>
+    Пожелание
+    <textarea
+        name="details"
+        placeholder="Опишите, какую квартиру ищете: расположение, состояние, мебель, этаж, вид и другие пожелания..."
+        rows="3"
+    ></textarea>
+</label>
                 <label>
     Telegram Username
     <input
