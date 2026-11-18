@@ -8020,7 +8020,7 @@ function openRequestForm() {
 
             <button class="orange-request-close" type="button">✕</button>
 
-            <h2>📝 Запрос на квартиру</h2>
+            <h2>📝 Запрос</h2>
 
             <form id="orangeRequestForm">
 
