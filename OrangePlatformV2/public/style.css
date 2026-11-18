@@ -3695,25 +3695,28 @@ body.dark-mode .property-info-item strong {
 .filter-actions button {
     min-height: 46px !important;
 }
-/* 🍊 კომპაქტური 3 ღილაკი */
-.view-switcher {
-    display: flex !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    gap: 6px !important;
-    padding: 0 10px !important;
-    margin: 8px auto 14px !important;
-}
 
-.view-switcher .view-btn {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-    height: 44px !important;
-    padding: 0 4px !important;
-    border-radius: 11px !important;
-    font-size: 13px !important;
-    font-weight: 700 !important;
-}
+/* 🍊 COMPACT BUTTONS — DESKTOP ONLY */
+@media (min-width: 901px) {
+
+    .view-switcher {
+        width: fit-content !important;
+        max-width: 420px !important;
+        gap: 8px !important;
+        padding: 0 !important;
+        margin: 8px auto 14px !important;
+    }
+
+    .view-switcher .view-btn {
+        flex: 0 0 auto !important;
+        min-width: 115px !important;
+        height: 38px !important;
+        padding: 0 12px !important;
+        border-radius: 10px !important;
+        font-size: 13px !important;
+    }
+
+
 /* 📝 REQUEST MODAL */
 
 #orangeRequestModal {
