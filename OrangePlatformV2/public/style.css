@@ -3695,3 +3695,108 @@ body.dark-mode .property-info-item strong {
 .filter-actions button {
     min-height: 46px !important;
 }
+/* 🍊 კომპაქტური 3 ღილაკი */
+.view-switcher {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 6px !important;
+    padding: 0 10px !important;
+    margin: 8px auto 14px !important;
+}
+
+.view-switcher .view-btn {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    padding: 0 4px !important;
+    border-radius: 11px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+}
+/* 📝 REQUEST MODAL */
+
+#orangeRequestModal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(0,0,0,.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.orange-request-dialog {
+    background: white;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 18px;
+    padding: 20px;
+    position: relative;
+}
+
+.orange-request-dialog h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #ff6b35;
+}
+
+.orange-request-close {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    border: none;
+    background: #eee;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+}
+
+.orange-request-dialog label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.orange-request-dialog input,
+.orange-request-dialog select,
+.orange-request-dialog textarea {
+    display: block;
+    width: 100%;
+    padding: 11px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+}
+
+.orange-request-row {
+    display: flex;
+    gap: 10px;
+}
+
+.orange-request-row label {
+    flex: 1;
+}
+
+.orange-request-submit {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    background: #ff6b35;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.orange-request-status {
+    margin-top: 12px;
+    text-align: center;
+    font-weight: bold;
+}
