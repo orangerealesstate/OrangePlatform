@@ -8054,7 +8054,9 @@ function openRequestForm() {
         <label><input type="checkbox" value="Чугурети"> Чугурети</label>
         <label><input type="checkbox" value="Дидубе"> Дидубе</label>
         <label><input type="checkbox" value="Надзаладеви"> Надзаладеви</label>
-        <label><input type="checkbox" value="Крцаниси"> Крцანისი</label>
+        <label><input type="checkbox" value="Крцаниси"> Крцаниси</label>
+        <label><input type="checkbox" value="Лиси"> Лиси</label>
+        
         <label><input type="checkbox" value="Любой район"> Любой район</label>
 
         <button type="button" class="orange-district-done">
