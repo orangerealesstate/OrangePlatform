@@ -679,6 +679,95 @@ app.get("/api/posts", (req, res) => {
 });
 
 // =========================================================
+// CLIENT APARTMENT REQUEST → TELEGRAM GROUP
+// =========================================================
+
+app.post("/api/requests", async (req, res) => {
+    try {
+        const data = req.body || {};
+
+        const BOT_TOKEN = process.env.BOT_TOKEN;
+        const REQUEST_GROUP_ID = "-5378097330";
+
+        if (!BOT_TOKEN) {
+            throw new Error("BOT_TOKEN არ არის მითითებული");
+        }
+
+        if (!data.phone) {
+            return res.status(400).json({
+                success: false,
+                error: "Phone is required"
+            });
+        }
+
+        const escapeHtml = (value) => {
+            return String(value ?? "-")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
+
+        const message = `
+📝 <b>НОВЫЙ ЗАПРОС НА КВАРТИРУ</b>
+
+🏠 <b>Тип сделки:</b> ${escapeHtml(data.dealType)}
+📍 <b>Районы:</b> ${escapeHtml(data.districts || "Не указано")}
+💰 <b>Бюджет:</b> ${escapeHtml(data.minPrice || "от -")} — ${escapeHtml(data.maxPrice || "до -")} $
+🛋 <b>Комнаты:</b> ${escapeHtml(data.rooms || "Любое")}
+📐 <b>Площадь от:</b> ${escapeHtml(data.area || "Не указано")} м²
+
+📝 <b>Дополнительно:</b>
+${escapeHtml(data.details || "Не указано")}
+
+📱 <b>Телефон:</b> ${escapeHtml(data.phone)}
+👤 <b>Username:</b> ${escapeHtml(data.username ? "@" + data.username : "Не указан")}
+🆔 <b>User ID:</b> ${escapeHtml(data.userId || "Не указан")}
+`;
+
+        const telegramResponse = await fetch(
+            `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    chat_id: REQUEST_GROUP_ID,
+                    text: message,
+                    parse_mode: "HTML"
+                })
+            }
+        );
+
+        const telegramResult = await telegramResponse.json();
+
+        if (!telegramResult.ok) {
+            console.error("TELEGRAM REQUEST ERROR:", telegramResult);
+
+            throw new Error(
+                telegramResult.description || "Telegram sendMessage failed"
+            );
+        }
+
+        console.log("✅ CLIENT REQUEST SENT TO TELEGRAM");
+
+        res.json({
+            success: true
+        });
+
+    } catch (error) {
+        console.error("CLIENT REQUEST API ERROR:", error);
+
+        res.status(500).json({
+            success: false,
+            error: "Failed to send request"
+        });
+    }
+});
+
+// =========================================================
 // MATCH REQUEST — SEARCH APARTMENTS
 // =========================================================
 
