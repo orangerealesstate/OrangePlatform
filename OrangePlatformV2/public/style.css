@@ -3815,3 +3815,11 @@ body.dark-mode .property-info-item strong {
     font-size: 13px;
     font-weight: bold;
 }
+.orange-district-select {
+    height: 75px;
+    padding: 5px !important;
+}
+
+.orange-district-select option {
+    padding: 4px;
+}
