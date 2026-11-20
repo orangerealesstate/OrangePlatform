@@ -8543,37 +8543,3 @@ document.addEventListener("click", function (event) {
 
 });
 
-/* =========================================================
-   TELEGRAM MINI APP — RESPONSIVE VIEWPORT
-========================================================= */
-
-(function setupTelegramViewport() {
-    const webApp = window.Telegram?.WebApp;
-    if (!webApp) return;
-
-    function syncTelegramViewport() {
-        const height =
-            Number(webApp.viewportStableHeight) ||
-            Number(webApp.viewportHeight) ||
-            window.innerHeight;
-
-        if (height > 0) {
-            document.documentElement.style.setProperty(
-                "--orange-tg-viewport-height",
-                `${height}px`
-            );
-        }
-
-        document.documentElement.classList.add("telegram-mini-app");
-    }
-
-    syncTelegramViewport();
-
-    if (typeof webApp.onEvent === "function") {
-        webApp.onEvent("viewportChanged", syncTelegramViewport);
-    }
-
-    window.addEventListener("resize", syncTelegramViewport, {
-        passive: true
-    });
-})();
